@@ -1,3 +1,4 @@
+"use client"
 import Image from "next/image"
 
 const brands = [
@@ -11,24 +12,26 @@ const brands = [
 
 export function BrandShowcase() {
   return (
-    <section className="h-[60vh] py-10 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-between">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Discover Premium Brands</h2>
+    <section className="py-16 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Heading */}
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Discover Premium Brands</h2>
           <p className="text-lg text-gray-600">
             We partner with the world's most prestigious fragrance houses
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 items-center flex-grow">
+        {/* Logos Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 items-center">
           {brands.map((brand) => (
             <div
               key={brand.name}
-              className="flex items-center justify-center p-6  rounded-lg shadow-sm hover:shadow-md transition-shadow h-[120px]"
+              className="flex items-center justify-center bg-white p-4 rounded-md shadow hover:shadow-md transition-shadow"
             >
-              <div className="relative w-[160px] h-[100px] md:w-[180px] md:h-[120px]">
+              <div className="relative w-32 h-20 sm:w-36 sm:h-24">
                 <Image
-                  src={brand.logo || "/placeholder.svg"}
+                  src={brand.logo}
                   alt={brand.name}
                   fill
                   className="object-contain opacity-70 hover:opacity-100 transition-opacity"
