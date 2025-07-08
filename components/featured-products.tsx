@@ -14,7 +14,7 @@ export function FeaturedProducts() {
   const { addToCart } = useCart()
 
   const featuredProducts = products.slice(0, 8)
-  const itemsPerPage = 4
+  const itemsPerPage = 5
   const maxIndex = Math.ceil(featuredProducts.length / itemsPerPage) - 1
 
   const nextSlide = () => {
@@ -31,7 +31,7 @@ export function FeaturedProducts() {
     <section className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-12">
-          <h2 className="text-3xl text-center font-bold text-gray-900">Best Selling Products</h2>
+          <h2 className="text-3xl text-center font-bold text--900">Best Selling Products</h2>
           <div className="flex space-x-2">
             <Button variant="outline" size="sm" onClick={prevSlide} className="rounded-full w-10 h-10 p-0">
               <ChevronLeft className="w-4 h-4" />
@@ -42,7 +42,7 @@ export function FeaturedProducts() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-6">
           {currentProducts.map((product) => (
             <Card key={product.id} className="product-card-hover border-0 shadow-lg">
               <CardContent className="p-0">
@@ -90,7 +90,7 @@ export function FeaturedProducts() {
                   </div>
 
                   <Button
-                    className="w-full bg-black text-white hover:bg-gray-800"
+                    className="w-full bg-green-600 text-white hover:bg-white hover:text-green-600 hover:border border-green-400"
                     onClick={() =>
                       addToCart({
                         id: product.id,

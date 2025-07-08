@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useState } from "react"
 import Image from "next/image"
 import { Plus, Edit, Trash2, Search } from "lucide-react"
@@ -7,30 +8,38 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { products, categories, brands } from "@/lib/products"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { products as allProducts } from "@/lib/products"
 import { useToast } from "@/hooks/use-toast"
+import AddProductForm from "./add-product-form"
 
 export function ProductManagement() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(1)
   const { toast } = useToast()
 
-  const filteredProducts = products.filter(
+  const productsPerPage = 10
+
+  // Search filter
+  const filteredProducts = allProducts.filter(
     (product) =>
       product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.brand.toLowerCase().includes(searchTerm.toLowerCase()),
+      product.brand.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
-  const handleAddProduct = () => {
-    toast({
-      title: "Product added",
-      description: "New product has been added successfully.",
-    })
-    setIsAddDialogOpen(false)
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
+  const startIndex = (currentPage - 1) * productsPerPage
+  const currentProducts = filteredProducts.slice(startIndex, startIndex + productsPerPage)
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value)
+    setCurrentPage(1)
   }
 
   const handleEditProduct = (id: string) => {
@@ -49,82 +58,27 @@ export function ProductManagement() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
-          <p className="text-gray-600">Manage your product catalog</p>
+          <p className="text-sm text-gray-600">Manage your products here</p>
         </div>
-        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+
+        <Dialog>
           <DialogTrigger asChild>
-            <Button>
-              <Plus className="w-4 h-4 mr-2" />
-              Add Product
-            </Button>
+            <Button className="bg-blue-600 text-white hover:bg-blue-700">Add Product</Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="w-full max-w-xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Add New Product</DialogTitle>
             </DialogHeader>
-            <form className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name">Product Name</Label>
-                  <Input id="name" placeholder="Enter product name" />
-                </div>
-                <div>
-                  <Label htmlFor="brand">Brand</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select brand" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {brands.slice(1).map((brand) => (
-                        <SelectItem key={brand} value={brand}>
-                          {brand}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="price">Price</Label>
-                  <Input id="price" type="number" placeholder="0.00" />
-                </div>
-                <div>
-                  <Label htmlFor="category">Category</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.slice(1).map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="description">Description</Label>
-                <Textarea id="description" placeholder="Enter product description" />
-              </div>
-              <div className="flex justify-end space-x-2">
-                <Button type="button" variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button type="button" onClick={handleAddProduct}>
-                  Add Product
-                </Button>
-              </div>
-            </form>
+            <AddProductForm />
           </DialogContent>
         </Dialog>
       </div>
 
+      {/* Product Table */}
       <Card>
         <CardHeader>
           <div className="flex justify-between items-center">
@@ -134,12 +88,13 @@ export function ProductManagement() {
               <Input
                 placeholder="Search products..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={handleSearch}
                 className="pl-10 w-64"
               />
             </div>
           </div>
         </CardHeader>
+
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -154,7 +109,7 @@ export function ProductManagement() {
                 </tr>
               </thead>
               <tbody>
-                {filteredProducts.map((product) => (
+                {currentProducts.map((product) => (
                   <tr key={product.id} className="border-b">
                     <td className="py-3 px-4">
                       <div className="flex items-center space-x-3">
@@ -180,7 +135,11 @@ export function ProductManagement() {
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex space-x-2">
-                        <Button variant="outline" size="sm" onClick={() => handleEditProduct(product.id)}>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditProduct(product.id)}
+                        >
                           <Edit className="w-4 h-4" />
                         </Button>
                         <Button
@@ -198,6 +157,29 @@ export function ProductManagement() {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-4 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-gray-600">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

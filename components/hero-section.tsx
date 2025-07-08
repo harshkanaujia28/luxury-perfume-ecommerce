@@ -77,8 +77,8 @@ export function HeroSection() {
   const setSlide = (index: number) => setCurrentSlide(index)
 
   return (
-    <section className="relative min-h-screen w-full overflow-hidden">
-      <div className="relative">
+    <section className="relative min-h-min w-full overflow-hidden flex items-center justify-center py-20">
+      <div className=" relative w-full h-[500px] overflow-hidden bg-green-50  max-w-7xl mx-auto mt-8 ">
         {/* Slider */}
         <div
           className="flex transition-transform duration-700 ease-in-out"
@@ -87,7 +87,7 @@ export function HeroSection() {
           {slides.map((slide, index) => (
             <div key={slide.id} className="w-full flex-shrink-0 h-screen relative">
               {/* Background Image */}
-              <div className="absolute inset-0 -z-10">
+              <div className="absolute top-0 left-0 w-full h-[500px] -z-10  overflow-hidden">
                 <Image
                   src={isMobile ? slide.mobileImage : slide.desktopImage}
                   alt={slide.accent}
@@ -98,29 +98,36 @@ export function HeroSection() {
                 <div className="absolute inset-0 bg-black/50" />
               </div>
 
+
               {/* Content */}
-              <div className="relative z-10 max-w-7xl h-full mx-auto px-6 lg:px-12 flex items-center justify-center">
-                <div className="space-y-6 text-center lg:text-left">
-                  <h1 className="text-white text-4xl sm:text-5xl lg:text-7xl font-serif leading-tight drop-shadow-2xl">
+              <div className="relative z-10 max-w-7xl h-full mx-auto px-6 lg:px-12 flex items-center ">
+                <div className="space-y-4 text-center lg:text-left">
+                  <h1 className="text-white text-3xl sm:text-4xl lg:text-5xl font-serif leading-snug drop-shadow-2xl">
                     {slide.title} <span>{slide.subtitle}</span>
                     <br />
-                    <span className="block text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+                    <span className="block text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-400">
                       {slide.accent}
                     </span>
                   </h1>
-                  <p className="text-white/90 max-w-lg mx-auto lg:mx-0 text-lg drop-shadow-md text-center lg:text-left">
+                  <p className="text-white/90 max-w-md mx-auto lg:mx-0 text-base drop-shadow-md text-center lg:text-left">
                     {slide.description}
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 items-center justify-center lg:justify-start">
-                    <Button size="lg" className="bg-black text-white hover:bg-gray-800 rounded-full" asChild>
+                    <Button size="lg" className="bg-green-600 text-white hover:bg-white hover:text-green-800 rounded-full" asChild>
                       <Link href="/products">Shop Now</Link>
                     </Button>
-                    <Button size="lg" variant="outline" className="rounded-full" asChild>
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      className="rounded-full border-white text-green-600 hover:bg-white hover:text-black"
+                      asChild
+                    >
                       <Link href="/about">Learn More</Link>
                     </Button>
                   </div>
                 </div>
               </div>
+
             </div>
           ))}
         </div>
@@ -131,11 +138,10 @@ export function HeroSection() {
             <button
               key={index}
               onClick={() => setSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-200 ${
-                index === currentSlide
-                  ? "bg-gradient-to-r from-purple-600 to-pink-600"
-                  : "bg-gray-300 hover:bg-gray-400"
-              }`}
+              className={`w-3 h-3 rounded-full transition-all duration-200 ${index === currentSlide
+                ? "bg-gradient-to-r from-green-600 to-emerald-600"
+                : "bg-gray-300 hover:bg-gray-400"
+                }`}
             />
           ))}
         </div>

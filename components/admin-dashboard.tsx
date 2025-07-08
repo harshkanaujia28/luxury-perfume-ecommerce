@@ -1,37 +1,45 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Package, ShoppingCart, Users, DollarSign, TrendingUp } from "lucide-react"
+import { Package, ShoppingCart, Users, DollarSign, TrendingUp,Store } from "lucide-react"
 
 export function AdminDashboard() {
-  const stats = [
-    {
-      title: "Total Revenue",
-      value: "$45,231",
-      change: "+20.1%",
-      icon: DollarSign,
-      color: "text-green-600",
-    },
-    {
-      title: "Total Orders",
-      value: "1,234",
-      change: "+15.3%",
-      icon: ShoppingCart,
-      color: "text-blue-600",
-    },
-    {
-      title: "Total Products",
-      value: "30",
-      change: "+2.5%",
-      icon: Package,
-      color: "text-purple-600",
-    },
-    {
-      title: "Total Users",
-      value: "2,456",
-      change: "+12.8%",
-      icon: Users,
-      color: "text-orange-600",
-    },
-  ]
+ const stats = [
+  {
+    title: "Total Revenue",
+    value: "$45,231",
+    change: "+20.1%",
+    icon: DollarSign,
+    color: "text-green-600",
+  },
+  {
+    title: "Total Orders",
+    value: "1,234",
+    change: "+15.3%",
+    icon: ShoppingCart,
+    color: "text-blue-600",
+  },
+  {
+    title: "Total Products",
+    value: "30",
+    change: "+2.5%",
+    icon: Package,
+    color: "text-purple-600",
+  },
+  {
+    title: "Total Users",
+    value: "2,456",
+    change: "+12.8%",
+    icon: Users,
+    color: "text-orange-600",
+  },
+  {
+    title: "Total Vendors", // ✅ new card
+    value: "78",            // ← You can fetch real count from backend later
+    change: "+4.2%",
+    icon: Store,            // ← Make sure to import this
+    color: "text-rose-600",
+  },
+]
+
 
   return (
     <div className="space-y-6">
@@ -40,7 +48,7 @@ export function AdminDashboard() {
         <p className="text-gray-600">Welcome to your admin dashboard</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {stats.map((stat) => {
           const Icon = stat.icon
           return (

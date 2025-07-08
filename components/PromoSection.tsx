@@ -3,7 +3,7 @@ import { Truck } from "lucide-react"
 import Link from "next/link"
 export default function PromoSection() {
   return (
-    <section className="min-h-[70vh] bg-gradient-to-r from-[#fdf4f1] to-[#fff9f4] p-6 rounded-xl shadow-sm max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8">
+    <section className="min-h-[70vh] bg-green-200 p-6 rounded-xl shadow-sm max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-8">
       
       {/* Left Side - Image + Price Tag */}
       <div className="relative">

@@ -3,7 +3,9 @@
 import { useState } from "react"
 import { useParams } from "next/navigation"
 import Image from "next/image"
+import Link from "next/link"
 import { Star, Heart, Share2, Minus, Plus } from "lucide-react"
+
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
@@ -14,16 +16,16 @@ import { useCart } from "@/contexts/cart-context"
 import { useToast } from "@/hooks/use-toast"
 import { products } from "@/lib/products"
 import { FeaturedProducts } from "@/components/featured-products"
-import Link from "next/link"
+
 export default function ProductDetailPage() {
   const params = useParams()
   const { addToCart } = useCart()
   const { toast } = useToast()
-  const [selectedSize, setSelectedSize] = useState("60 ml");
+
+  const [selectedSize, setSelectedSize] = useState("60 ml")
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
-  const [selectedBrand, setSelectedBrand] = useState("Azzaro");
-
+  const [selectedBrand, setSelectedBrand] = useState("Azzaro")
 
   const product = products.find((p) => p.id === params.id)
 
@@ -60,16 +62,15 @@ export default function ProductDetailPage() {
   return (
     <div className="min-h-screen bg-white pt-16">
       <Header />
-       <Link
-          href="/products"
-          className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-black transition-colors pt-5 pl-5"
-        >
-          ← Back to Products
-        </Link>
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-       
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 ">
+      <Link
+        href="/products"
+        className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-black transition-colors pt-5 pl-5"
+      >
+        ← Back to Products
+      </Link>
 
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Product Images */}
           <div className="space-y-4">
             <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
@@ -86,8 +87,11 @@ export default function ProductDetailPage() {
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
-                  className={`aspect-square overflow-hidden rounded-lg border-2 ${selectedImage === index ? "border-black" : "border-gray-200"
-                    }`}
+                  className={`aspect-square overflow-hidden rounded-lg border-2 ${
+                    selectedImage === index
+                      ? "border-green-600"
+                      : "border-gray-200"
+                  }`}
                 >
                   <Image
                     src={image || "/placeholder.svg"}
@@ -112,8 +116,11 @@ export default function ProductDetailPage() {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-5 h-5 ${i < Math.floor(product.rating) ? "text-yellow-400 fill-current" : "text-gray-300"
-                        }`}
+                      className={`w-5 h-5 ${
+                        i < Math.floor(product.rating)
+                          ? "text-yellow-400 fill-current"
+                          : "text-gray-300"
+                      }`}
                     />
                   ))}
                   <span className="text-sm text-gray-600 ml-2">
@@ -128,12 +135,15 @@ export default function ProductDetailPage() {
                   <span className="text-xl text-gray-500 line-through">${product.originalPrice}</span>
                 )}
                 {product.originalPrice && (
-                  <Badge variant="destructive">Save ${product.originalPrice - product.price}</Badge>
+                  <Badge className="bg-green-600 text-white">
+                    Save ${product.originalPrice - product.price}
+                  </Badge>
                 )}
               </div>
             </div>
 
             <div className="space-y-4">
+              {/* Quantity Counter */}
               <div className="flex items-center space-x-4">
                 <span className="text-sm font-medium">Add:</span>
                 <div className="flex items-center border rounded-lg">
@@ -151,6 +161,8 @@ export default function ProductDetailPage() {
                   </Button>
                 </div>
               </div>
+
+              {/* Brand Pills */}
               <div className="space-y-2 pt-4 pb-3">
                 <span className="block text-sm font-semibold text-gray-600">BRAND</span>
                 <div className="flex gap-2">
@@ -158,10 +170,11 @@ export default function ProductDetailPage() {
                     <button
                       key={brand}
                       onClick={() => setSelectedBrand(brand)}
-                      className={`px-3 py-1 rounded-full border text-sm ${selectedBrand === brand
-                        ? "border-black font-semibold text-black"
-                        : "border-gray-300 text-gray-600"
-                        }`}
+                      className={`px-3 py-1 rounded-full border text-sm ${
+                        selectedBrand === brand
+                          ? "border-green-600 text-green-700 font-semibold"
+                          : "border-gray-300 text-gray-600"
+                      }`}
                     >
                       {brand}
                     </button>
@@ -169,44 +182,52 @@ export default function ProductDetailPage() {
                 </div>
               </div>
 
-              <div className="space-y-4">
-                {/* Quantity Pills */}
-                <div className="space-y-2 pt-4 pb-3">
-                  <span className="block text-sm font-semibold text-gray-600">QUANTITY</span>
-                  <div className="flex gap-2">
-                    {['20 ml', '60 ml', '100 ml'].map((option) => (
-                      <button
-                        key={option}
-                        onClick={() => setSelectedSize(option)}
-                        className={`px-3 py-1 rounded-full border text-sm ${selectedSize === option ? 'border-black font-semibold' : 'border-gray-300 text-gray-600'
-                          }`}
-                      >
-                        {option}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex space-x-4">
-                  <Button size="lg" className="flex-1 bg-black text-white hover:bg-gray-800" onClick={handleAddToCart}>
-                    Add to Cart
-                  </Button>
-                  <Button variant="outline" size="lg">
-                    <Heart className="w-5 h-5" />
-                  </Button>
-                  <Button variant="outline" size="lg">
-                    <Share2 className="w-5 h-5" />
-                  </Button>
+              {/* Quantity Options */}
+              <div className="space-y-2 pt-4 pb-3">
+                <span className="block text-sm font-semibold text-gray-600">QUANTITY</span>
+                <div className="flex gap-2">
+                  {["20 ml", "60 ml", "100 ml"].map((option) => (
+                    <button
+                      key={option}
+                      onClick={() => setSelectedSize(option)}
+                      className={`px-3 py-1 rounded-full border text-sm ${
+                        selectedSize === option
+                          ? "border-green-600 text-green-700 font-semibold"
+                          : "border-gray-300 text-gray-600"
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  ))}
                 </div>
               </div>
+
+              {/* Action Buttons */}
+              <div className="flex space-x-4">
+                <Button
+                  size="lg"
+                  className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                  onClick={handleAddToCart}
+                >
+                  Add to Cart
+                </Button>
+                <Button variant="outline" size="lg">
+                  <Heart className="w-5 h-5" />
+                </Button>
+                <Button variant="outline" size="lg">
+                  <Share2 className="w-5 h-5" />
+                </Button>
+              </div>
             </div>
+
+            {/* Product Features */}
             <Card>
               <CardContent className="p-6">
                 <h3 className="font-semibold mb-4">Product Features</h3>
                 <ul className="space-y-2">
                   {product.features.map((feature, index) => (
                     <li key={index} className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-black rounded-full" />
+                      <div className="w-2 h-2 bg-green-600 rounded-full" />
                       <span className="text-sm">{feature}</span>
                     </li>
                   ))}
@@ -216,13 +237,28 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        {/* Product Details Tabs */}
+        {/* Product Tabs */}
         <div className="mt-16">
           <Tabs defaultValue="description" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="description">Description</TabsTrigger>
-              <TabsTrigger value="specifications">Specifications</TabsTrigger>
-              <TabsTrigger value="reviews">Reviews</TabsTrigger>
+              <TabsTrigger
+                value="description"
+                className="data-[state=active]:text-green-700 data-[state=active]:border-b-2 data-[state=active]:border-green-600"
+              >
+                Description
+              </TabsTrigger>
+              <TabsTrigger
+                value="specifications"
+                className="data-[state=active]:text-green-700 data-[state=active]:border-b-2 data-[state=active]:border-green-600"
+              >
+                Specifications
+              </TabsTrigger>
+              <TabsTrigger
+                value="reviews"
+                className="data-[state=active]:text-green-700 data-[state=active]:border-b-2 data-[state=active]:border-green-600"
+              >
+                Reviews
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="description" className="mt-6">
@@ -269,13 +305,13 @@ export default function ProductDetailPage() {
             </TabsContent>
           </Tabs>
         </div>
+
+        {/* Related Products */}
         <div className="py-8">
           <FeaturedProducts />
         </div>
-
       </main>
       <Footer />
     </div>
-
   )
 }

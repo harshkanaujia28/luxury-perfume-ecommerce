@@ -1,6 +1,6 @@
 "use client"
 
-import { BarChart3, Package, ShoppingCart, Users, Settings } from "lucide-react"
+import { BarChart3, Package, ShoppingCart, Users,UserCircle,Store, Settings, Percent,Megaphone } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface AdminSidebarProps {
@@ -14,6 +14,10 @@ export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
     { id: "products", label: "Products", icon: Package },
     { id: "orders", label: "Orders", icon: ShoppingCart },
     { id: "users", label: "Users", icon: Users },
+    { id: "vendors", label: "Vendors", icon: Store  },
+    { id: "banners", label: "Banners", icon:Megaphone  },
+    { id: "coupons", label: "Coupons", icon: Percent },
+    { id: "profile", label: "Profile", icon: UserCircle },
     { id: "settings", label: "Settings", icon: Settings },
   ]
 

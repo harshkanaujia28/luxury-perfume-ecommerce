@@ -6,6 +6,8 @@ import { CategoryShowcase } from "@/components/category-showcase"
 import { BrandShowcase } from "@/components/brand-showcase"
 import { NewsletterSection } from "@/components/newsletter-section"
 import PromoSection from "@/components/PromoSection"
+import { CategoriesSection } from "@/components/CategoriesSection"
+import WhyUsSection from "@/components/why-us-section"
 
 export default function HomePage() {
   return (
@@ -13,10 +15,10 @@ export default function HomePage() {
       <Header />
       <main>
         <HeroSection />
+        <CategoriesSection/>
         <FeaturedProducts />
-        <PromoSection/>
         <CategoryShowcase />
-        <BrandShowcase />
+       <WhyUsSection/>
         <NewsletterSection />
       </main>
       <Footer />

@@ -28,7 +28,7 @@ export function NewsletterSection() {
   }
 
   return (
-     <section className=" rounded py-16 bg-gray-400  text-black max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-16">
+     <section className=" rounded py-16 bg-white  text-gray-700 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-16">
  <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl font-bold mb-4">Stay in the Loop</h2>
         <p className="text-lg text-gray-600 mb-8">
@@ -44,7 +44,7 @@ export function NewsletterSection() {
             required
             className="flex-1 bg-white text-black"
           />
-          <Button type="submit" disabled={isLoading} className="bg-white text-black hover:bg-gray-100">
+          <Button type="submit" disabled={isLoading} className="bg-green-600 text-white hover:bg-gray-100">
             {isLoading ? "Subscribing..." : "Subscribe"}
           </Button>
         </form>

@@ -6,13 +6,14 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { ProductGrid } from "@/components/product-grid"
 import { ProductFilters } from "@/components/product-filters"
-import { products, categories, brands } from "@/lib/products"
+import { products, categories, brands, genders } from "@/lib/products"
 
 export default function ProductsPage() {
   const searchParams = useSearchParams()
   const [filteredProducts, setFilteredProducts] = useState(products)
   const [selectedCategory, setSelectedCategory] = useState("All")
   const [selectedBrand, setSelectedBrand] = useState("All")
+  const [selectedGender, setSelectedGender] = useState("All")
   const [priceRange, setPriceRange] = useState([0, 500])
   const [sortBy, setSortBy] = useState("name")
   const [searchQuery, setSearchQuery] = useState("")
@@ -20,10 +21,12 @@ export default function ProductsPage() {
   useEffect(() => {
     const category = searchParams.get("category")
     const brand = searchParams.get("brand")
+    const gender = searchParams.get("gender")
     const search = searchParams.get("search")
 
     if (category) setSelectedCategory(category)
     if (brand) setSelectedBrand(brand)
+    if (gender) setSelectedGender(gender)
     if (search) setSearchQuery(search)
   }, [searchParams])
 
@@ -40,8 +43,15 @@ export default function ProductsPage() {
       filtered = filtered.filter((product) => product.brand === selectedBrand)
     }
 
+    // Filter by gender
+    if (selectedGender !== "All") {
+      filtered = filtered.filter((product) => product.gender === selectedGender)
+    }
+
     // Filter by price range
-    filtered = filtered.filter((product) => product.price >= priceRange[0] && product.price <= priceRange[1])
+    filtered = filtered.filter(
+      (product) => product.price >= priceRange[0] && product.price <= priceRange[1]
+    )
 
     // Filter by search query
     if (searchQuery) {
@@ -49,7 +59,7 @@ export default function ProductsPage() {
         (product) =>
           product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          product.description.toLowerCase().includes(searchQuery.toLowerCase()),
+          product.description.toLowerCase().includes(searchQuery.toLowerCase())
       )
     }
 
@@ -70,7 +80,14 @@ export default function ProductsPage() {
     })
 
     setFilteredProducts(filtered)
-  }, [selectedCategory, selectedBrand, priceRange, sortBy, searchQuery])
+  }, [
+    selectedCategory,
+    selectedBrand,
+    selectedGender,
+    priceRange,
+    sortBy,
+    searchQuery,
+  ])
 
   return (
     <div className="min-h-screen bg-white pt-16">
@@ -79,14 +96,17 @@ export default function ProductsPage() {
         <div className="flex flex-col lg:flex-row gap-8">
           <aside className="lg:w-64 flex-shrink-0">
             <ProductFilters
+              genders={genders}  // ✅ corrected from `gender`
               categories={categories}
               brands={brands}
               selectedCategory={selectedCategory}
               selectedBrand={selectedBrand}
+              selectedGender={selectedGender}
               priceRange={priceRange}
               sortBy={sortBy}
               onCategoryChange={setSelectedCategory}
               onBrandChange={setSelectedBrand}
+              onGenderChange={setSelectedGender}
               onPriceRangeChange={setPriceRange}
               onSortChange={setSortBy}
             />

@@ -3,7 +3,7 @@ import { Facebook, Twitter, Instagram, Youtube } from "lucide-react"
 
 export function Footer() {
   return (
-    <footer className="bg-gray-900 text-white">
+    <footer className="bg-green-100 text-gray-600">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Company Info */}
@@ -12,7 +12,7 @@ export function Footer() {
               <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
                 <span className="text-black font-bold text-sm">L</span>
               </div>
-              <span className="text-xl font-bold">Luxe Fragrances</span>
+              <span className="text-xl font-bold text-gray-700">Luxe Fragrances</span>
             </div>
             <p className="text-gray-400 text-sm">
               Discover timeless luxury fragrances that reflect your unique essence and personal style.
@@ -35,7 +35,7 @@ export function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4 text-gray-700">Quick Links</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/products" className="text-gray-400 hover:text-white">
@@ -67,7 +67,7 @@ export function Footer() {
 
           {/* Customer Service */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Customer Service</h3>
+            <h3 className="text-lg font-semibold mb-4 text-gray-700">Customer Service</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/shipping" className="text-gray-400 hover:text-white">
@@ -99,7 +99,7 @@ export function Footer() {
 
           {/* Legal */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Legal</h3>
+            <h3 className="text-lg font-semibold mb-4 text-gray-700">Legal</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/privacy" className="text-gray-400 hover:text-white">
@@ -126,7 +126,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-          <p className="text-gray-400 text-sm">© 2024 Luxe Fragrances. All rights reserved.</p>
+          <p className="text-gray-700 text-sm">© 2024 Luxe Fragrances. All rights reserved.</p>
         </div>
       </div>
     </footer>

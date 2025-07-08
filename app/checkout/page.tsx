@@ -15,7 +15,7 @@ import { Separator } from "@/components/ui/separator"
 import { useCart } from "@/contexts/cart-context"
 import { useAuth } from "@/contexts/auth-context"
 import { useToast } from "@/hooks/use-toast"
-
+import Link from "next/link"
 export default function CheckoutPage() {
   const { state, clearCart } = useCart()
   const { user } = useAuth()
@@ -239,7 +239,7 @@ export default function CheckoutPage() {
                       <span>${total.toFixed(2)}</span>
                     </div>
                   </div>
-
+               <Link href="/payment/success">
                   <Button
                     type="submit"
                     className="w-full bg-black text-white hover:bg-gray-800"
@@ -248,6 +248,7 @@ export default function CheckoutPage() {
                   >
                     {isLoading ? "Processing..." : `Place Order - $${total.toFixed(2)}`}
                   </Button>
+                  </Link>
                 </CardContent>
               </Card>
             </div>
