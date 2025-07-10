@@ -14,6 +14,7 @@ import VendorsPage from "../vendors/page"
 import AdminSettingsPage from "./settings/page"
 import AdminBannersPage from "./banners/page"
 import CouponsPage from "../coupons/page"
+import ReportsPage from "../reports/page"
 
 export default function AdminPage() {
   const { user } = useAuth()
@@ -46,6 +47,8 @@ switch (activeTab) {
     return <AdminBannersPage />
   case "coupons": // ✅ New coupons tab
     return <CouponsPage /> // <-- Make sure to import this component
+  case "reports": // ✅ New coupons tab
+    return <ReportsPage /> // <-- Make sure to import this component
   case "profile":
     return <AdminProfilePage />
   case "settings":

@@ -15,28 +15,7 @@ import { io, Socket } from "socket.io-client";
 // Types
 // ==================
 
-export interface Product {
-    id: string
-    name: string
-    brand: string
-    brandimage: string
-    price: number
-    originalPrice?: number
-    image: string
-    images: string[]
-    description: string
-    category: string
-    inStock: boolean
-    rating: number
-    reviews: number
-    features: string[]
-    specifications: {
-        skinType: string
-        longevity: string
-        sillage: string
-        season: string
-    }
-}
+ 
 
 export interface CartItem {
     id: string
@@ -107,35 +86,40 @@ export interface User {
     createdAt: string;
     updatedAt: string;
 }
-interface ProductFormData {
-    name: string
-    brand: string
-    brandImage: string
-    price: number
-    originalPrice: number
-    mainImage: string
-    images: string[]
-    description: string
-    category: string
-    inStock: boolean
-    features: string[]
-    offer: {
-        isActive: boolean
-        type: "percentage" | "fixed" | "bogo" | "bundle"
-        value: number
-        startDate: string
-        endDate: string
-        description: string
-        minQuantity: number
-        maxUses: number
-    }
-    specifications: {
-        skinType: string
-        longevity: string
-        sillage: string
-        season: string
-    }
+export interface Review {
+  userId: string
+  name: string
+  comment: string
+  stars: number
 }
+
+export type OfferType = "percentage" | "fixed" | "bogo" | "bundle"
+
+export interface Offer {
+  isActive: boolean
+  type: OfferType
+  value: number
+  startDate: string
+  endDate: string
+  description: string
+  minQuantity: number
+  maxUses: number
+}
+
+export interface Product {
+  name: string
+  brand: string
+  description: string
+  price: number
+  stock: number
+  images: string[]
+  category: string
+  seller: string
+  rating: number
+  reviews: Review[]
+  offer: Offer
+}
+
 export interface Banner {
     _id: string;
     title: string;
@@ -271,10 +255,15 @@ export const ApiProvider = ({ children }: { children: ReactNode }) => {
         const res = await axios.get(`/products/${id}`);
         return res.data.product;
     };
-    const addProduct = async (data: Partial<Product>) => {
-        const res = await axios.post("/admin/product", data);
-        return res.data.product;
-    };
+   const addProduct = async (data: Partial<Product>) => {
+  try {
+    const res = await axios.post("/admin/product", data)
+    return res.data.product
+  } catch (error: any) {
+    console.error("Failed to add product:", error)
+    throw new Error(error.response?.data?.message || "Something went wrong while adding the product.")
+  }
+}
     const editProduct = async (id: string, data: Partial<Product>) => {
         const res = await axios.put(`/admin/product/${id}`, data);
         return res.data.product;
