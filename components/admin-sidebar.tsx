@@ -1,6 +1,6 @@
 "use client"
 
-import { BarChart3, Package, ShoppingCart, Users,UserCircle,Store, Settings, Percent,Megaphone,FileText } from "lucide-react"
+import { LayoutDashboard, Package, ShoppingCart, Users,UserCircle,Store, Settings, Percent,Megaphone,FileText,LifeBuoy,Tags,Palette,MapPin,BarChart3  } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface AdminSidebarProps {
@@ -10,14 +10,19 @@ interface AdminSidebarProps {
 
 export function AdminSidebar({ activeTab, onTabChange }: AdminSidebarProps) {
   const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: BarChart3 },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "products", label: "Products", icon: Package },
+    { id: "brands", label: "Brands", icon: Palette },
+    { id: "categories", label: "Categories", icon:Tags },
     { id: "orders", label: "Orders", icon: ShoppingCart },
     { id: "users", label: "Users", icon: Users },
     { id: "vendors", label: "Vendors", icon: Store  },
     { id: "banners", label: "Banners", icon:Megaphone  },
     { id: "coupons", label: "Coupons", icon: Percent },
-    { id: "reports", label: "Reports", icon: FileText },
+    { id: "delivery-zones", label: "Delivery Zones", icon: MapPin },
+    { id: "support", label: "Support & Returns", icon: LifeBuoy },
+    { id: "reports", label: "Reports", icon: BarChart3 },
+    { id: "legal", label: "Legal", icon:FileText  },
     { id: "profile", label: "Profile", icon: UserCircle },
     { id: "settings", label: "Settings", icon: Settings },
   ]

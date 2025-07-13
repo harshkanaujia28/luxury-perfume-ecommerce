@@ -3,7 +3,7 @@
 import Image from "next/image"
 import { Truck, Leaf, Tag, Heart } from "lucide-react"
 
-export default function WhyUsSection() {
+export default function WhyUs() {
     return (
         <section className="py-16 px-4 bg-gray-50">
             <div className="max-w-7xl mx-auto bg-green-100 rounded-3xl px-6 py-12">

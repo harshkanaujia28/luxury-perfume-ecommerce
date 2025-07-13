@@ -15,6 +15,11 @@ import AdminSettingsPage from "./settings/page"
 import AdminBannersPage from "./banners/page"
 import CouponsPage from "../coupons/page"
 import ReportsPage from "../reports/page"
+import SupportPage from "./support/page"
+import BrandDetailPage from "./brands/page"
+import CategoriesPage from "./categories/page"
+import  DeliveryZonesPage  from "./delivery-zones/page"
+import LegalPage from "./legal/page"
 
 export default function AdminPage() {
   const { user } = useAuth()
@@ -37,6 +42,10 @@ switch (activeTab) {
     return <AdminDashboard />
   case "products":
     return <ProductManagement />
+  case "brands":
+    return <BrandDetailPage />
+  case "categories":
+    return <CategoriesPage />
   case "orders":
     return <OrderManagement />
   case "users":
@@ -47,8 +56,14 @@ switch (activeTab) {
     return <AdminBannersPage />
   case "coupons": // ✅ New coupons tab
     return <CouponsPage /> // <-- Make sure to import this component
+  case "delivery-zones": // ✅ New coupons tab
+    return <DeliveryZonesPage /> // <-- Make sure to import this component
+  case "support": // ✅ New coupons tab
+    return <SupportPage /> // <-- Make sure to import this component
   case "reports": // ✅ New coupons tab
     return <ReportsPage /> // <-- Make sure to import this component
+  case "legal": // ✅ New coupons tab
+    return <LegalPage /> // <-- Make sure to import this component
   case "profile":
     return <AdminProfilePage />
   case "settings":
