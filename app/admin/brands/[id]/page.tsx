@@ -1,6 +1,6 @@
 "use client"
 import { useParams, useRouter } from "next/navigation"
-import { AdminHeader } from "@/components/admin-header"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -106,11 +106,7 @@ export default function BrandDetailPage() {
 
   return (
     <div className="flex flex-col">
-      <AdminHeader
-        title={brand.name}
-        breadcrumbs={[{ label: "Dashboard", href: "/" }, { label: "Brands", href: "/brands" }, { label: brand.name }]}
-      />
-
+     
       <div className="flex-1 space-y-6 p-4 md:p-8 pt-6">
         {/* Header Section */}
         <div className="flex items-center justify-between">
