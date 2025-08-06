@@ -25,7 +25,7 @@ export function HeroSection() {
   useEffect(() => {
     const fetchHeroImages = async () => {
       try {
-        const res = await axios.get("https://luxury-perfume-ecommerce.onrender.com/banners?type=hero")
+     const res = await axios.get("https://luxury-perfume-ecommerce.onrender.com/api/banners?type=hero")
         const activeSlides = res.data.filter((s: HeroBanner) => s.isActive)
         setSlides(activeSlides)
       } catch (err) {
