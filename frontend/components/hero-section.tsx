@@ -25,7 +25,7 @@ export function HeroSection() {
   useEffect(() => {
     const fetchHeroImages = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/banners?type=hero")
+        const res = await axios.get("https://luxury-perfume-ecommerce.onrender.com/banners?type=hero")
         const activeSlides = res.data.filter((s: HeroBanner) => s.isActive)
         setSlides(activeSlides)
       } catch (err) {
@@ -63,7 +63,7 @@ export function HeroSection() {
           {slides.map((slide, index) => {
             const imageUrl = slide.imageUrl.startsWith("http")
               ? slide.imageUrl
-              : `http://localhost:5000${slide.imageUrl}`
+              : `https://luxury-perfume-ecommerce.onrender.com${slide.imageUrl}`
 
             return (
               <div key={slide._id} className="w-full flex-shrink-0 h-screen relative">

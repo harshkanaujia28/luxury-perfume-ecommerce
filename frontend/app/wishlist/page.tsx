@@ -10,7 +10,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Heart } from "lucide-react";
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const baseURL = process.env.NEXT_PUBLIC_API_URL || "https://luxury-perfume-ecommerce.onrender.com";
 
 export default function WishlistPage() {
   const { items, removeItem } = useWishlist();

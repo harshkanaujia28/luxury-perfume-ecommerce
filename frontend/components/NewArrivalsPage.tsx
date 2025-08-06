@@ -110,7 +110,7 @@ export default function NewProductsPage() {
                     <div className="relative w-full aspect-square overflow-hidden rounded-t-lg group">
                       <Link href={`/products/${product._id}`}>
                         <Image
-                          src={`http://localhost:5000${product.image || product.images?.[0] || "/placeholder.svg"}`}
+                          src={`https://luxury-perfume-ecommerce.onrender.com${product.image || product.images?.[0] || "/placeholder.svg"}`}
                           alt={product.name}
                           fill
                           className="object-cover"

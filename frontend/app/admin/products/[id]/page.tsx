@@ -112,7 +112,7 @@ export default function ProductDetailsDialog({ productId, open, onOpenChange }: 
                 {product.images?.map((image: string, index: number) => (
                   <div key={index} className="relative">
                     <img
-                      src={image.startsWith("http") ? image : `http://localhost:5000${image}`}
+                      src={image.startsWith("http") ? image : `https://luxury-perfume-ecommerce.onrender.com${image}`}
                       alt={`Product ${index + 1}`}
                       className="w-full h-32 object-cover rounded-lg border border-gray-200"
                     />

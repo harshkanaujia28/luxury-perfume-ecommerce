@@ -8,7 +8,7 @@ import { Footer } from "@/components/footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import clsx from "clsx";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://luxury-perfume-ecommerce.onrender.com";
 
 export default function OrdersPage() {
   const { getMyOrders } = useApi();

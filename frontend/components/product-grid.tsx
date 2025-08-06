@@ -10,7 +10,7 @@ import { useWishlist } from "@/contexts/wishlist-context";
 import { useCart } from "@/contexts/cart-context";
 
 
-const baseURL = "http://localhost:5000";
+const baseURL = "https://luxury-perfume-ecommerce.onrender.com";
 
 interface Product {
   _id: string;

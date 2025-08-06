@@ -9,7 +9,7 @@ import { Calendar, CheckCircle, Package, Truck, XCircle } from "lucide-react";
 import { RequestReturnDialog } from "@/components/request-return-dialog";
 import Link from "next/link";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://luxury-perfume-ecommerce.onrender.com";
 const statusSteps = [
   { status: "pending", icon: XCircle },
   { status: "confirmed", icon: CheckCircle },

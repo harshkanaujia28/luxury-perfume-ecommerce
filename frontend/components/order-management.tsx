@@ -415,7 +415,7 @@ export function OrderManagement() {
                         <div className="w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center">
                           {item.image ? (
                             <img
-                              src={item.image.startsWith("http") ? item.image : `http://localhost:5000${item.image}`}
+                              src={item.image.startsWith("http") ? item.image : `https://luxury-perfume-ecommerce.onrender.com${item.image}`}
                               alt={item.name}
                               className="w-full h-full object-cover rounded-md"
                             />

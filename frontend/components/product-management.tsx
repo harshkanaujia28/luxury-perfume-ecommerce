@@ -147,7 +147,7 @@ export function ProductManagement() {
                               Array.isArray(product.images) && product.images.length > 0
                                 ? product.images[0].startsWith("http")
                                   ? product.images[0]
-                                  : `http://localhost:5000${product.images[0]}`
+                                  : `https://luxury-perfume-ecommerce.onrender.com${product.images[0]}`
                                 : "/placeholder.svg"
                             }
                             alt={product.name || "Product Image"}

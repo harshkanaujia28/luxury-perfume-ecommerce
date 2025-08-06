@@ -368,7 +368,7 @@ export default function AdminBannersPage() {
                                   src={
                                     banner.imageUrl.startsWith("http")
                                       ? banner.imageUrl
-                                      : `http://localhost:5000${banner.imageUrl}`
+                                      : `https://luxury-perfume-ecommerce.onrender.com${banner.imageUrl}`
                                   }
                                   alt={banner.title}
                                   width={400}
@@ -457,7 +457,7 @@ export default function AdminBannersPage() {
                             src={
                               hero.imageUrl?.startsWith("http")
                                 ? hero.imageUrl
-                                : `http://localhost:5000${hero.imageUrl || "/placeholder.svg"}`
+                                : `https://luxury-perfume-ecommerce.onrender.com${hero.imageUrl || "/placeholder.svg"}`
                             }
                             alt={hero.title}
                             width={400}
@@ -647,7 +647,7 @@ export default function AdminBannersPage() {
                               const { url } = await uploadFile(file); // ← uploadFile must return { url: string }
                               const fullUrl = url.startsWith("http")
                                 ? url
-                                : `http://localhost:5000${url}`; // fix for local dev
+                                : `https://luxury-perfume-ecommerce.onrender.com${url}`; // fix for local dev
 
                               setBannerForm((prev) => ({ ...prev, imageUrl: fullUrl }));
                             } catch (err) {
@@ -749,7 +749,7 @@ export default function AdminBannersPage() {
                               const { url } = await uploadFile(file); // must return { url: string }
                               const fullUrl = url.startsWith("http")
                                 ? url
-                                : `http://localhost:5000${url}`;
+                                : `https://luxury-perfume-ecommerce.onrender.com${url}`;
 
                               setHeroForm((prev) => ({ ...prev, imageUrl: fullUrl }));
                             } catch (err) {

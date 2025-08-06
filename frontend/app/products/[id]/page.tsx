@@ -17,7 +17,7 @@ import { useToast } from "@/hooks/use-toast"
 import { products } from "@/lib/products"
 import { FeaturedProducts } from "@/components/featured-products"
 import { useApi } from "@/contexts/api-context";
-const baseURL = "http://localhost:5000";
+const baseURL = "https://luxury-perfume-ecommerce.onrender.com";
 
 export default function ProductDetailPage() {
   const params = useParams();
