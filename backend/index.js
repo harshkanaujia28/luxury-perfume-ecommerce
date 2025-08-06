@@ -83,6 +83,11 @@ app.use("/api/payment", paymentRoutes);
 // ✅ Upload Route
 app.use("/api/upload", uploadRoutes); // 👈 mount multer route here
 
+app.get("/", (req, res) => {
+  res.send("Backend is running");
+});
+
+
 // Socket connection
 io.on("connection", (socket) => {
   console.log("Socket connected:", socket.id);
