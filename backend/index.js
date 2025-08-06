@@ -44,6 +44,19 @@ const io = new SocketIOServer(server, {
     credentials: true,
   },
 });
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      const vercelRegex = /^https:\/\/luxury-perfume-ecommerce.*\.vercel\.app$/;
+      if (!origin || vercelRegex.test(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
+  })
+);
 
 // Middleware
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
