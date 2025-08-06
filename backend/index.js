@@ -48,7 +48,9 @@ app.use(
   cors({
     origin: function (origin, callback) {
       const vercelRegex = /^https:\/\/luxury-perfume-ecommerce.*\.vercel\.app$/;
-      if (!origin || vercelRegex.test(origin)) {
+      const isLocalhost = origin === "http://localhost:3000";
+
+      if (!origin || vercelRegex.test(origin) || isLocalhost) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
@@ -59,7 +61,7 @@ app.use(
 );
 
 // Middleware
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+// app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
