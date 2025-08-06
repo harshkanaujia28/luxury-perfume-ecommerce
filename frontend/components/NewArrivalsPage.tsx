@@ -25,7 +25,7 @@ export default function NewProductsPage() {
           .filter((p) => p.createdAt)
           .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
         const unique = Array.from(new Map(sorted.map((p) => [p._id, p])).values());
-        setNewProducts(unique.slice(0, 20));
+        setNewProducts(unique.slice(0, 10));
       } catch (error) {
         console.error("Failed to fetch new products", error);
       }
@@ -82,9 +82,15 @@ export default function NewProductsPage() {
   return (
     <section className="py-12 md:py-16 bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-gray-50 mb-8 text-center">
-          New Arrivals
-        </h2>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-xl md:text-4xl font-extrabold text-gray-900 dark:text-gray-50 mb-2 text-start">
+            New Arrivals
+          </h2>
+          <p className="text-start text-gray-600 dark:text-gray-300 mb-8">
+            Discover our latest luxurious perfumes just arrived.
+          </p>
+        </div>
+
         <div className="relative">
           <Button
             variant="ghost"
@@ -99,6 +105,7 @@ export default function NewProductsPage() {
             ref={carouselRef}
             className="flex overflow-x-scroll snap-x snap-mandatory scroll-smooth pb-4 no-scrollbar"
           >
+
             {newProducts.map((product, index) => {
               const inWishlist = isInWishlist(product._id);
               return (
@@ -130,8 +137,8 @@ export default function NewProductsPage() {
                             : addItem(product)
                         }
                         className={`absolute top-3 right-3 z-10 p-2 rounded-full transition-colors ${inWishlist
-                            ? "bg-pink-100 text-green-500 hover:bg-green-200"
-                            : "bg-white/80 text-gray-500 hover:bg-white"
+                          ? "bg-pink-100 text-green-500 hover:bg-green-200"
+                          : "bg-white/80 text-gray-500 hover:bg-white"
                           } shadow-md`}
                       >
                         <Heart
@@ -152,8 +159,8 @@ export default function NewProductsPage() {
                           <Star
                             key={i}
                             className={`w-4 h-4 ${i < Math.floor(product.rating)
-                                ? "text-yellow-400 fill-current"
-                                : "text-gray-300 dark:text-gray-600"
+                              ? "text-yellow-400 fill-current"
+                              : "text-gray-300 dark:text-gray-600"
                               }`}
                           />
                         ))}

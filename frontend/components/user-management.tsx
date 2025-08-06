@@ -36,19 +36,23 @@ export function UserManagement() {
   const { toast } = useToast()
   const { getAllUsers } = useApi()
 
-  useEffect(() => {
-    fetchUsers()
-  }, [])
+useEffect(() => {
+  fetchUsers();
+}, []);
 
-  const fetchUsers = async () => {
-    try {
-      const data = await getAllUsers()
-      setUsers(data)
-      console.log(data)
-    } catch (error) {
-      console.error("Failed to fetch users", error)
-    }
+const fetchUsers = async () => {
+  try {
+    const data = await getAllUsers();
+    const sorted = [...data].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+    setUsers(sorted);
+    console.log(sorted);
+  } catch (error) {
+    console.error("Failed to fetch users", error);
   }
+};
+
 
  const filteredUsers = users.filter((user) => {
   const name = user.name?.toLowerCase() || "";

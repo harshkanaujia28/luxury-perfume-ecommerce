@@ -52,19 +52,24 @@ export function OrderManagement() {
   const { toast } = useToast()
   const router = useRouter()
 
-  useEffect(() => {
-    fetchOrders()
-  }, [])
+useEffect(() => {
+  fetchOrders()
+}, [])
 
-  const fetchOrders = async () => {
-    try {
-      const data = await getOrders()
-      setOrders(data)
-      console.log(data)
-    } catch (err) {
-      console.error("Failed to fetch orders", err)
-    }
+const fetchOrders = async () => {
+  try {
+    const data = await getOrders()
+    
+    // Sort by date descending (newest first)
+    const sortedOrders = data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
+    setOrders(sortedOrders)
+    console.log(sortedOrders)
+  } catch (err) {
+    console.error("Failed to fetch orders", err)
   }
+}
+
 
   useEffect(() => {
     fetchOrders()

@@ -32,19 +32,25 @@ export function ProductManagement() {
 
   const productsPerPage = 10;
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+useEffect(() => {
+  fetchProducts();
+}, []);
 
-  const fetchProducts = async () => {
-    try {
-      const data = await getProducts();
-      setProducts(data);
-      console.log(data);
-    } catch (err) {
-      console.error("Failed to fetch products", err);
-    }
-  };
+const fetchProducts = async () => {
+  try {
+    const data = await getProducts();
+
+    // Sort newest first by createdAt date
+    const sortedData = [...data].sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    setProducts(sortedData);
+    console.log(sortedData);
+  } catch (err) {
+    console.error("Failed to fetch products", err);
+  }
+};
 
   const filteredProducts = products.filter(
     (product) =>
