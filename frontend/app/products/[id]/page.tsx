@@ -123,8 +123,8 @@ export default function ProductDetailPage() {
       console.error(err);
     }
   };
-  
- if (loading) {
+
+  if (loading) {
     return (
       <div className="p-8 flex justify-center items-center min-h-[300px]">
         <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-400 border-t-transparent" />
@@ -139,19 +139,14 @@ export default function ProductDetailPage() {
 
       <div className="flex flex-col min-h-screen bg-white pt-16">
         <Header />
-        <div className="pt-5 pl-5 flex flex-wrap items-center text-sm text-gray-600 gap-2">
-          {/* Back Button */}
+        <div className="pt-4 px-4 sm:px-6 flex flex-wrap items-center text-xs sm:text-sm text-gray-600 gap-1 sm:gap-2">
           <Link
             href="/products"
             className="inline-flex items-center gap-1 text-gray-600 hover:text-black transition-colors"
           >
             ← Back
           </Link>
-
-          {/* Divider */}
           <span>/</span>
-
-          {/* Breadcrumbs */}
           <Link href="/" className="hover:underline text-gray-500">Home</Link>
           <span>/</span>
           <Link
@@ -179,13 +174,19 @@ export default function ProductDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Product Images */}
             <div className="space-y-4">
-              <div className="w-[600px] h-[600px] overflow-hidden rounded-lg bg-gray-100">
+              <div className="w-full h-[400px] sm:h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden rounded-lg bg-gray-100">
                 <Image
-                  src={`${baseURL}${product.images[selectedImage] || "/placeholder.svg"}`}
+                  src={
+                    product.images[selectedImage] && product.images[selectedImage].startsWith("http")
+                      ? product.images[selectedImage]
+                      : product.images[selectedImage]
+                        ? `${baseURL}${product.images[selectedImage]}`
+                        : "/placeholder.svg"
+                  }
                   alt={product.name}
                   width={600}
                   height={600}
-                  className="w-full h-full object-cover rounded-lg"
+                  className="w-full h-full object-cover rounded-lg transition-all duration-300 ease-in-out"
                 />
               </div>
 
@@ -194,13 +195,20 @@ export default function ProductDetailPage() {
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`w-[100px] h-[100px] rounded-md border-2 overflow-hidden ${selectedImage === index ? "border-green-600" : "border-gray-200"}`}
+                    className={`w-[100px] h-[100px] rounded-md border-2 overflow-hidden ${selectedImage === index ? "border-green-600" : "border-gray-200"
+                      }`}
                   >
                     <Image
-                      src={`${baseURL}${img}`}
+                      src={
+                        img?.startsWith("http")
+                          ? img
+                          : img
+                            ? `${baseURL}${img}`
+                            : "/placeholder.svg"
+                      }
                       alt={`Thumbnail ${index + 1}`}
-                      width={100}
-                      height={100}
+                      width={80}
+                      height={80}
                       className="w-full h-full object-cover"
                     />
                   </button>
@@ -230,9 +238,9 @@ export default function ProductDetailPage() {
                         <Badge className="bg-amber-100 text-amber-800 border-amber-200 text-xs">
                           {product.offer.value}% OFF
                         </Badge>
-                        
+
                       </div>
-                     
+
                     </div>
                   )}
 

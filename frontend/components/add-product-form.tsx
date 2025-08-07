@@ -103,12 +103,27 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
     }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    const files = Array.from(e.target.files);
-    setFormData((prev) => ({ ...prev, images: files.slice(0, 5) }));
-  };
+   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    for (const file of files) {
+      const formDataUpload = new FormData();
+      formDataUpload.append("file", file);
+      formDataUpload.append("upload_preset", "myCloud");
 
+      const res = await fetch("https://api.cloudinary.com/v1_1/datxfosoi/image/upload", {
+        method: "POST",
+        body: formDataUpload,
+      });
+
+      const data = await res.json();
+      if (data.secure_url) {
+        setFormData((prev) => ({
+          ...prev,
+          images: [...prev.images, data.secure_url],
+        }));
+      }
+    }
+  };
   const handleAddReview = () => {
     if (!newReview.name || !newReview.comment || newReview.stars <= 0) {
       alert("Please fill all review fields");

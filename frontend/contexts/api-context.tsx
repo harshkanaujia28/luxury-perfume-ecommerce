@@ -1353,18 +1353,19 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
 
-    const uploadFile = async (file: File): Promise<{ url: string }> => {
-        const formData = new FormData();
-        formData.append("file", file);
+ const uploadFile = async (file: File): Promise<{ url: string }> => {
+    const formData = new FormData();
+    formData.append("file", file);
 
-        const res = await axios.post("/upload", formData, {
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
-        });
+    const res = await axios.post("/upload", formData, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+        },
+    });
 
-        return res.data; // ✅ should be { url: string }
-    };
+    return res.data; // ✅ { url: string }
+};
+
 
 
     // =====================

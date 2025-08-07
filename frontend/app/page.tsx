@@ -12,6 +12,7 @@ import NewProductsPage from "@/components/NewArrivalsPage";
 import WhyUs from "@/components/whyus";
 import axios from "@/utils/axios";
 import { Featured } from "@/components/featured";
+import ImageUploader from "@/components/ImageUploader";
 
 export default function HomePage() {
   const [products, setProducts] = useState([]);
@@ -47,6 +48,7 @@ export default function HomePage() {
         <WhyUs />
         <FeaturedProducts /> {/* pass backend products */}
         <NewsletterSection />
+        <ImageUploader/>
       </main>
       <Footer />
     </div>

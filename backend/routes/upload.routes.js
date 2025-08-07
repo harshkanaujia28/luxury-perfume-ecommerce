@@ -1,18 +1,14 @@
-// routes/upload.routes.js
-import express from "express";
-import upload from "../middlewares/multer.js";
-
-
-
+import express from 'express';
+import upload from '../middlewares/cloudinaryMulter.js'; // updated multer
 const router = express.Router();
 
-router.post("/", upload.single("file"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: "No file uploaded" });
+router.post('/', upload.single('file'), (req, res) => {
+  if (!req.file || !req.file.path) {
+    return res.status(400).json({ message: 'Upload failed' });
   }
 
-  const fileUrl = `/uploads/${req.file.filename}`;
-  res.status(200).json({ url: fileUrl });
+  // Cloudinary provides the URL in req.file.path
+  res.status(200).json({ url: req.file.path });
 });
 
-export default router; // ✅ Make sure this is here
+export default router;

@@ -263,16 +263,16 @@ export default function AdminBannersPage() {
     setSaveStatus("success")
     setTimeout(() => setSaveStatus("idle"), 3000)
   }
- const handleReorderHeroImage = async (id: string, direction: "up" | "down") => {
-  try {
-    console.log("🔃 Reordering", id, direction)
-    await reorderHeroImage(id, direction)
-    const updated = await getHeroBanners()
-    setHeroImages(updated)
-  } catch (error) {
-    console.error("❌ Reorder failed:", error)
+  const handleReorderHeroImage = async (id: string, direction: "up" | "down") => {
+    try {
+      console.log("🔃 Reordering", id, direction)
+      await reorderHeroImage(id, direction)
+      const updated = await getHeroBanners()
+      setHeroImages(updated)
+    } catch (error) {
+      console.error("❌ Reorder failed:", error)
+    }
   }
-}
 
 
   const StatusAlert = () => {
@@ -502,7 +502,7 @@ export default function AdminBannersPage() {
                               <Button
                                 variant="ghost"
                                 size="sm"
-                                 onClick={() => handleReorderHeroImage(hero._id, "down")}
+                                onClick={() => handleReorderHeroImage(hero._id, "down")}
                                 disabled={index === heroImages.length - 1}
                               >
                                 <ArrowDown className="h-4 w-4" />
@@ -621,72 +621,76 @@ export default function AdminBannersPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="bannerImage">Image *</Label>
-                    <div className="flex space-x-2 items-center">
-                      <Input
-                        id="bannerImage"
-                        value={bannerForm.imageUrl}
-                        onChange={(e) =>
-                          setBannerForm((prev) => ({ ...prev, imageUrl: e.target.value }))
-                        }
-                        placeholder="Enter image URL or upload"
-                      />
+                  <div className="space-y-4">
+                    {/* Image Upload Section */}
+                    <div className="space-y-2">
+                      <Label htmlFor="bannerImage">Image *</Label>
+                      <div className="flex space-x-2 items-center">
+                        <Input
+                          id="bannerImage"
+                          value={bannerForm.imageUrl}
+                          onChange={(e) =>
+                            setBannerForm((prev) => ({ ...prev, imageUrl: e.target.value }))
+                          }
+                          placeholder="Enter image URL or upload"
+                        />
 
-                      <label htmlFor="upload-banner-image">
-                        <input
-                          id="upload-banner-image"
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
+                        <label htmlFor="upload-banner-image">
+                          <input
+                            id="upload-banner-image"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
                           onChange={async (e) => {
                             const file = e.target.files?.[0];
                             if (!file) return;
 
                             try {
-                              const { url } = await uploadFile(file); // ← uploadFile must return { url: string }
-                              const fullUrl = url.startsWith("http")
-                                ? url
-                                : `https://luxury-perfume-ecommerce.onrender.com/api${url}`; // fix for local dev
+                              const formData = new FormData();
+                              formData.append("file", file);
+                              formData.append("upload_preset", "myCloud"); // 🔁 replace with your Cloudinary upload preset
 
-                              setBannerForm((prev) => ({ ...prev, imageUrl: fullUrl }));
+                              const res = await fetch("https://api.cloudinary.com/v1_1/datxfosoi/image/upload", {
+                                method: "POST",
+                                body: formData,
+                              });
+
+                              const data = await res.json();
+
+                              if (data.secure_url) {
+                                setBannerForm((prev) => ({ ...prev, imageUrl: data.secure_url }));
+                              } else {
+                                throw new Error("No secure_url from Cloudinary");
+                              }
                             } catch (err) {
-                              console.error("Upload failed", err);
+                              console.error("Hero Image Upload Failed", err);
                             }
                           }}
                         />
-                        <Button asChild variant="outline" size="sm">
-                          <span className="cursor-pointer flex items-center space-x-2">
-                            <Upload className="h-4 w-4" />
-                            <span>Upload</span>
-                          </span>
-                        </Button>
-                      </label>
-                    </div>
-
-                    {bannerForm.imageUrl && (
-                      <div className="mt-2">
-                        <Image
-                          src={bannerForm.imageUrl}
-                          alt="Preview"
-                          width={400}
-                          height={200}
-                          className="rounded border object-cover max-h-32"
-                        />
+                          <Button asChild variant="outline" size="sm">
+                            <span className="cursor-pointer flex items-center space-x-2">
+                              <Upload className="h-4 w-4" />
+                              <span>Upload</span>
+                            </span>
+                          </Button>
+                        </label>
                       </div>
-                    )}
+
+                      {/* ✅ Optional Preview */}
+                      {bannerForm.imageUrl && (
+                        <div className="mt-2">
+                          <Image
+                            src={bannerForm.imageUrl || "/placeholder.svg"}
+                            alt="Preview"
+                            width={400}
+                            height={200}
+                            className="rounded border object-cover max-h-32"
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
 
-
-                  <div className="space-y-2">
-                    <Label htmlFor="linkUrl">Link URL</Label>
-                    <Input
-                      id="linkUrl"
-                      value={bannerForm.linkUrl ?? ""}
-                      onChange={(e) => setBannerForm((prev) => ({ ...prev, linkUrl: e.target.value }))}
-                      placeholder="Enter destination URL"
-                    />
-                  </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -746,12 +750,22 @@ export default function AdminBannersPage() {
                             if (!file) return;
 
                             try {
-                              const { url } = await uploadFile(file); // must return { url: string }
-                              const fullUrl = url.startsWith("http")
-                                ? url
-                                : `https://luxury-perfume-ecommerce.onrender.com/api${url}`;
+                              const formData = new FormData();
+                              formData.append("file", file);
+                              formData.append("upload_preset", "myCloud"); // 🔁 replace with your Cloudinary upload preset
 
-                              setHeroForm((prev) => ({ ...prev, imageUrl: fullUrl }));
+                              const res = await fetch("https://api.cloudinary.com/v1_1/datxfosoi/image/upload", {
+                                method: "POST",
+                                body: formData,
+                              });
+
+                              const data = await res.json();
+
+                              if (data.secure_url) {
+                                setHeroForm((prev) => ({ ...prev, imageUrl: data.secure_url }));
+                              } else {
+                                throw new Error("No secure_url from Cloudinary");
+                              }
                             } catch (err) {
                               console.error("Hero Image Upload Failed", err);
                             }
@@ -783,6 +797,7 @@ export default function AdminBannersPage() {
                       </div>
                     )}
                   </div>
+
 
 
 
