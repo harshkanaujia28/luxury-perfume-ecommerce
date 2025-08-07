@@ -55,7 +55,7 @@ export function HeroSection() {
           {slides.map((slide, index) => {
             const imageUrl = slide.imageUrl.startsWith("http")
               ? slide.imageUrl
-              : `https://luxury-perfume-ecommerce.onrender.com/api${slide.imageUrl}`;
+              : `https://luxury-perfume-ecommerce.onrender.com${slide.imageUrl}`;
 
             return (
               <div key={slide._id} className="w-full flex-shrink-0 relative h-[400px] sm:h-[450px] md:h-[500px]">
