@@ -1,60 +1,52 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import Image from "next/image"
-import { useEffect, useState } from "react"
-import { Button } from "@/components/ui/button"
-import axios from "axios"
+import Link from "next/link";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import axios from "axios";
 
 interface HeroBanner {
-  _id: string
-  title: string
-  subtitle: string
-  buttonText: string
-  buttonLink: string
-  imageUrl: string
-  isActive: boolean
-  type: string
+  _id: string;
+  title: string;
+  subtitle: string;
+  buttonText: string;
+  buttonLink: string;
+  imageUrl: string;
+  isActive: boolean;
+  type: string;
 }
 
 export function HeroSection() {
-  const [slides, setSlides] = useState<HeroBanner[]>([])
-  const [currentSlide, setCurrentSlide] = useState(0)
-  const [isMobile, setIsMobile] = useState(false)
+  const [slides, setSlides] = useState<HeroBanner[]>([]);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     const fetchHeroImages = async () => {
       try {
-     const res = await axios.get("https://luxury-perfume-ecommerce.onrender.com/api/banners?type=hero")
-        const activeSlides = res.data.filter((s: HeroBanner) => s.isActive)
-        setSlides(activeSlides)
+        const res = await axios.get("https://luxury-perfume-ecommerce.onrender.com/api/banners?type=hero");
+        const activeSlides = res.data.filter((s: HeroBanner) => s.isActive);
+        setSlides(activeSlides);
       } catch (err) {
-        console.error("❌ Failed to fetch hero images:", err)
+        console.error("❌ Failed to fetch hero images:", err);
       }
-    }
+    };
 
-    fetchHeroImages()
-  }, [])
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth <= 768)
-    handleResize()
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
+    fetchHeroImages();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length)
-    }, 5000)
-    return () => clearInterval(timer)
-  }, [slides])
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [slides]);
 
-  const setSlide = (index: number) => setCurrentSlide(index)
+  const setSlide = (index: number) => setCurrentSlide(index);
 
   return (
-    <section className="relative min-h-min w-full overflow-hidden flex items-center justify-center py-20">
-      <div className="relative w-full h-[500px] overflow-hidden max-w-7xl mx-auto mt-8">
+    <section className="relative w-full overflow-hidden py-10 sm:py-16 md:py-20 lg:py-24">
+      <div className="relative w-full h-[400px] sm:h-[450px] md:h-[500px] overflow-hidden max-w-7xl mx-auto">
         {/* Slider */}
         <div
           className="flex transition-transform duration-700 ease-in-out"
@@ -63,12 +55,12 @@ export function HeroSection() {
           {slides.map((slide, index) => {
             const imageUrl = slide.imageUrl.startsWith("http")
               ? slide.imageUrl
-              : `https://luxury-perfume-ecommerce.onrender.com${slide.imageUrl}`
+              : `https://luxury-perfume-ecommerce.onrender.com${slide.imageUrl}`;
 
             return (
-              <div key={slide._id} className="w-full flex-shrink-0 h-screen relative">
+              <div key={slide._id} className="w-full flex-shrink-0 relative h-[400px] sm:h-[450px] md:h-[500px]">
                 {/* Background */}
-                <div className="absolute top-0 left-0 w-full h-[500px] -z-10 overflow-hidden">
+                <div className="absolute inset-0 -z-10">
                   <Image
                     src={imageUrl}
                     alt={slide.title}
@@ -80,52 +72,58 @@ export function HeroSection() {
                 </div>
 
                 {/* Content */}
-                <div className="relative z-10 max-w-7xl h-full mx-auto px-6 lg:px-12 flex items-center">
-                  <div className="space-y-4 text-center lg:text-left">
-                    <h1 className="text-white text-3xl sm:text-4xl lg:text-5xl font-serif leading-snug drop-shadow-2xl">
+                {/* <div className="relative z-10 max-w-7xl h-full mx-auto px-4 sm:px-6 md:px-8 lg:px-12 flex items-center justify-center sm:justify-start sm:mt-20 ">
+                  <div className="space-y-3 text-center sm:text-left">
+                    <h1 className="text-white text-xl sm:text-2xl md:text-4xl lg:text-5xl font-serif leading-snug drop-shadow-2xl">
                       {slide.title} <br />
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-400">
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-400">
                         {slide.subtitle}
                       </span>
                     </h1>
-                    <p className="text-white/90 max-w-md mx-auto lg:mx-0 text-base drop-shadow-md text-center lg:text-left">
+                    <p className="text-white/90 text-xs sm:text-sm md:text-base max-w-md mx-auto sm:mx-0 drop-shadow-md">
                       {slide.buttonText}
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4 items-center justify-center lg:justify-start">
-                      <Button size="lg" className="bg-green-600 text-white hover:bg-white hover:text-green-800 rounded-full" asChild>
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-center sm:items-start justify-center sm:justify-start">
+                      <Button
+                        size="sm"
+                        className="bg-green-600 text-white hover:bg-white hover:text-green-800 rounded-full w-full sm:w-auto"
+                        asChild
+                      >
                         <Link href={slide.buttonLink || "/products"}>Shop Now</Link>
                       </Button>
                       <Button
-                        size="lg"
+                        size="sm"
                         variant="outline"
-                        className="rounded-full border-white text-green-600 hover:bg-white hover:text-black"
+                        className="rounded-full border-white text-green-600 hover:bg-white hover:text-black w-full sm:w-auto"
                         asChild
                       >
                         <Link href="/about">Learn More</Link>
                       </Button>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
-            )
+            );
           })}
         </div>
 
         {/* Slide Dots */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-200 ${
-                index === currentSlide
-                  ? "bg-gradient-to-r from-green-600 to-emerald-600"
-                  : "bg-gray-300 hover:bg-gray-400"
-              }`}
-            />
-          ))}
-        </div>
+        {slides.length > 1 && (
+          <div className="absolute bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-20">
+            {slides.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setSlide(index)}
+                className={`w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 rounded-full transition-all duration-300 ${
+                  index === currentSlide
+                    ? "bg-gradient-to-r from-green-600 to-emerald-600 scale-110"
+                    : "bg-gray-300 hover:bg-gray-400"
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
-  )
+  );
 }

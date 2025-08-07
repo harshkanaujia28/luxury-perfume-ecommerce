@@ -72,7 +72,6 @@ app.use("/uploads", express.static("uploads"));
 app.use("/api/coupons", couponRoutes)
 app.use("/users", userRoutes);
 app.use("/api/offers", offerRoutes);
-app.use("/api/upload", uploadRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);

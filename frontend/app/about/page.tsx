@@ -44,7 +44,7 @@ export default function AboutPage() {
           {/* Content */}
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-              About Luxe Fragrances
+              About Zafrine
             </h1>
             <p className="text-xl text-gray-800 leading-relaxed">
               For over two decades, we've been crafting exceptional fragrances that capture the essence of luxury and sophistication.

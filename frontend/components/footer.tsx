@@ -9,13 +9,10 @@ export function Footer() {
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-                <span className="text-black font-bold text-sm">L</span>
-              </div>
-              <span className="text-xl font-bold text-gray-700">Luxe Fragrances</span>
+              <img src="/Z-1-removebg-preview.png" alt="Zafrine" className="h-6 md:h-8" />
             </div>
             <p className="text-gray-400 text-sm">
-              Discover timeless luxury fragrances that reflect your unique essence and personal style.
+              Discover timeless Zafrine fragrances that reflect your unique essence and personal style.
             </p>
             <div className="flex space-x-4">
               <Link href="#" className="text-gray-400 hover:text-white">
@@ -126,7 +123,7 @@ export function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-          <p className="text-gray-700 text-sm">© 2024 Luxe Fragrances. All rights reserved.</p>
+          <p className="text-gray-700 text-sm">© 2025 Zafrine. All rights reserved.</p>
         </div>
       </div>
     </footer>

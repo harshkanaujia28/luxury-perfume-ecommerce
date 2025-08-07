@@ -420,7 +420,7 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="space-y-1.5 sm:space-y-2">
+                    {/* <div className="space-y-1.5 sm:space-y-2">
                       <Label htmlFor="quantity" className="text-sm font-semibold text-slate-700">
                         Quantity (ML)
                       </Label>
@@ -431,7 +431,7 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
                         placeholder="e.g., 50ml"
                         className="h-10 sm:h-11 border-slate-300 focus:border-green-500 focus:ring-green-500/20 rounded-lg transition-all duration-200 text-sm sm:text-base"
                       />
-                    </div>
+                    </div> */}
                     <div className="space-y-2">
                       <Label className="text-sm font-semibold text-slate-700">Available Quantities (ML)</Label>
                       <div className="flex gap-2">
@@ -486,7 +486,19 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
                         </div>
                       )}
                     </div>
-
+                    <div>
+                      <Label className="text-sm font-semibold text-slate-700">Skin Type</Label>
+                      <Input
+                        value={formData.specifications.skinType}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            specifications: { ...prev.specifications, skinType: e.target.value },
+                          }))
+                        }
+                        placeholder="e.g., All Skin Types"
+                      />
+                    </div>
                     <div>
                       <Label className="text-sm font-semibold text-slate-700">Sillage</Label>
                       <Input

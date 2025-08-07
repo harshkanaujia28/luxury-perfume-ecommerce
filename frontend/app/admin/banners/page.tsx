@@ -647,7 +647,7 @@ export default function AdminBannersPage() {
                               const { url } = await uploadFile(file); // ← uploadFile must return { url: string }
                               const fullUrl = url.startsWith("http")
                                 ? url
-                                : `https://luxury-perfume-ecommerce.onrender.com${url}`; // fix for local dev
+                                : `https://luxury-perfume-ecommerce.onrender.com/api${url}`; // fix for local dev
 
                               setBannerForm((prev) => ({ ...prev, imageUrl: fullUrl }));
                             } catch (err) {
@@ -749,7 +749,7 @@ export default function AdminBannersPage() {
                               const { url } = await uploadFile(file); // must return { url: string }
                               const fullUrl = url.startsWith("http")
                                 ? url
-                                : `https://luxury-perfume-ecommerce.onrender.com${url}`;
+                                : `https://luxury-perfume-ecommerce.onrender.com/api${url}`;
 
                               setHeroForm((prev) => ({ ...prev, imageUrl: fullUrl }));
                             } catch (err) {

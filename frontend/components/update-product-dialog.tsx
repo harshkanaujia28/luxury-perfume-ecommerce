@@ -1030,14 +1030,15 @@ export default function UpdateProductDialog({ product, trigger, onUpdate, onClos
                                                                     <img
                                                                         src={
                                                                             typeof file === "string"
-                                                                                ? file // Already uploaded image URL
+                                                                                ? file
                                                                                 : file instanceof File
-                                                                                    ? URL.createObjectURL(file) // Local preview of new File
+                                                                                    ? URL.createObjectURL(file)
                                                                                     : ""
                                                                         }
                                                                         alt={`Product ${index + 1}`}
                                                                         className="h-20 w-20 object-cover rounded"
                                                                     />
+
 
                                                                     <Button
                                                                         type="button"

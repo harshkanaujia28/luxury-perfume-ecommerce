@@ -15,20 +15,26 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const data = await getMyOrders();
-        setOrders(data.orders || []);
-      } catch (error) {
-        console.error("Failed to fetch orders", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+useEffect(() => {
+  const fetchOrders = async () => {
+    try {
+      const data = await getMyOrders();
 
-    fetchOrders();
-  }, []);
+      const sortedOrders = (data.orders || []).sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+
+      setOrders(sortedOrders);
+    } catch (error) {
+      console.error("Failed to fetch orders", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchOrders();
+}, []);
+
 
   const getStatusColor = (status: string) =>
     clsx(

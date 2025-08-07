@@ -46,7 +46,7 @@ export default function ReturnsPage() {
       <Header />
       <main>
         {/* Hero Section */}
-        <section className="luxury-gradient py-20">
+        <section className="luxury-gradient py-32">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">Returns & Exchanges</h1>
             <p className="text-xl text-gray-600">
@@ -191,7 +191,7 @@ export default function ReturnsPage() {
               <p className="text-gray-600 mb-6">Our customer service team is here to help you with your return.</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button size="lg" asChild>
-                  <a href="/contact">Contact Support</a>
+                  <a href="/support">Contact Support</a>
                 </Button>
                 <Button variant="outline" size="lg" asChild>
                   <a href="mailto:returns@luxefragrances.com">Email Returns Team</a>

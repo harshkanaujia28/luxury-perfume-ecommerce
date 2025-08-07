@@ -918,7 +918,7 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
     };
     const addProduct = async (data: FormData) => {
         try {
-            const res = await axios.post("http://localhost:5000/api/products", data, {
+            const res = await axios.post("https://luxury-perfume-ecommerce.onrender.com/api/products", data, {
                 headers: {
                     "Content-Type": "multipart/form-data",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -933,7 +933,7 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
 
     const editProduct = async (id: string, data: FormData) => {
         const res = await axios.put(
-            `http://localhost:5000/api/products/admin/product/${id}`,
+            `https://luxury-perfume-ecommerce.onrender.com/api/products/admin/product/${id}`,
             data,
             {
                 headers: {

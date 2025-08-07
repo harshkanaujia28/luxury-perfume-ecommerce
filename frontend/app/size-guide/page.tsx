@@ -13,7 +13,7 @@ export default function SizeGuidePage() {
       sprays: "50-70 sprays",
       duration: "1-2 weeks daily use",
       icon: Zap,
-      price: "$15-25",
+      price: "₹15-25",
     },
     {
       size: "10ml",
@@ -22,7 +22,7 @@ export default function SizeGuidePage() {
       sprays: "100-140 sprays",
       duration: "3-4 weeks daily use",
       icon: Droplets,
-      price: "$25-35",
+      price: "₹25-35",
     },
     {
       size: "30ml",
@@ -31,7 +31,7 @@ export default function SizeGuidePage() {
       sprays: "300-420 sprays",
       duration: "2-3 months daily use",
       icon: Heart,
-      price: "$45-75",
+      price: "₹45-75",
     },
     {
       size: "50ml",
@@ -40,7 +40,7 @@ export default function SizeGuidePage() {
       sprays: "500-700 sprays",
       duration: "4-6 months daily use",
       icon: Clock,
-      price: "$65-120",
+      price: "₹65-120",
     },
     {
       size: "100ml",
@@ -49,7 +49,7 @@ export default function SizeGuidePage() {
       sprays: "1000-1400 sprays",
       duration: "8-12 months daily use",
       icon: Clock,
-      price: "$95-200",
+      price: "₹95-200",
     },
   ]
 
@@ -112,7 +112,7 @@ export default function SizeGuidePage() {
       <Header />
       <main>
         {/* Hero Section */}
-        <section className="luxury-gradient py-20">
+        <section className="luxury-gradient py-28">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">Fragrance Size Guide</h1>
             <p className="text-xl text-gray-600">Choose the perfect size for your lifestyle and fragrance needs</p>

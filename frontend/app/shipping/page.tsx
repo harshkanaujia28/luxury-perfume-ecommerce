@@ -9,19 +9,19 @@ export default function ShippingPage() {
       name: "Standard Shipping",
       price: "Free",
       time: "5-7 business days",
-      description: "Free shipping on orders over $75",
+      description: "Free shipping on orders over ₹75",
       icon: Truck,
     },
     {
       name: "Express Shipping",
-      price: "$9.99",
+      price: "₹9.99",
       time: "2-3 business days",
       description: "Faster delivery for urgent orders",
       icon: Clock,
     },
     {
       name: "Overnight Shipping",
-      price: "$24.99",
+      price: "₹24.99",
       time: "1 business day",
       description: "Next day delivery available",
       icon: Package,
@@ -29,10 +29,10 @@ export default function ShippingPage() {
   ]
 
   const internationalRates = [
-    { region: "Canada", price: "$15.99", time: "7-10 business days" },
-    { region: "Europe", price: "$25.99", time: "10-14 business days" },
-    { region: "Asia Pacific", price: "$29.99", time: "12-16 business days" },
-    { region: "Rest of World", price: "$35.99", time: "14-21 business days" },
+    { region: "Canada", price: "₹15.99", time: "7-10 business days" },
+    { region: "Europe", price: "₹25.99", time: "10-14 business days" },
+    { region: "Asia Pacific", price: "₹29.99", time: "12-16 business days" },
+    { region: "Rest of World", price: "₹35.99", time: "14-21 business days" },
   ]
 
   return (
@@ -40,7 +40,7 @@ export default function ShippingPage() {
       <Header />
       <main>
         {/* Hero Section */}
-        <section className="luxury-gradient py-20">
+        <section className="luxury-gradient py-36">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">Shipping Information</h1>
             <p className="text-xl text-gray-600">Fast, secure, and reliable delivery worldwide</p>

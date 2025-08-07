@@ -1,13 +1,13 @@
 "use client";
 
 import { Heart, ShoppingCart, User, Menu, X, Search } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/contexts/cart-context";
-import { useApi } from "@/contexts/api-context"; // updated to useApi
+import { useApi } from "@/contexts/api-context";
 import { useWishlist } from "@/contexts/wishlist-context";
 import Image from "next/image";
 import {
@@ -17,17 +17,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-
-
-
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { state } = useCart();
   const { user, logout } = useApi();
-  const { items: wishlistItems } = useWishlist();
+  const { items: wishlistItems, clearWishlist } = useWishlist();
   const router = useRouter();
-  const { clearWishlist } = useWishlist();
+
+  // Disable scroll when mobile menu is open
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMenuOpen]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +46,6 @@ export function Header() {
       setIsMenuOpen(false);
     }
   };
-  
 
   const navigation = [
     { name: "Home", href: "/" },
@@ -51,7 +58,7 @@ export function Header() {
       <nav className="flex items-center justify-between px-4 py-4 lg:px-12">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
-          <div className="relative w-28 h-10">
+          <div className="relative w-24 h-8 sm:w-28 sm:h-10">
             <Image
               src="/Z-1.png"
               alt="Luxe Fragrances Logo"
@@ -89,7 +96,7 @@ export function Header() {
         </div>
 
         {/* Icons */}
-        <div className="flex items-center space-x-4 md:space-x-3">
+        <div className="flex items-center space-x-3">
           {/* Mobile Menu Toggle */}
           <Button
             variant="ghost"
@@ -162,11 +169,11 @@ export function Header() {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu (Full Screen) */}
       {isMenuOpen && (
-        <div className="md:hidden border-t border-green-200 bg-white px-4 py-4">
+        <div className="fixed inset-0 z-40 h-screen w-full overflow-y-auto bg-white px-4 py-6 md:hidden">
           {/* Search Bar */}
-          <form onSubmit={handleSearch} className="mb-4">
+          <form onSubmit={handleSearch} className="mb-6">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
@@ -174,18 +181,18 @@ export function Header() {
                 placeholder="Search products"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full"
+                className="pl-10 pr-4 py-2 w-full border border-green-300 rounded-md"
               />
             </div>
           </form>
 
           {/* Navigation */}
-          <nav className="space-y-2 mb-4">
+          <nav className="space-y-3 mb-6 flex justify-center items-center">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="block px-3 py-2 text-base font-medium text-green-900 hover:bg-green-50 rounded-md"
+                className="block px-4 py-2 text-base font-medium text-green-900 hover:bg-green-100 rounded-md"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {item.name}
@@ -194,16 +201,16 @@ export function Header() {
           </nav>
 
           {/* Auth Buttons */}
-          <div className="border-t border-green-200 pt-4">
+          <div className="border-t border-green-200 pt-4 space-y-3">
             {user ? (
               <>
-                <Link href="/profile" className="block px-3 py-2 text-green-900 hover:bg-green-50 rounded-md">
+                <Link href="/profile" className="block px-4 py-2 text-green-900 hover:bg-green-100 rounded-md">
                   Profile
                 </Link>
-                <Link href="/orders" className="block px-3 py-2 text-green-900 hover:bg-green-50 rounded-md">
+                <Link href="/orders" className="block px-4 py-2 text-green-900 hover:bg-green-100 rounded-md">
                   My Orders
                 </Link>
-                <Link href="/wishlist" className="block px-3 py-2 text-green-900 hover:bg-green-50 rounded-md">
+                <Link href="/wishlist" className="block px-4 py-2 text-green-900 hover:bg-green-100 rounded-md">
                   Wishlist
                 </Link>
                 <button
@@ -211,17 +218,17 @@ export function Header() {
                     logout();
                     setIsMenuOpen(false);
                   }}
-                  className="w-full text-left px-3 py-2 text-green-900 hover:bg-green-50 rounded-md"
+                  className="w-full text-left px-4 py-2 text-green-900 hover:bg-green-100 rounded-md"
                 >
                   Logout
                 </button>
               </>
             ) : (
               <>
-                <Link href="/login" className="block px-3 py-2 text-green-900 hover:bg-green-50 rounded-md">
+                <Link href="/login" className="block px-4 py-2 text-green-900 hover:bg-green-100 rounded-md">
                   Login
                 </Link>
-                <Link href="/register" className="block px-3 py-2 text-green-900 hover:bg-green-50 rounded-md">
+                <Link href="/register" className="block px-4 py-2 text-green-900 hover:bg-green-100 rounded-md">
                   Register
                 </Link>
               </>
