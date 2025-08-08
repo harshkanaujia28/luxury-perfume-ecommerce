@@ -149,14 +149,27 @@ export default function UpdateProductDialog({ product, trigger, onUpdate, onClos
 
 
     const sellers = ["Seller 1", "Seller 2", "Seller 3", "Seller 4"]
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files) return;
-        const files = Array.from(e.target.files);
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    for (const file of files) {
+      const formDataUpload = new FormData();
+      formDataUpload.append("file", file);
+      formDataUpload.append("upload_preset", "myCloud");
+
+      const res = await fetch("https://api.cloudinary.com/v1_1/datxfosoi/image/upload", {
+        method: "POST",
+        body: formDataUpload,
+      });
+
+      const data = await res.json();
+      if (data.secure_url) {
         setFormData((prev) => ({
-            ...prev,
-            images: [...prev.images, ...files].slice(0, 5), // append new, max 5
+          ...prev,
+          images: [...prev.images, data.secure_url],
         }));
-    };
+      }
+    }
+  };
 
     const handleInputChange = (field: string, value: any) => {
         setFormData((prev) => ({

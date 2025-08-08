@@ -10,7 +10,6 @@ const safeParse = (value, fallback) => {
   }
 };
 
-
 export const getProducts = async (req, res) => {
   try {
     const products = await Product.find();
@@ -31,7 +30,21 @@ export const getProductById = async (req, res) => {
 
 export const addProduct = async (req, res) => {
   try {
-    const images = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
+    let images = [];
+
+    // 1️⃣ If files are uploaded via multer
+    if (req.files && req.files.length > 0) {
+      images = req.files.map((file) => `/uploads/${file.filename}`);
+    }
+    // 2️⃣ If Cloudinary URLs are sent from frontend
+    else if (req.body.images) {
+      try {
+        images = JSON.parse(req.body.images);
+      } catch (err) {
+        console.error("Failed to parse images JSON:", err);
+        images = [];
+      }
+    }
 
     const product = new Product({
       name: req.body.name,
@@ -40,7 +53,7 @@ export const addProduct = async (req, res) => {
       description: req.body.description,
       price: req.body.price,
       stock: req.body.stock,
-     features: safeParse(req.body.features, []),
+      features: safeParse(req.body.features, []),
       quantity: safeParse(req.body.quantity, []),
       category: safeParse(req.body.category, {
         type: "Perfume",
@@ -60,12 +73,17 @@ export const addProduct = async (req, res) => {
       images,
       image: images[0] || "",
     });
+    console.log("Body:", req.body);
+    console.log("Files:", req.files);
+    console.log("Images parsed:", images);
 
     await product.save();
     res.status(201).json(product);
   } catch (error) {
     console.error("Error creating product:", error);
-    res.status(500).json({ message: "Failed to add product", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to add product", error: error.message });
   }
 };
 
@@ -74,7 +92,8 @@ export const updateProduct = async (req, res) => {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: "Product not found" });
 
-    const newImages = req.files?.map(file => `/uploads/${file.filename}`) || [];
+    const newImages =
+      req.files?.map((file) => `/uploads/${file.filename}`) || [];
 
     const updatedFields = {
       name: req.body.name || product.name,
@@ -84,7 +103,10 @@ export const updateProduct = async (req, res) => {
       price: req.body.price || product.price,
       stock: req.body.stock || product.stock,
       category: safeParse(req.body.category, product.category),
-      specifications: safeParse(req.body.specifications, product.specifications),
+      specifications: safeParse(
+        req.body.specifications,
+        product.specifications
+      ),
       features: safeParse(req.body.features, product.features), // ✅ ADD THIS LINE
       seller: req.body.seller || product.seller,
       rating: Number(req.body.rating) || product.rating,
@@ -95,9 +117,13 @@ export const updateProduct = async (req, res) => {
       image: newImages.length > 0 ? newImages[0] : product.image,
     };
 
-    const updatedProduct = await Product.findByIdAndUpdate(req.params.id, updatedFields, {
-      new: true,
-    });
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      updatedFields,
+      {
+        new: true,
+      }
+    );
 
     res.json({ product: updatedProduct });
   } catch (error) {

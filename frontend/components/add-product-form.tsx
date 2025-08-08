@@ -103,27 +103,37 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
     }));
   };
 
-   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+
     for (const file of files) {
       const formDataUpload = new FormData();
       formDataUpload.append("file", file);
-      formDataUpload.append("upload_preset", "myCloud");
+      formDataUpload.append("upload_preset", "myCloud"); // your preset
 
-      const res = await fetch("https://api.cloudinary.com/v1_1/datxfosoi/image/upload", {
-        method: "POST",
-        body: formDataUpload,
-      });
+      try {
+        const res = await fetch(
+          "https://api.cloudinary.com/v1_1/datxfosoi/image/upload",
+          {
+            method: "POST",
+            body: formDataUpload,
+          }
+        );
 
-      const data = await res.json();
-      if (data.secure_url) {
-        setFormData((prev) => ({
-          ...prev,
-          images: [...prev.images, data.secure_url],
-        }));
+        const data = await res.json();
+
+        if (data.secure_url) {
+          setFormData((prev) => ({
+            ...prev,
+            images: [...prev.images, data.secure_url], // store URL only
+          }));
+        }
+      } catch (err) {
+        console.error("Image upload failed", err);
       }
     }
   };
+
   const handleAddReview = () => {
     if (!newReview.name || !newReview.comment || newReview.stars <= 0) {
       alert("Please fill all review fields");
@@ -153,8 +163,15 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
       data.append("stock", formData.stock.toString());
       data.append("features", JSON.stringify(formData.features));
 
+      // ✅ Main image (first uploaded image)
+      if (formData.images.length > 0) {
+        data.append("image", formData.images[0]); // main image
+      }
 
-      // ✅ Append full category as JSON string
+      // ✅ All images as JSON array
+      data.append("images", JSON.stringify(formData.images));
+
+      // Category object
       const category = {
         type: formData.type,
         gender: formData.gender,
@@ -162,26 +179,19 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
       };
       data.append("category", JSON.stringify(category));
 
-      // ✅ Append specifications if required
+      // Specs, seller, reviews, quantity
       data.append("specifications", JSON.stringify(formData.specifications));
-
       data.append("seller", formData.seller);
       data.append("reviews", JSON.stringify(formData.reviews));
       data.append("quantity", JSON.stringify(formData.quantity));
-      formData.images.forEach((file) => {
-        if (file instanceof File) {
-          data.append("images", file);
-        }
-      });
 
       const savedProduct = await addProduct(data);
 
-
       if (formData.offer.isActive && formData.offer.value > 0) {
         await createOffer({
-          title: formData.name + " Offer", // Or any meaningful title
+          title: formData.name + " Offer",
           discountType:
-            formData.offer.type === "fixed" ? "flat" : "percentage", // Map types
+            formData.offer.type === "fixed" ? "flat" : "percentage",
           discountValue: formData.offer.value,
           startDate: new Date(formData.offer.startDate),
           endDate: new Date(formData.offer.endDate),
@@ -198,6 +208,7 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
       alert("Failed to add product");
     }
   };
+
 
 
   const handlePreview = () => {
@@ -883,10 +894,11 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
                           <div className="relative overflow-hidden rounded-lg sm:rounded-xl border-2 border-slate-200 bg-slate-50 aspect-square">
                             <img
                               key={index}
-                              src={file instanceof File ? URL.createObjectURL(file) : ""}
+                              src={file} // now file is always a string
                               alt={`Product ${index + 1}`}
                               className="h-120 w-120 object-cover rounded"
                             />
+
                             <Button
                               type="button"
                               variant="destructive"

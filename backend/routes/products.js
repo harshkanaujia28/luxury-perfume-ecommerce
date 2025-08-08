@@ -22,7 +22,7 @@ const upload = multer({ storage });
 
 router.get("/", getProducts);
 router.get("/:id", getProductById);
-router.post("/", protect, isAdmin, upload.array("images", 5), addProduct);
+router.post("/", protect, isAdmin, upload.none(), addProduct);
 router.put("/admin/product/:id", protect, isAdmin, upload.array("images", 5), updateProduct); // ✅ updated
 router.delete("/admin/product/:id", protect, isAdmin, deleteProduct);
 
