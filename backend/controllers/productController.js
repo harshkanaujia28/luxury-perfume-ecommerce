@@ -60,48 +60,42 @@ export const addProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ message: "Product not found" });
+    // Parse incoming image URLs
+    const images = req.body.images ? JSON.parse(req.body.images) : [];
 
-    const newImages =
-      req.files?.map((file) => `/uploads/${file.filename}`) || [];
-
-    const updatedFields = {
-      name: req.body.name || product.name,
-      brand: req.body.brand || product.brand,
-      brandimage: req.body.brandimage || product.brandimage,
-      description: req.body.description || product.description,
-      price: req.body.price || product.price,
-      stock: req.body.stock || product.stock,
-      category: safeParse(req.body.category, product.category),
-      specifications: safeParse(
-        req.body.specifications,
-        product.specifications
-      ),
-      features: safeParse(req.body.features, product.features), // ✅ ADD THIS LINE
-      seller: req.body.seller || product.seller,
-      rating: Number(req.body.rating) || product.rating,
-      reviews: safeParse(req.body.reviews, product.reviews),
-      offer: safeParse(req.body.offer, product.offer),
-      quantity: safeParse(req.body.quantity, product.quantity), // ✅ ADD THIS
-      images: newImages.length > 0 ? newImages : product.images,
-      image: newImages.length > 0 ? newImages[0] : product.image,
+    const updatedData = {
+      name: req.body.name,
+      brand: req.body.brand,
+      description: req.body.description,
+      price: Number(req.body.price),
+      stock: Number(req.body.stock),
+      features: JSON.parse(req.body.features || "[]"),
+      image: images[0] || "",
+      images,
+      category: JSON.parse(req.body.category || "{}"),
+      specifications: JSON.parse(req.body.specifications || "{}"),
+      seller: req.body.seller || "admin",
+      reviews: JSON.parse(req.body.reviews || "[]"),
+      quantity: JSON.parse(req.body.quantity || "[]"),
     };
 
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
-      updatedFields,
-      {
-        new: true,
-      }
+      updatedData,
+      { new: true }
     );
 
-    res.json({ product: updatedProduct });
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json(updatedProduct);
   } catch (error) {
-    console.error("Update error:", error);
-    res.status(400).json({ message: error.message });
+    console.error("Error updating product:", error);
+    res.status(500).json({ message: "Failed to update product", error: error.message });
   }
 };
+
 
 export const deleteProduct = async (req, res) => {
   try {
