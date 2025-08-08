@@ -123,7 +123,7 @@ export default function PaymentSuccessPage() {
             <CardContent className="py-8">
               <h3 className="text-xl font-semibold mb-2">Continue Shopping</h3>
               <p className="text-gray-600 mb-4">Discover more amazing products from our store</p>
-              <Link href="/">
+              <Link href="/orders">
                 <Button>
                   Browse Products
                   <ArrowRight className="h-4 w-4 ml-2" />

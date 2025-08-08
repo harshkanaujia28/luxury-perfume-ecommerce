@@ -15,25 +15,25 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  const fetchOrders = async () => {
-    try {
-      const data = await getMyOrders();
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const data = await getMyOrders();
 
-      const sortedOrders = (data.orders || []).sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+        const sortedOrders = (data.orders || []).sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
 
-      setOrders(sortedOrders);
-    } catch (error) {
-      console.error("Failed to fetch orders", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        setOrders(sortedOrders);
+      } catch (error) {
+        console.error("Failed to fetch orders", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  fetchOrders();
-}, []);
+    fetchOrders();
+  }, []);
 
 
   const getStatusColor = (status: string) =>
@@ -95,10 +95,27 @@ useEffect(() => {
                         return (
                           <li key={idx} className="flex items-center gap-4">
                             <img
-                              src={`${BASE_URL}${prod.image}`}
+                              src={
+                                p?.image
+                                  ? p.image.startsWith("http")
+                                    ? p.image
+                                    : `${BASE_URL}${p.image}`
+                                  : prod?.image?.startsWith("http")
+                                    ? prod.image
+                                    : prod?.image
+                                      ? `${BASE_URL}${prod.image}`
+                                      : prod?.images?.[0]?.startsWith("http")
+                                        ? prod.images[0]
+                                        : prod?.images?.[0]
+                                          ? `${BASE_URL}${prod.images[0]}`
+                                          : "/placeholder.svg"
+                              }
                               alt={prod.name}
                               className="w-14 h-14 object-cover rounded-md border"
                             />
+
+
+
                             <div>
                               <p className="font-medium">{prod.name}</p>
                               <p className="text-xs text-gray-500">

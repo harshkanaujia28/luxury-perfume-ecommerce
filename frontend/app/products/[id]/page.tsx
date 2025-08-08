@@ -170,11 +170,11 @@ export default function ProductDetailPage() {
             {product.category?.subCategory}
           </Link>
         </div>
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+       <main className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Product Images */}
             <div className="space-y-4">
-              <div className="w-full h-[400px] sm:h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden rounded-lg bg-gray-100">
+              <div className="w-full h-[500px] sm:h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden rounded-lg bg-gray-100">
                 <Image
                   src={
                     product.images[selectedImage] && product.images[selectedImage].startsWith("http")

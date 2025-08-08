@@ -48,7 +48,6 @@ export default function HomePage() {
         <WhyUs />
         <FeaturedProducts /> {/* pass backend products */}
         <NewsletterSection />
-        <ImageUploader/>
       </main>
       <Footer />
     </div>

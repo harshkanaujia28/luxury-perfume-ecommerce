@@ -149,27 +149,27 @@ export default function UpdateProductDialog({ product, trigger, onUpdate, onClos
 
 
     const sellers = ["Seller 1", "Seller 2", "Seller 3", "Seller 4"]
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    for (const file of files) {
-      const formDataUpload = new FormData();
-      formDataUpload.append("file", file);
-      formDataUpload.append("upload_preset", "myCloud");
+    const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        for (const file of files) {
+            const formDataUpload = new FormData();
+            formDataUpload.append("file", file);
+            formDataUpload.append("upload_preset", "myCloud");
 
-      const res = await fetch("https://api.cloudinary.com/v1_1/datxfosoi/image/upload", {
-        method: "POST",
-        body: formDataUpload,
-      });
+            const res = await fetch("https://api.cloudinary.com/v1_1/datxfosoi/image/upload", {
+                method: "POST",
+                body: formDataUpload,
+            });
 
-      const data = await res.json();
-      if (data.secure_url) {
-        setFormData((prev) => ({
-          ...prev,
-          images: [...prev.images, data.secure_url],
-        }));
-      }
-    }
-  };
+            const data = await res.json();
+            if (data.secure_url) {
+                setFormData((prev) => ({
+                    ...prev,
+                    images: [...prev.images, data.secure_url],
+                }));
+            }
+        }
+    };
 
     const handleInputChange = (field: string, value: any) => {
         setFormData((prev) => ({
@@ -248,55 +248,40 @@ export default function UpdateProductDialog({ product, trigger, onUpdate, onClos
         }
         return true
     }
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        if (!validateForm()) return;
+
         try {
-            const data = new FormData();
+            setLoading(true);
 
-            // Basic product fields
-            data.append("name", formData.name);
-            data.append("brand", formData.brand);
-            data.append("description", formData.description);
-            data.append("price", formData.price.toString());
-            data.append("stock", formData.stock.toString());
-            data.append("seller", formData.seller || "admin");
-            data.append("features", JSON.stringify(formData.features));
-
-            // ✅ Append category as JSON string
-            const category = {
-                type: formData.type,
-                gender: formData.gender,
-                subCategory: formData.subCategory,
-            };
-            data.append("category", JSON.stringify(category));
-
-            // ✅ Append specifications as JSON string
-            data.append("specifications", JSON.stringify(formData.specifications || {}));
-
-            // ✅ Append reviews if present
-            data.append("reviews", JSON.stringify(formData.reviews || []));
-
-            // ✅ Append offer if present
-            if (formData.offer && formData.offer.isActive && formData.offer.value > 0) {
-                data.append("offer", JSON.stringify(formData.offer));
+            const payload = {
+                name: formData.name,
+                brand: formData.brand,
+                description: formData.description,
+                price: formData.price,
+                stock: formData.stock,
+                seller: formData.seller || "admin",
+                features: JSON.stringify(formData.features),
+                quantity: JSON.stringify(formData.quantity),
+                category: JSON.stringify({
+                    type: formData.type,
+                    gender: formData.gender,
+                    subCategory: formData.subCategory,
+                }),
+                specifications: JSON.stringify(formData.specifications || {}),
+                reviews: JSON.stringify(formData.reviews || []),
+                images: JSON.stringify(formData.images),
+                offer: JSON.stringify(
+                    formData.offer && formData.offer.isActive && formData.offer.value > 0
+                        ? formData.offer
+                        : {}
+                ),
             }
-            formData.quantity.forEach((qty) => {
-                data.append("quantity[]", qty); // assuming backend supports multiple values
-            });
 
+            const updatedProduct = await editProduct(formData.id!, payload);
 
-            // ✅ Append new image files
-            formData.images.forEach((file) => {
-                if (file instanceof File) {
-                    data.append("images", file);
-                }
-            });
-
-            // Call the API to update the product
-            const updatedProduct = await editProduct(formData.id!, data); // `editProduct` must accept FormData
-            console.log("Product updated:", updatedProduct);
 
             toast({
                 title: "Product updated",
@@ -313,6 +298,8 @@ export default function UpdateProductDialog({ product, trigger, onUpdate, onClos
                 description: error?.response?.data?.message || "Something went wrong",
                 variant: "destructive",
             });
+        } finally {
+            setLoading(false);
         }
     };
 

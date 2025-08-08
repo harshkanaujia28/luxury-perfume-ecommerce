@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 export default function CheckoutPage() {
   const router = useRouter();
   const { state, clearCart } = useCart();
-  const { getProfile, updateProfile, createPaymentSession, placeOrder,validateCoupon } = useApi();
+  const { getProfile, updateProfile, createPaymentSession, placeOrder, validateCoupon } = useApi();
   const { toast } = useToast();
 
   const [hasMounted, setHasMounted] = useState(false);
@@ -61,40 +61,40 @@ export default function CheckoutPage() {
       : 0;
   const total = subtotal + tax - couponDiscount;
 
- const applyCoupon = async () => {
-  try {
-    const result = await validateCoupon(couponCode);
+  const applyCoupon = async () => {
+    try {
+      const result = await validateCoupon(couponCode);
 
-    if (result.valid) {
-      setCouponValue(result.value);
-      setCouponType(result.type);
+      if (result.valid) {
+        setCouponValue(result.value);
+        setCouponType(result.type);
 
+        toast({
+          title: "Coupon Applied",
+          description: result.type === "Percentage"
+            ? `${result.value}% discount applied`
+            : `₹${result.value} discount applied`,
+          variant: "default",
+        });
+      } else {
+        setCouponValue(0);
+        setCouponType(null);
+
+        toast({
+          title: "Invalid Coupon",
+          description: result.message || "Coupon is not valid.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to apply coupon:", error);
       toast({
-        title: "Coupon Applied",
-        description: result.type === "Percentage"
-          ? `${result.value}% discount applied`
-          : `₹${result.value} discount applied`,
-        variant: "default",
-      });
-    } else {
-      setCouponValue(0);
-      setCouponType(null);
-
-      toast({
-        title: "Invalid Coupon",
-        description: result.message || "Coupon is not valid.",
+        title: "Error",
+        description: "Something went wrong while applying the coupon.",
         variant: "destructive",
       });
     }
-  } catch (error) {
-    console.error("Failed to apply coupon:", error);
-    toast({
-      title: "Error",
-      description: "Something went wrong while applying the coupon.",
-      variant: "destructive",
-    });
-  }
-};
+  };
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -171,6 +171,12 @@ export default function CheckoutPage() {
       setIsLoading(false);
     }
   };
+  const formatCurrency = (value: number) =>
+    new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 2,
+    }).format(value);
 
 
   return (
@@ -305,7 +311,7 @@ export default function CheckoutPage() {
                             <span className="ml-1 italic text-xs text-gray-600">{selectedSize}</span>
                           </p>
                         </div>
-                        <p>₹{(price * item.quantity).toFixed(2)}</p>
+                       <span>{formatCurrency(total)}</span>
                       </div>
                     );
                   })}

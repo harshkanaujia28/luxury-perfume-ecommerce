@@ -60,41 +60,50 @@ export const addProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   try {
-    // Parse incoming image URLs
-    const images = req.body.images ? JSON.parse(req.body.images) : [];
+    console.log("Body:", req.body);
+    console.log("Files:", req.files);
 
-    const updatedData = {
-      name: req.body.name,
-      brand: req.body.brand,
-      description: req.body.description,
-      price: Number(req.body.price),
-      stock: Number(req.body.stock),
-      features: JSON.parse(req.body.features || "[]"),
-      image: images[0] || "",
-      images,
-      category: JSON.parse(req.body.category || "{}"),
-      specifications: JSON.parse(req.body.specifications || "{}"),
-      seller: req.body.seller || "admin",
-      reviews: JSON.parse(req.body.reviews || "[]"),
-      quantity: JSON.parse(req.body.quantity || "[]"),
-    };
+    // Use URLs if provided in body
+    let images = [];
+    if (req.body.images) {
+      const parsed = JSON.parse(req.body.images);
+      if (Array.isArray(parsed)) {
+        images = parsed;
+      }
+    }
 
-    const updatedProduct = await Product.findByIdAndUpdate(
+    // Or fall back to uploaded files
+    if (req.files && req.files.length > 0) {
+      images = req.files.map(file => `/uploads/${file.filename}`);
+    }
+
+    const product = await Product.findByIdAndUpdate(
       req.params.id,
-      updatedData,
+      {
+        ...req.body,
+        images,
+        image: images[0] || req.body.image || "",
+        features: safeParse(req.body.features, []),
+        quantity: safeParse(req.body.quantity, []),
+        category: safeParse(req.body.category, {}),
+        specifications: safeParse(req.body.specifications, {}),
+        offer: safeParse(req.body.offer, {}),
+        reviews: safeParse(req.body.reviews, [])
+      },
       { new: true }
     );
 
-    if (!updatedProduct) {
+    if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    res.json(updatedProduct);
+    res.json(product);
   } catch (error) {
     console.error("Error updating product:", error);
     res.status(500).json({ message: "Failed to update product", error: error.message });
   }
 };
+
 
 
 export const deleteProduct = async (req, res) => {

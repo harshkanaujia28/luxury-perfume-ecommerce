@@ -772,11 +772,11 @@ interface ApiContextType {
     addCoupon: (data: Partial<Coupon>) => Promise<Coupon>
     updateCoupon: (id: string, data: Partial<Coupon>) => Promise<Coupon>
     deleteCoupon: (id: string) => Promise<void>
-      validateCoupon: (code: string) => Promise<{ valid: boolean; value?: number; type?: string; message?: string }>;
+    validateCoupon: (code: string) => Promise<{ valid: boolean; value?: number; type?: string; message?: string }>;
     //Reports
     // fetchReportData: () => Promise<ReportResponse>;
     getReportData: () => Promise<ReportResponse>
-    
+
     //payment 
     createPaymentSession: (amount: number, productName: string) => Promise<{ url: string }>;
 
@@ -931,19 +931,21 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
         }
     };
 
-    const editProduct = async (id: string, data: FormData) => {
+    const editProduct = async (id: string, data: any) => {
         const res = await axios.put(
             `https://luxury-perfume-ecommerce.onrender.com/api/products/admin/product/${id}`,
             data,
             {
                 headers: {
-                    "Content-Type": "multipart/form-data",
+                    "Content-Type": "application/json",
                     Authorization: `Bearer ${localStorage.getItem("token")}`,
                 },
             }
         );
-        return res.data.product;
+
+        return res.data; // assuming your backend does: res.json(product)
     };
+
 
 
 
@@ -1353,18 +1355,18 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
     }
 
 
- const uploadFile = async (file: File): Promise<{ url: string }> => {
-    const formData = new FormData();
-    formData.append("file", file);
+    const uploadFile = async (file: File): Promise<{ url: string }> => {
+        const formData = new FormData();
+        formData.append("file", file);
 
-    const res = await axios.post("/upload", formData, {
-        headers: {
-            "Content-Type": "multipart/form-data",
-        },
-    });
+        const res = await axios.post("/upload", formData, {
+            headers: {
+                "Content-Type": "multipart/form-data",
+            },
+        });
 
-    return res.data; // ✅ { url: string }
-};
+        return res.data; // ✅ { url: string }
+    };
 
 
 
