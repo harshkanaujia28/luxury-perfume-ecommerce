@@ -30,52 +30,23 @@ export const getProductById = async (req, res) => {
 
 export const addProduct = async (req, res) => {
   try {
-    let images = [];
-
-    // 1️⃣ If files are uploaded via multer
-    if (req.files && req.files.length > 0) {
-      images = req.files.map((file) => `/uploads/${file.filename}`);
-    }
-    // 2️⃣ If Cloudinary URLs are sent from frontend
-    else if (req.body.images) {
-      try {
-        images = JSON.parse(req.body.images);
-      } catch (err) {
-        console.error("Failed to parse images JSON:", err);
-        images = [];
-      }
-    }
+    const images = req.body.images ? JSON.parse(req.body.images) : [];
 
     const product = new Product({
       name: req.body.name,
       brand: req.body.brand,
-      brandimage: req.body.brandimage || "/uploads/default-brand.png",
       description: req.body.description,
-      price: req.body.price,
-      stock: req.body.stock,
-      features: safeParse(req.body.features, []),
-      quantity: safeParse(req.body.quantity, []),
-      category: safeParse(req.body.category, {
-        type: "Perfume",
-        gender: "Men",
-        subCategory: "Celebrity",
-      }),
-      specifications: safeParse(req.body.specifications, {
-        skinType: "All",
-        longevity: "6+ hours",
-        sillage: "Moderate",
-        season: "All",
-      }),
-      seller: req.body.seller || "admin",
-      rating: Number(req.body.rating) || 0,
-      reviews: safeParse(req.body.reviews, []),
-      offer: safeParse(req.body.offer, {}),
-      images,
+      price: Number(req.body.price),
+      stock: Number(req.body.stock),
+      features: JSON.parse(req.body.features || "[]"),
       image: images[0] || "",
+      images,
+      category: JSON.parse(req.body.category || "{}"),
+      specifications: JSON.parse(req.body.specifications || "{}"),
+      seller: req.body.seller || "admin",
+      reviews: JSON.parse(req.body.reviews || "[]"),
+      quantity: JSON.parse(req.body.quantity || "[]"),
     });
-    console.log("Body:", req.body);
-    console.log("Files:", req.files);
-    console.log("Images parsed:", images);
 
     await product.save();
     res.status(201).json(product);
