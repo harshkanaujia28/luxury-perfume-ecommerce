@@ -130,19 +130,24 @@ export default function ProductDetailPage() {
     }
   };
 const handleSubmitReview = async () => {
-  if (!reviewComment || reviewStars === 0) return;
+  if (!reviewName || !reviewComment || reviewStars === 0) return;
 
   try {
+    const token = localStorage.getItem("token"); // make sure token exists
+    if (!token) throw new Error("You must be logged in to submit a review");
+
     const { data } = await axios.post(
       `https://luxury-perfume-ecommerce.onrender.com/api/products/${product._id}/reviews`,
       {
+        userId: "64f1c2e...", // or get from logged-in user
+        name: reviewName,
         comment: reviewComment,
         stars: reviewStars,
       },
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // if auth required
+          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -153,11 +158,21 @@ const handleSubmitReview = async () => {
       reviews: data.reviews,
     }));
 
+    setReviewName("");
     setReviewComment("");
     setReviewStars(0);
+
+    toast({
+      title: "Review submitted",
+      description: "Thank you for your feedback!",
+    });
   } catch (err: any) {
     console.error(err);
-    alert(err.response?.data?.message || err.message);
+    toast({
+      title: "Error",
+      description: err.response?.data?.message || err.message,
+      variant: "destructive",
+    });
   }
 };
 
