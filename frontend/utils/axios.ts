@@ -25,16 +25,20 @@ instance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      if (typeof window !== "undefined") {
-        const currentPath = window.location.pathname;
-        if (!currentPath.includes("/login")) {
-          localStorage.clear();
-          window.location.replace("/login"); // safer than href to prevent reload loops
-        }
+      const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
+
+      // Sirf protected pages par hi redirect kare
+      const protectedPaths = ["/checkout", "/account", "/orders"];
+      const isProtected = protectedPaths.some((path) => currentPath.startsWith(path));
+
+      if (isProtected && !currentPath.includes("/login")) {
+        localStorage.clear();
+        window.location.replace("/login");
       }
     }
     return Promise.reject(error);
   }
 );
+
 
 export default instance;

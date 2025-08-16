@@ -5,6 +5,9 @@ import {
   addProduct,
   updateProduct,
   deleteProduct,
+  addReview,
+  updateReview,
+  deleteReview,
 } from "../controllers/productController.js";
 import multer from "multer";
 import path from "path";
@@ -25,5 +28,9 @@ router.get("/:id", getProductById);
 router.post("/", protect, isAdmin, upload.none(), addProduct);
 router.put("/admin/product/:id", protect, isAdmin, upload.none(), updateProduct);
 router.delete("/admin/product/:id", protect, isAdmin, deleteProduct);
+// Review routes
+router.post("/:productId/reviews",protect, addReview);
+router.put("/:productId/reviews/:reviewId",protect, updateReview);
+router.delete("/:productId/reviews/:reviewId",protect, deleteReview);
 
 export default router;

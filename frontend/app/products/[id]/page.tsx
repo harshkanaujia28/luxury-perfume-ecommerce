@@ -17,6 +17,9 @@ import { useToast } from "@/hooks/use-toast"
 import { products } from "@/lib/products"
 import { FeaturedProducts } from "@/components/featured-products"
 import { useApi } from "@/contexts/api-context";
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import axios from "axios"
 const baseURL = "https://luxury-perfume-ecommerce.onrender.com";
 
 export default function ProductDetailPage() {
@@ -35,6 +38,9 @@ export default function ProductDetailPage() {
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [selectedBrand, setSelectedBrand] = useState("Azzaro")
+  const [reviewName, setReviewName] = useState("");
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewStars, setReviewStars] = useState(0);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -123,6 +129,37 @@ export default function ProductDetailPage() {
       console.error(err);
     }
   };
+const handleSubmitReview = async () => {
+  if (!reviewComment || reviewStars === 0) return;
+
+  try {
+    const { data } = await axios.post(
+      `https://luxury-perfume-ecommerce.onrender.com/api/products/${product._id}/reviews`,
+      {
+        comment: reviewComment,
+        stars: reviewStars,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`, // if auth required
+        },
+      }
+    );
+
+    setProduct((prev: any) => ({
+      ...prev,
+      rating: data.rating,
+      reviews: data.reviews,
+    }));
+
+    setReviewComment("");
+    setReviewStars(0);
+  } catch (err: any) {
+    console.error(err);
+    alert(err.response?.data?.message || err.message);
+  }
+};
 
   if (loading) {
     return (
@@ -170,7 +207,7 @@ export default function ProductDetailPage() {
             {product.category?.subCategory}
           </Link>
         </div>
-       <main className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-8">
+        <main className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Product Images */}
             <div className="space-y-4">
@@ -476,7 +513,44 @@ export default function ProductDetailPage() {
 
               <TabsContent value="reviews" className="mt-6">
                 <Card>
-                  <CardContent className="p-6">
+                  <CardContent className="p-6 space-y-6">
+                    {/* Review Form */}
+                    <div className="border rounded-lg p-4">
+                      <h3 className="font-semibold mb-2">Write a Review</h3>
+                      <div className="space-y-3">
+                        <Input
+                          placeholder="Your name"
+                          value={reviewName}
+                          onChange={(e) => setReviewName(e.target.value)}
+                        />
+                        <Textarea
+                          placeholder="Write your comment..."
+                          value={reviewComment}
+                          onChange={(e) => setReviewComment(e.target.value)}
+                        />
+                        <div className="flex gap-1">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              type="button"
+                              onClick={() => setReviewStars(star)}
+                              className={`w-6 h-6 ${reviewStars >= star ? "text-yellow-400" : "text-gray-300"
+                                }`}
+                            >
+                              ★
+                            </button>
+                          ))}
+                        </div>
+                        <Button
+                          onClick={handleSubmitReview}
+                          className="bg-green-600 text-white"
+                        >
+                          Submit Review
+                        </Button>
+                      </div>
+                    </div>
+
+                    {/* Existing Reviews */}
                     {product.reviews && product.reviews.length > 0 ? (
                       <div className="space-y-4">
                         {product.reviews.map((review: any, index: number) => (

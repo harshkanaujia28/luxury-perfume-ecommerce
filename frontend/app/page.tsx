@@ -18,20 +18,20 @@ export default function HomePage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await axios.get("/products"); // calls http://localhost:5000/api/products
-        setProducts(res.data);
-      } catch (err) {
-        console.error("Failed to fetch products:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     try {
+  //       const res = await axios.get("/products"); // calls http://localhost:5000/api/products
+  //       setProducts(res.data);
+  //     } catch (err) {
+  //       console.error("Failed to fetch products:", err);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
 
-    fetchProducts();
-  }, []);
+  //   fetchProducts();
+  // }, []);
 
   // if (loading) {
   //   return <div className="p-8 text-center">Loading home page...</div>;

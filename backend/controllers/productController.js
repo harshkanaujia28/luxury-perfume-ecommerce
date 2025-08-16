@@ -74,7 +74,7 @@ export const updateProduct = async (req, res) => {
 
     // Or fall back to uploaded files
     if (req.files && req.files.length > 0) {
-      images = req.files.map(file => `/uploads/${file.filename}`);
+      images = req.files.map((file) => `/uploads/${file.filename}`);
     }
 
     const product = await Product.findByIdAndUpdate(
@@ -88,7 +88,7 @@ export const updateProduct = async (req, res) => {
         category: safeParse(req.body.category, {}),
         specifications: safeParse(req.body.specifications, {}),
         offer: safeParse(req.body.offer, {}),
-        reviews: safeParse(req.body.reviews, [])
+        reviews: safeParse(req.body.reviews, []),
       },
       { new: true }
     );
@@ -100,11 +100,11 @@ export const updateProduct = async (req, res) => {
     res.json(product);
   } catch (error) {
     console.error("Error updating product:", error);
-    res.status(500).json({ message: "Failed to update product", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Failed to update product", error: error.message });
   }
 };
-
-
 
 export const deleteProduct = async (req, res) => {
   try {
@@ -112,5 +112,90 @@ export const deleteProduct = async (req, res) => {
     res.json({ message: "Product deleted" });
   } catch (err) {
     res.status(400).json({ message: err.message });
+  }
+};
+
+// ✅ Add review
+// Add review
+export const addReview = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const { comment, stars } = req.body;
+
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    const userId = req.user._id; // extracted from JWT
+    const name = req.user.name;
+
+    const alreadyReviewed = product.reviews.find(
+      (rev) => rev.userId.toString() === userId.toString()
+    );
+    if (alreadyReviewed) {
+      return res.status(400).json({ message: "You already reviewed this product" });
+    }
+
+    product.reviews.push({ userId, name, comment, stars });
+    await product.save();
+
+    res.status(201).json({
+      message: "Review added successfully",
+      rating: product.rating,
+      reviews: product.reviews,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+// ✅ Update review
+export const updateReview = async (req, res) => {
+  try {
+    const { productId, reviewId } = req.params;
+    const { comment, stars } = req.body;
+
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    const review = product.reviews.id(reviewId);
+    if (!review) return res.status(404).json({ message: "Review not found" });
+
+    if (comment) review.comment = comment;
+    if (stars) review.stars = stars;
+
+    await product.save();
+
+    res.json({
+      message: "Review updated successfully",
+      rating: product.rating,
+      reviews: product.reviews,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ✅ Delete review
+export const deleteReview = async (req, res) => {
+  try {
+    const { productId, reviewId } = req.params;
+
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    product.reviews = product.reviews.filter(
+      (rev) => rev._id.toString() !== reviewId
+    );
+
+    await product.save();
+
+    res.json({
+      message: "Review deleted successfully",
+      rating: product.rating,
+      reviews: product.reviews,
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 };
