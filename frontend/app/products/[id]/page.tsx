@@ -19,6 +19,7 @@ import { FeaturedProducts } from "@/components/featured-products"
 import { useApi } from "@/contexts/api-context";
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import jwt_decode from "jwt-decode";
 import axios from "axios"
 const baseURL = "https://luxury-perfume-ecommerce.onrender.com";
 
@@ -130,35 +131,48 @@ export default function ProductDetailPage() {
     }
   };
 const handleSubmitReview = async () => {
-  if (!reviewName || !reviewComment || reviewStars === 0) return;
+  if (!reviewComment || reviewStars === 0) {
+    toast({
+      title: "Missing fields",
+      description: "Please fill in both stars and comment before submitting.",
+      variant: "destructive",
+    });
+    return;
+  }
+
+  // Get token from localStorage
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  if (!token) {
+    toast({
+      title: "Login required",
+      description: "You must be logged in to submit a review",
+      variant: "destructive",
+    });
+    return;
+  }
 
   try {
-    const token = localStorage.getItem("token"); // make sure token exists
-    if (!token) throw new Error("You must be logged in to submit a review");
-
     const { data } = await axios.post(
       `https://luxury-perfume-ecommerce.onrender.com/api/products/${product._id}/reviews`,
       {
-        userId: "64f1c2e...", // or get from logged-in user
-        name: reviewName,
         comment: reviewComment,
         stars: reviewStars,
       },
       {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       }
     );
 
+    // Update product reviews in frontend
     setProduct((prev: any) => ({
       ...prev,
-      rating: data.rating,
       reviews: data.reviews,
+      rating: data.rating,
     }));
 
-    setReviewName("");
+    // Clear input fields
     setReviewComment("");
     setReviewStars(0);
 
@@ -170,11 +184,12 @@ const handleSubmitReview = async () => {
     console.error(err);
     toast({
       title: "Error",
-      description: err.response?.data?.message || err.message,
+      description: err.response?.data?.message || "Failed to submit review",
       variant: "destructive",
     });
   }
 };
+
 
   if (loading) {
     return (
