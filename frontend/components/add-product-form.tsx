@@ -289,12 +289,12 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
           <Tabs defaultValue="basic" className="w-full">
             {/* Mobile-optimized tabs */}
             <div className="sticky top-0 z-10 bg-gradient-to-br from-slate-50 via-green-50 to-white pb-1">
-              <TabsList className="grid w-full grid-cols-4 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-md p-1 shadow-sm gap-1">
+              <TabsList className="grid w-full grid-cols-3 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-md p-1 shadow-sm gap-1">
                 {[
                   { value: "basic", label: "Basic", icon: Package },
                   { value: "media", label: "Media", icon: ImageIcon },
                   { value: "inventory", label: "Stock", icon: BarChart3 },
-                  { value: "reviews", label: "Reviews", icon: MessageSquare },
+                  // { value: "reviews", label: "Reviews", icon: MessageSquare },
                 ].map(({ value, label, icon: Icon }) => (
                   <TabsTrigger
                     key={value}
@@ -967,131 +967,7 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
               </Card>
             </TabsContent>
 
-            <TabsContent value="reviews" className="space-y-4 sm:space-y-6 mt-4 sm:mt-6 md:mt-8">
-              <Card className="bg-white/80 backdrop-blur-sm border border-slate-200/60 shadow-lg sm:shadow-xl rounded-lg sm:rounded-xl md:rounded-2xl overflow-hidden">
-                <CardHeader className="bg-gradient-to-r from-slate-50 to-green-50 border-b border-slate-200/60 p-3 sm:p-4 md:p-6">
-                  <CardTitle className="flex items-center gap-2 sm:gap-3 text-base sm:text-lg md:text-xl text-slate-800">
-                    <div className="p-1.5 sm:p-2 bg-green-100 rounded-lg">
-                      <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-green-600" />
-                    </div>
-                    Product Reviews
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="p-3 sm:p-4 md:p-6 space-y-4 sm:space-y-5 md:space-y-6">
-                  <div className="space-y-4 sm:space-y-5 md:space-y-6">
-                    <div className="space-y-4 sm:space-y-5 md:space-y-0 md:grid md:grid-cols-2 md:gap-4 lg:gap-6">
-                      <div className="space-y-1.5 sm:space-y-2">
-                        <Label htmlFor="reviewerName" className="text-sm font-semibold text-slate-700">
-                          Reviewer Name
-                        </Label>
-                        <Input
-                          id="reviewerName"
-                          value={newReview.name}
-                          onChange={(e) => setNewReview((prev) => ({ ...prev, name: e.target.value }))}
-                          placeholder="John Doe"
-                          className="h-10 sm:h-11 border-slate-300 focus:border-green-500 focus:ring-green-500/20 rounded-lg text-sm sm:text-base"
-                        />
-                      </div>
-                      <div className="space-y-1.5 sm:space-y-2">
-                        <Label htmlFor="reviewStars" className="text-sm font-semibold text-slate-700">
-                          Rating (1-5)
-                        </Label>
-                        <Select
-                          value={newReview.stars.toString()}
-                          onValueChange={(value) =>
-                            setNewReview((prev) => ({ ...prev, stars: Number.parseInt(value) }))
-                          }
-                        >
-                          <SelectTrigger className="h-10 sm:h-11 border-slate-300 focus:border-green-500 focus:ring-green-500/20 rounded-lg text-sm sm:text-base">
-                            <SelectValue placeholder="Select rating" />
-                          </SelectTrigger>
-                          <SelectContent className="rounded-lg sm:rounded-xl border-slate-200 shadow-xl">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <SelectItem key={star} value={star.toString()} className="rounded-md text-sm py-2">
-                                <div className="flex items-center gap-2">
-                                  <span>{"⭐".repeat(star)}</span>
-                                  {star} Star{star > 1 ? "s" : ""}
-                                </div>
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <div className="space-y-1.5 sm:space-y-2">
-                      <Label htmlFor="reviewComment" className="text-sm font-semibold text-slate-700">
-                        Review Comment
-                      </Label>
-                      <Textarea
-                        id="reviewComment"
-                        value={newReview.comment}
-                        onChange={(e) => setNewReview((prev) => ({ ...prev, comment: e.target.value }))}
-                        placeholder="Great fragrance, long-lasting and perfect for special occasions!"
-                        rows={3}
-                        className="border-slate-300 focus:border-green-500 focus:ring-green-500/20 rounded-lg resize-none text-sm sm:text-base min-h-[80px] sm:min-h-[100px]"
-                      />
-                    </div>
-                    <Button
-                      type="button"
-                      onClick={handleAddReview}
-                      variant="outline"
-                      className="w-full h-10 sm:h-11 border-green-300 text-green-600 hover:bg-green-50 hover:border-green-400 rounded-lg bg-transparent text-sm sm:text-base"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Review
-                    </Button>
-                  </div>
-
-                  <Separator className="bg-slate-200" />
-
-                  <div className="space-y-3 sm:space-y-4">
-                    <h4 className="font-semibold text-slate-800 flex items-center gap-2 text-sm sm:text-base">
-                      <MessageSquare className="w-4 h-4" />
-                      Existing Reviews ({formData.reviews.length})
-                    </h4>
-                    {formData.reviews.length === 0 ? (
-                      <div className="text-center py-6 sm:py-8">
-                        <MessageSquare className="w-10 h-10 sm:w-12 sm:h-12 text-slate-300 mx-auto mb-2 sm:mb-3" />
-                        <p className="text-slate-500 text-sm sm:text-base">No reviews added yet.</p>
-                      </div>
-                    ) : (
-                      <div className="space-y-2 sm:space-y-3">
-                        {formData.reviews.map((review, index) => (
-                          <div
-                            key={index}
-                            className="border border-slate-200 rounded-lg sm:rounded-xl p-3 sm:p-4 bg-slate-50/50 hover:bg-slate-50 transition-colors duration-200"
-                          >
-                            <div className="flex items-start sm:items-center justify-between mb-2 gap-2">
-                              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 min-w-0 flex-1">
-                                <span className="font-semibold text-slate-800 text-sm sm:text-base truncate">
-                                  {review.name}
-                                </span>
-                                <Badge
-                                  variant="outline"
-                                  className="border-yellow-300 text-yellow-700 bg-yellow-50 text-xs w-fit"
-                                >
-                                  {"⭐".repeat(review.stars)} {review.stars}
-                                </Badge>
-                              </div>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeReview(index)}
-                                className="text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg p-1 sm:p-2 flex-shrink-0"
-                              >
-                                <X className="w-3 h-3 sm:w-4 sm:h-4" />
-                              </Button>
-                            </div>
-                            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">{review.comment}</p>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
+           
           </Tabs>
         </form>
       </div>

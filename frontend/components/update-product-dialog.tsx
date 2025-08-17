@@ -248,58 +248,58 @@ export default function UpdateProductDialog({ product, trigger, onUpdate, onClos
         }
         return true
     }
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-  if (!validateForm()) return;
+        if (!validateForm()) return;
 
-  try {
-    setLoading(true);
+        try {
+            setLoading(true);
 
-    const payload = {
-      name: formData.name,
-      brand: formData.brand,
-      description: formData.description,
-      price: formData.price,
-      stock: formData.stock,
-      seller: formData.seller || "admin",
-      features: formData.features, 
-      quantity: formData.quantity,
-      category: {
-        type: formData.type,
-        gender: formData.gender,
-        subCategory: formData.subCategory,
-      },
-      specifications: formData.specifications || {},
-      reviews: formData.reviews || [],
-      images: formData.images,
-      offer:
-        formData.offer && formData.offer.isActive && formData.offer.value > 0
-          ? formData.offer
-          : null, // safer than "{}"
+            const payload = {
+                name: formData.name,
+                brand: formData.brand,
+                description: formData.description,
+                price: formData.price,
+                stock: formData.stock,
+                seller: formData.seller || "admin",
+                features: formData.features, // send raw object/array
+                quantity: formData.quantity,
+                category: {
+                    type: formData.type,
+                    gender: formData.gender,
+                    subCategory: formData.subCategory,
+                },
+                specifications: formData.specifications || {},
+                reviews: formData.reviews || [],
+                images: formData.images,
+                offer:
+                    formData.offer && formData.offer.isActive && formData.offer.value > 0
+                        ? formData.offer
+                        : {}, // backend safeParse handles {}
+            };
+
+            const updatedProduct = await editProduct(formData.id!, payload);
+
+            toast({
+                title: "Product updated",
+                description: `${updatedProduct.name} was updated successfully.`,
+            });
+
+            if (onUpdate) onUpdate(updatedProduct);
+            setOpen(false);
+            if (onClose) onClose();
+        } catch (error: any) {
+            console.error("Failed to update product:", error);
+            toast({
+                title: "Update failed",
+                description: error?.response?.data?.message || "Something went wrong",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+        }
     };
-
-    const updatedProduct = await editProduct(formData.id!, payload);
-
-    toast({
-      title: "Product updated",
-      description: `${updatedProduct.name} was updated successfully.`,
-    });
-
-    if (onUpdate) onUpdate(updatedProduct);
-    setOpen(false);
-    if (onClose) onClose();
-  } catch (error: any) {
-    console.error("Failed to update product:", error);
-    toast({
-      title: "Update failed",
-      description: error?.response?.data?.message || "Something went wrong",
-      variant: "destructive",
-    });
-  } finally {
-    setLoading(false);
-  }
-};
 
 
 
@@ -360,7 +360,7 @@ export default function UpdateProductDialog({ product, trigger, onUpdate, onClos
                                 <Tabs defaultValue="basic" className="w-full">
                                     {/* Sticky Tabs Navigation */}
                                     <div className="sticky top-0 z-20 bg-white/95 backdrop-blur-sm pb-4 border-b border-slate-100 mb-6">
-                                        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-lg p-1 shadow-sm gap-1">
+                                        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 bg-white/90 backdrop-blur-sm border border-slate-200 rounded-lg p-1 shadow-sm gap-1">
                                             <TabsTrigger
                                                 value="basic"
                                                 className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-green-600 data-[state=active]:text-white rounded-md transition-all duration-200 text-xs sm:text-sm py-2 px-2"
@@ -382,13 +382,13 @@ export default function UpdateProductDialog({ product, trigger, onUpdate, onClos
                                                 <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4" />
                                                 <span>Stock</span>
                                             </TabsTrigger>
-                                            <TabsTrigger
+                                            {/* <TabsTrigger
                                                 value="reviews"
                                                 className="flex flex-col sm:flex-row items-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-green-600 data-[state=active]:text-white rounded-md transition-all duration-200 text-xs sm:text-sm py-2 px-2"
                                             >
                                                 <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4" />
                                                 <span>Reviews</span>
-                                            </TabsTrigger>
+                                            </TabsTrigger> */}
                                         </TabsList>
                                     </div>
 
@@ -1146,156 +1146,7 @@ export default function UpdateProductDialog({ product, trigger, onUpdate, onClos
                                                 </div>
                                             </CardContent>
                                         </Card>
-                                    </TabsContent>
-
-                                    <TabsContent value="reviews" className="space-y-6 mt-0">
-                                        <Card className="bg-white border border-slate-200 shadow-sm rounded-xl overflow-hidden">
-                                            <CardHeader className="bg-gradient-to-r from-slate-50 to-green-50 border-b border-slate-200 p-4">
-                                                <CardTitle className="flex items-center gap-3 text-lg text-slate-800">
-                                                    <div className="p-2 bg-green-100 rounded-lg">
-                                                        <MessageSquare className="w-4 h-4 text-green-600" />
-                                                    </div>
-                                                    Product Reviews
-                                                </CardTitle>
-                                            </CardHeader>
-                                            <CardContent className="p-4 space-y-4">
-                                                <div className="space-y-4">
-                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                        <div className="space-y-2">
-                                                            <Label htmlFor="reviewerName" className="text-sm font-semibold text-slate-700">
-                                                                Reviewer Name
-                                                            </Label>
-                                                            <Input
-                                                                id="reviewerName"
-                                                                value={newReview.name}
-                                                                onChange={(e) => setNewReview((prev) => ({ ...prev, name: e.target.value }))}
-                                                                placeholder="John Doe"
-                                                                className="h-10 border-slate-300 focus:border-green-500 focus:ring-green-500/20 rounded-lg"
-                                                            />
-                                                        </div>
-
-                                                        {/* Enhanced Review Stars with Slider */}
-                                                        <div className="space-y-3">
-                                                            <Label htmlFor="reviewStars" className="text-sm font-semibold text-slate-700">
-                                                                Rating (1-5)
-                                                            </Label>
-                                                            <div className="space-y-3">
-                                                                <Select
-                                                                    value={newReview.stars.toString()}
-                                                                    onValueChange={(value) =>
-                                                                        setNewReview((prev) => ({ ...prev, stars: Number.parseInt(value) }))
-                                                                    }
-                                                                >
-                                                                    <SelectTrigger className="h-10 border-slate-300 focus:border-green-500 focus:ring-green-500/20 rounded-lg">
-                                                                        <SelectValue placeholder="Select rating" />
-                                                                    </SelectTrigger>
-                                                                    <SelectContent className="rounded-xl border-slate-200 shadow-xl">
-                                                                        {[1, 2, 3, 4, 5].map((star) => (
-                                                                            <SelectItem key={star} value={star.toString()} className="rounded-lg">
-                                                                                <div className="flex items-center gap-2">
-                                                                                    <span>{"⭐".repeat(star)}</span>
-                                                                                    {star} Star{star > 1 ? "s" : ""}
-                                                                                </div>
-                                                                            </SelectItem>
-                                                                        ))}
-                                                                    </SelectContent>
-                                                                </Select>
-                                                                <div className="px-1">
-                                                                    <Slider
-                                                                        value={[newReview.stars]}
-                                                                        onValueChange={(value) => setNewReview((prev) => ({ ...prev, stars: value[0] }))}
-                                                                        max={5}
-                                                                        min={1}
-                                                                        step={1}
-                                                                        className="w-full"
-                                                                    />
-                                                                    <div className="flex justify-between text-xs text-slate-500 mt-1">
-                                                                        <span>1 ⭐</span>
-                                                                        <span className="font-medium text-yellow-600">
-                                                                            {newReview.stars} {"⭐".repeat(newReview.stars)}
-                                                                        </span>
-                                                                        <span>5 ⭐</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-
-                                                    <div className="space-y-2">
-                                                        <Label htmlFor="reviewComment" className="text-sm font-semibold text-slate-700">
-                                                            Review Comment
-                                                        </Label>
-                                                        <Textarea
-                                                            id="reviewComment"
-                                                            value={newReview.comment}
-                                                            onChange={(e) => setNewReview((prev) => ({ ...prev, comment: e.target.value }))}
-                                                            placeholder="Great fragrance, long-lasting and perfect for special occasions!"
-                                                            rows={3}
-                                                            className="border-slate-300 focus:border-green-500 focus:ring-green-500/20 rounded-lg resize-none"
-                                                        />
-                                                    </div>
-
-                                                    <Button
-                                                        type="button"
-                                                        onClick={addReview}
-                                                        variant="outline"
-                                                        className="w-full h-10 border-green-300 text-green-600 hover:bg-green-50 hover:border-green-400 rounded-lg bg-transparent"
-                                                    >
-                                                        <Plus className="w-4 h-4 mr-2" />
-                                                        Add Review
-                                                    </Button>
-                                                </div>
-
-                                                <Separator className="bg-slate-200" />
-
-                                                <div className="space-y-4">
-                                                    <h4 className="font-semibold text-slate-800 flex items-center gap-2">
-                                                        <MessageSquare className="w-4 h-4" />
-                                                        Existing Reviews ({formData.reviews.length})
-                                                    </h4>
-                                                    {formData.reviews.length === 0 ? (
-                                                        <div className="text-center py-6">
-                                                            <MessageSquare className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-                                                            <p className="text-slate-500 text-sm">No reviews added yet.</p>
-                                                        </div>
-                                                    ) : (
-                                                        <ScrollArea className="h-60 w-full rounded-md border border-slate-200 p-4">
-                                                            <div className="space-y-3">
-                                                                {formData.reviews.map((review, index) => (
-                                                                    <div
-                                                                        key={index}
-                                                                        className="border border-slate-200 rounded-lg p-3 bg-slate-50/50 hover:bg-slate-50 transition-colors duration-200"
-                                                                    >
-                                                                        <div className="flex items-center justify-between mb-2">
-                                                                            <div className="flex items-center gap-3">
-                                                                                <span className="font-semibold text-slate-800 text-sm">{review.name}</span>
-                                                                                <Badge
-                                                                                    variant="outline"
-                                                                                    className="border-yellow-300 text-yellow-700 bg-yellow-50 text-xs"
-                                                                                >
-                                                                                    {"⭐".repeat(review.stars)} {review.stars}
-                                                                                </Badge>
-                                                                            </div>
-                                                                            <Button
-                                                                                type="button"
-                                                                                variant="ghost"
-                                                                                size="sm"
-                                                                                onClick={() => removeReview(index)}
-                                                                                className="text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg p-1"
-                                                                            >
-                                                                                <X className="w-4 h-4" />
-                                                                            </Button>
-                                                                        </div>
-                                                                        <p className="text-sm text-slate-600 leading-relaxed">{review.comment}</p>
-                                                                    </div>
-                                                                ))}
-                                                            </div>
-                                                        </ScrollArea>
-                                                    )}
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    </TabsContent>
+                                    </TabsContent>                        
                                 </Tabs>
                             </form>
                         </div>
