@@ -165,7 +165,7 @@ const handleSubmitReview = async () => {
       }
     );
 
-    // Update product reviews in frontend
+    // Update product reviews in frontend with backend response
     setProduct((prev: any) => ({
       ...prev,
       reviews: data.reviews,
@@ -177,11 +177,11 @@ const handleSubmitReview = async () => {
     setReviewStars(0);
 
     toast({
-      title: "Review submitted",
-      description: "Thank you for your feedback!",
+      title: "Success",
+      description: data.message || "Review submitted successfully",
     });
   } catch (err: any) {
-    console.error(err);
+    console.error("Review error:", err);
     toast({
       title: "Error",
       description: err.response?.data?.message || "Failed to submit review",
@@ -189,6 +189,7 @@ const handleSubmitReview = async () => {
     });
   }
 };
+
 
 
   if (loading) {

@@ -248,60 +248,58 @@ export default function UpdateProductDialog({ product, trigger, onUpdate, onClos
         }
         return true
     }
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-        if (!validateForm()) return;
+  if (!validateForm()) return;
 
-        try {
-            setLoading(true);
+  try {
+    setLoading(true);
 
-            const payload = {
-                name: formData.name,
-                brand: formData.brand,
-                description: formData.description,
-                price: formData.price,
-                stock: formData.stock,
-                seller: formData.seller || "admin",
-                features: JSON.stringify(formData.features),
-                quantity: JSON.stringify(formData.quantity),
-                category: JSON.stringify({
-                    type: formData.type,
-                    gender: formData.gender,
-                    subCategory: formData.subCategory,
-                }),
-                specifications: JSON.stringify(formData.specifications || {}),
-                reviews: JSON.stringify(formData.reviews || []),
-                images: JSON.stringify(formData.images),
-                offer: JSON.stringify(
-                    formData.offer && formData.offer.isActive && formData.offer.value > 0
-                        ? formData.offer
-                        : {}
-                ),
-            }
-
-            const updatedProduct = await editProduct(formData.id!, payload);
-
-
-            toast({
-                title: "Product updated",
-                description: `${updatedProduct.name} was updated successfully.`,
-            });
-
-            if (onUpdate) onUpdate(updatedProduct);
-            setOpen(false);
-            if (onClose) onClose();
-        } catch (error: any) {
-            console.error("Failed to update product:", error);
-            toast({
-                title: "Update failed",
-                description: error?.response?.data?.message || "Something went wrong",
-                variant: "destructive",
-            });
-        } finally {
-            setLoading(false);
-        }
+    const payload = {
+      name: formData.name,
+      brand: formData.brand,
+      description: formData.description,
+      price: formData.price,
+      stock: formData.stock,
+      seller: formData.seller || "admin",
+      features: formData.features, 
+      quantity: formData.quantity,
+      category: {
+        type: formData.type,
+        gender: formData.gender,
+        subCategory: formData.subCategory,
+      },
+      specifications: formData.specifications || {},
+      reviews: formData.reviews || [],
+      images: formData.images,
+      offer:
+        formData.offer && formData.offer.isActive && formData.offer.value > 0
+          ? formData.offer
+          : null, // safer than "{}"
     };
+
+    const updatedProduct = await editProduct(formData.id!, payload);
+
+    toast({
+      title: "Product updated",
+      description: `${updatedProduct.name} was updated successfully.`,
+    });
+
+    if (onUpdate) onUpdate(updatedProduct);
+    setOpen(false);
+    if (onClose) onClose();
+  } catch (error: any) {
+    console.error("Failed to update product:", error);
+    toast({
+      title: "Update failed",
+      description: error?.response?.data?.message || "Something went wrong",
+      variant: "destructive",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
 
 
