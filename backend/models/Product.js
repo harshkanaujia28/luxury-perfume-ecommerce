@@ -65,7 +65,7 @@ const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     brand: { type: String, required: true },
-    brandimage: { type: String, required: true },
+    brandimage: { type: String, required: false },
     price: { type: Number, required: true },
     originalPrice: Number,
     image: { type: String, required: true },
