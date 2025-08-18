@@ -38,25 +38,25 @@ export default function OrdersPage() {
     fetchOrders();
   }, []);
 
-  const getStatusColor = (status: string) =>
-    clsx("px-3 py-1 rounded-full text-xs font-medium capitalize", {
-      "bg-green-100 text-green-700 border border-green-300":
-        status === "Delivered",
-      "bg-yellow-100 text-yellow-700 border border-yellow-300":
-        status === "Pending",
-      "bg-red-100 text-red-700 border border-red-300":
-        status === "Cancelled",
+  const getStatusColor = (status: string) => {
+    const s = status?.toLowerCase(); // normalize
+    return clsx("px-3 py-1 rounded-full text-xs font-medium capitalize", {
+      "bg-green-100 text-green-700 border border-green-300": s === "delivered",
+      "bg-yellow-100 text-yellow-700 border border-yellow-300": s === "pending",
+      "bg-red-100 text-red-700 border border-red-300": s === "cancelled",
       "bg-gray-100 text-gray-600 border border-gray-300": ![
-        "Delivered",
-        "Pending",
-        "Cancelled",
-      ].includes(status),
+        "delivered",
+        "pending",
+        "cancelled",
+      ].includes(s),
     });
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-white">
       <Header />
-      <main className="max-w-6xl mx-auto min-h-screen px-4 py-28">
+      <main className="max-w-6xl mx-auto min-h-screen px-4 py-36">
         <h1 className="text-3xl font-bold mb-8 text-green-900 text-center">
           My Orders
         </h1>
@@ -93,12 +93,17 @@ export default function OrdersPage() {
               >
                 <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-green-50 rounded-t-2xl px-6 py-4">
                   <CardTitle className="text-lg text-green-900 font-semibold">
-                    <Link
-                      href={`/orders/${order._id}`}
-                      className="hover:underline"
-                    >
-                      click here to check your order details   #{order._id.slice(-6)}
+                    <Link href={`/orders/${order._id}`}>
+                      <button
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg shadow-md hover:bg-green-700 hover:shadow-lg transition-all duration-300 flex items-center gap-2"
+                      >
+                        <span>View Order</span>
+                        <span className="text-xs bg-white text-green-700 px-2 py-0.5 rounded-md">
+                          #{order._id.slice(-6)}
+                        </span>
+                      </button>
                     </Link>
+
                   </CardTitle>
                   <span className={getStatusColor(order.status)}>
                     {order.status}
@@ -136,14 +141,14 @@ export default function OrdersPage() {
                                       ? p.image
                                       : `${BASE_URL}${p.image}`
                                     : prod?.image?.startsWith("http")
-                                    ? prod.image
-                                    : prod?.image
-                                    ? `${BASE_URL}${prod.image}`
-                                    : prod?.images?.[0]?.startsWith("http")
-                                    ? prod.images[0]
-                                    : prod?.images?.[0]
-                                    ? `${BASE_URL}${prod.images[0]}`
-                                    : "/placeholder.svg"
+                                      ? prod.image
+                                      : prod?.image
+                                        ? `${BASE_URL}${prod.image}`
+                                        : prod?.images?.[0]?.startsWith("http")
+                                          ? prod.images[0]
+                                          : prod?.images?.[0]
+                                            ? `${BASE_URL}${prod.images[0]}`
+                                            : "/placeholder.svg"
                                 }
                                 alt={prod.name}
                                 className="w-16 h-16 object-cover rounded-md border shadow-sm hover:scale-105 transition"
