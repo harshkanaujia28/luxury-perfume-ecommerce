@@ -8,7 +8,9 @@ import { Footer } from "@/components/footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import clsx from "clsx";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://luxury-perfume-ecommerce.onrender.com";
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  "https://luxury-perfume-ecommerce.onrender.com";
 
 export default function OrdersPage() {
   const { getMyOrders } = useApi();
@@ -21,7 +23,8 @@ export default function OrdersPage() {
         const data = await getMyOrders();
 
         const sortedOrders = (data.orders || []).sort(
-          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
 
         setOrders(sortedOrders);
@@ -35,47 +38,75 @@ export default function OrdersPage() {
     fetchOrders();
   }, []);
 
-
   const getStatusColor = (status: string) =>
-    clsx(
-      "px-3 py-1 rounded-full text-xs font-medium capitalize",
-      {
-        "bg-green-100 text-green-800": status === "Delivered",
-        "bg-yellow-100 text-yellow-800": status === "Pending",
-        "bg-red-100 text-red-800": status === "Cancelled",
-        "bg-gray-100 text-gray-800": !["Delivered", "Pending", "Cancelled"].includes(status),
-      }
-    );
+    clsx("px-3 py-1 rounded-full text-xs font-medium capitalize", {
+      "bg-green-100 text-green-700 border border-green-300":
+        status === "Delivered",
+      "bg-yellow-100 text-yellow-700 border border-yellow-300":
+        status === "Pending",
+      "bg-red-100 text-red-700 border border-red-300":
+        status === "Cancelled",
+      "bg-gray-100 text-gray-600 border border-gray-300": ![
+        "Delivered",
+        "Pending",
+        "Cancelled",
+      ].includes(status),
+    });
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-white">
       <Header />
-      <main className="max-w-5xl mx-auto min-h-screen px-4 py-20">
-        <h1 className="text-3xl font-bold mb-6 text-green-900">My Orders</h1>
+      <main className="max-w-6xl mx-auto min-h-screen px-4 py-28">
+        <h1 className="text-3xl font-bold mb-8 text-green-900 text-center">
+          My Orders
+        </h1>
 
         {loading ? (
-          <p className="text-gray-600 flex justify-center items-center">Loading your orders...</p>
+          <div className="flex justify-center items-center py-20">
+            <p className="text-gray-600 animate-pulse">
+              Loading your orders...
+            </p>
+          </div>
         ) : orders.length === 0 ? (
-          <p className="text-gray-600 flex justify-center items-center">You haven’t placed any orders yet.</p>
+          <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+            <img
+              src="/empty-orders.svg"
+              alt="No orders"
+              className="w-40 h-40 opacity-80"
+            />
+            <p className="text-gray-600 text-lg">
+              You haven’t placed any orders yet.
+            </p>
+            <Link
+              href="/products"
+              className="px-5 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition"
+            >
+              Shop Now
+            </Link>
+          </div>
         ) : (
-          <div className="space-y-6 py-8">
+          <div className="space-y-8">
             {orders.map((order) => (
               <Card
                 key={order._id}
-                className="border border-green-100 shadow-sm rounded-xl"
+                className="border border-green-100 shadow-md rounded-2xl hover:shadow-lg transition-all duration-300"
               >
-                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-green-50 rounded-t-2xl px-6 py-4">
                   <CardTitle className="text-lg text-green-900 font-semibold">
-                    <Link href={`/orders/${order._id}`}>View Order</Link>
-
+                    <Link
+                      href={`/orders/${order._id}`}
+                      className="hover:underline"
+                    >
+                      click here to check your order details   #{order._id.slice(-6)}
+                    </Link>
                   </CardTitle>
                   <span className={getStatusColor(order.status)}>
                     {order.status}
                   </span>
                 </CardHeader>
 
-                <CardContent className="space-y-4 text-sm text-gray-700">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <CardContent className="space-y-5 p-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
                     <p>
                       <strong>Total:</strong> ₹{order.total}
                     </p>
@@ -86,45 +117,53 @@ export default function OrdersPage() {
                   </div>
 
                   <div>
-                    <p className="font-medium text-green-800 mb-2">Items:</p>
-                    <ul className="space-y-3">
+                    <p className="font-medium text-green-800 mb-3">Items:</p>
+                    <ul className="space-y-4">
                       {order.products.map((p, idx) => {
                         const prod = p.product;
                         if (!prod) return null;
 
                         return (
-                          <li key={idx} className="flex items-center gap-4">
-                            <img
-                              src={
-                                p?.image
-                                  ? p.image.startsWith("http")
-                                    ? p.image
-                                    : `${BASE_URL}${p.image}`
-                                  : prod?.image?.startsWith("http")
+                          <li
+                            key={idx}
+                            className="flex items-center gap-4 bg-gray-50 p-3 rounded-lg border hover:bg-gray-100 transition"
+                          >
+                            <Link href={`/products/${prod._id}`} className="flex-shrink-0">
+                              <img
+                                src={
+                                  p?.image
+                                    ? p.image.startsWith("http")
+                                      ? p.image
+                                      : `${BASE_URL}${p.image}`
+                                    : prod?.image?.startsWith("http")
                                     ? prod.image
                                     : prod?.image
-                                      ? `${BASE_URL}${prod.image}`
-                                      : prod?.images?.[0]?.startsWith("http")
-                                        ? prod.images[0]
-                                        : prod?.images?.[0]
-                                          ? `${BASE_URL}${prod.images[0]}`
-                                          : "/placeholder.svg"
-                              }
-                              alt={prod.name}
-                              className="w-14 h-14 object-cover rounded-md border"
-                            />
-
-
+                                    ? `${BASE_URL}${prod.image}`
+                                    : prod?.images?.[0]?.startsWith("http")
+                                    ? prod.images[0]
+                                    : prod?.images?.[0]
+                                    ? `${BASE_URL}${prod.images[0]}`
+                                    : "/placeholder.svg"
+                                }
+                                alt={prod.name}
+                                className="w-16 h-16 object-cover rounded-md border shadow-sm hover:scale-105 transition"
+                              />
+                            </Link>
 
                             <div>
-                              <p className="font-medium">{prod.name}</p>
+                              <Link
+                                href={`/products/${prod._id}`}
+                                className="font-medium text-gray-900 hover:underline"
+                              >
+                                {prod.name}
+                              </Link>
                               <p className="text-xs text-gray-500">
                                 Qty: {p.quantity} × ₹{prod.price} = ₹
                                 {(prod.price * p.quantity).toFixed(2)}
                               </p>
                               {p.selectedSize && (
                                 <p className="text-xs italic text-gray-400">
-                                  Selected Size: {p.selectedSize}
+                                  Size: {p.selectedSize}
                                 </p>
                               )}
                             </div>
@@ -132,7 +171,6 @@ export default function OrdersPage() {
                         );
                       })}
                     </ul>
-
                   </div>
                 </CardContent>
               </Card>

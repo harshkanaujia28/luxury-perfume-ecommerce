@@ -66,7 +66,7 @@ export default function CategoriesPage() {
   );
 
   return (
-    <div className="min-h-screen bg-white py-16">
+    <div className="min-h-screen bg-white py-32">
       <Header />
       <main>
         {/* Hero Section */}

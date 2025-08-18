@@ -112,7 +112,7 @@ export default function SizeGuidePage() {
       <Header />
       <main>
         {/* Hero Section */}
-        <section className="luxury-gradient py-28">
+        <section className="luxury-gradient py-40">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">Fragrance Size Guide</h1>
             <p className="text-xl text-gray-600">Choose the perfect size for your lifestyle and fragrance needs</p>

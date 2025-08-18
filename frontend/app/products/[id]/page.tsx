@@ -194,7 +194,7 @@ const handleSubmitReview = async () => {
 
   if (loading) {
     return (
-      <div className="p-8 flex justify-center items-center min-h-[300px]">
+      <div className="p-8 flex justify-center items-center min-h-[300px] py-40">
         <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-400 border-t-transparent" />
         <span className="ml-4 text-gray-600">Loading product...</span>
       </div>
@@ -203,11 +203,12 @@ const handleSubmitReview = async () => {
 
 
   return (
-    <>
+    <> 
+    <Header />
 
       <div className="flex flex-col min-h-screen bg-white pt-16">
-        <Header />
-        <div className="pt-4 px-4 sm:px-6 flex flex-wrap items-center text-xs sm:text-sm text-gray-600 gap-1 sm:gap-2">
+        
+        <div className="pt-20 px-4 sm:px-6 flex flex-wrap items-center text-xs sm:text-sm text-gray-600 gap-1 sm:gap-2">
           <Link
             href="/products"
             className="inline-flex items-center gap-1 text-gray-600 hover:text-black transition-colors"
@@ -621,9 +622,9 @@ const handleSubmitReview = async () => {
             <FeaturedProducts />
           </div>
         </main>
-        <Footer />
+       
       </div>
-
+ <Footer />
     </>
   )
 }

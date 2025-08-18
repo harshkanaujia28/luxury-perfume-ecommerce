@@ -20,7 +20,7 @@ export default function CartPage() {
 
   if (!items || items.length === 0) {
     return (
-      <div className="min-h-screen bg-white pt-16">
+      <div className="min-h-screen bg-white pt-28">
         <Header />
         <main className="max-w-7xl mx-auto px-4 py-16 text-center">
           <ShoppingBag className="mx-auto h-12 w-12 text-gray-400" />
@@ -54,7 +54,7 @@ export default function CartPage() {
   const { itemCount, subtotal, tax, total } = calculateSummary();
 
   return (
-    <div className="min-h-screen bg-white pt-16">
+    <div className="min-h-screen bg-white pt-36">
       <Header />
       <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
         <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>

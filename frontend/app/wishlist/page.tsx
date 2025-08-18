@@ -23,7 +23,7 @@ export default function WishlistPage() {
     return (
       <>
         <Header />
-        <div className="flex flex-col items-center justify-center py-28 text-center px-4 space-y-4">
+        <div className="flex flex-col items-center justify-center py-36 text-center px-4 space-y-4">
           <Heart className="w-16 h-16 text-gray-300" />
           <h2 className="text-2xl font-semibold text-gray-700">
             Your wishlist is empty
@@ -41,7 +41,7 @@ export default function WishlistPage() {
   return (
     <>
       <Header />
-      <div className="max-w-7xl mx-auto pt-24 pb-12 px-4">
+      <div className="max-w-7xl mx-auto pt-36 pb-12 px-4">
         <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
           My Wishlist
         </h1>

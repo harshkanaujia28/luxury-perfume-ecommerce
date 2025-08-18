@@ -40,7 +40,7 @@ export default function ShippingPage() {
       <Header />
       <main>
         {/* Hero Section */}
-        <section className="luxury-gradient py-36">
+        <section className="luxury-gradient py-40">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">Shipping Information</h1>
             <p className="text-xl text-gray-600">Fast, secure, and reliable delivery worldwide</p>

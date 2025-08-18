@@ -28,7 +28,7 @@ export default function AboutPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-white pt-16">
+    <div className="min-h-screen bg-white pt-28">
       <Header />
       <main>
         {/* Hero Section */}

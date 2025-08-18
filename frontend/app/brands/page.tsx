@@ -61,7 +61,7 @@ export default function BrandsPage() {
   })
 
   return (
-    <div className="min-h-screen bg-white pt-18 py-16">
+    <div className="min-h-screen bg-white pt-18 py-32">
       <Header />
       <main>
         {/* Hero Section */}

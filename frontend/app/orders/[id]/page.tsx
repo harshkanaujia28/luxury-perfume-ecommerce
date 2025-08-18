@@ -96,8 +96,9 @@ export default function OrderDetailPage() {
   );
 
   return (
-    <div className="min-h-screen bg-white py-20">
-      <Header />
+    <>
+    <Header />
+    <div className="min-h-screen bg-white py-32">
       <main className="max-w-5xl mx-auto px-4 py-10">
         {loading ? (
           <p className="text-gray-600">Loading order...</p>
@@ -265,7 +266,9 @@ export default function OrderDetailPage() {
           </div>
         )}
       </main>
-      <Footer />
+      
     </div>
+    <Footer />
+    </>
   );
 }
