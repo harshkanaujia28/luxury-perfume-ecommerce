@@ -9,7 +9,7 @@ export function Footer() {
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <img src="/Z-1-removebg-preview.png" alt="Zafrine" className="h-6 md:h-8" />
+              <img src="/Zafrine_Logo.png" alt="Zafrine" className="w-20 h-28" />
             </div>
             <p className="text-gray-400 text-sm">
               Discover timeless Zafrine fragrances that reflect your unique essence and personal style.

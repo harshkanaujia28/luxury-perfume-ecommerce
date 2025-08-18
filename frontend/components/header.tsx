@@ -58,16 +58,18 @@ export function Header() {
       <nav className="flex items-center justify-between px-4 py-4 lg:px-12">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
-          <div className="relative w-24 h-8 sm:w-28 sm:h-10">
+          <div className="relative">
             <Image
-              src="/Z-1.png"
+              src="/Zafrine_Logo.png"
               alt="Luxe Fragrances Logo"
-              fill
+              width={60}           // keep square dimensions
+              height={60}
               className="object-contain"
               priority
             />
           </div>
         </Link>
+
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-6">
