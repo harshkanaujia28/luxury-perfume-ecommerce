@@ -107,7 +107,7 @@ export default function NewProductsPage() {
                           src={
                             product.image?.startsWith("http")
                               ? product.image
-                              : `https://luxury-perfume-ecommerce.onrender.com${product.image || product.images?.[0] || "/placeholder.svg"}`
+                              : `NEXT_PUBLIC_API_URL${product.image || product.images?.[0] || "/placeholder.svg"}`
                           }
                           alt={product.name}
                           fill

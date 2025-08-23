@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import jwt_decode from "jwt-decode";
 import axios from "axios"
-const baseURL = "https://luxury-perfume-ecommerce.onrender.com";
+const baseURL = "NEXT_PUBLIC_API_URL";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -153,7 +153,7 @@ const handleSubmitReview = async () => {
 
   try {
     const { data } = await axios.post(
-      `https://luxury-perfume-ecommerce.onrender.com/api/products/${product._id}/reviews`,
+      `${process.env.NEXT_PUBLIC_API_URL}/products/${product._id}/reviews`,
       {
         comment: reviewComment,
         stars: reviewStars,

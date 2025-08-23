@@ -7,7 +7,7 @@ import { useApi } from "@/contexts/api-context"
 export default function WhyUs() {
   const { getPromotionalBanners } = useApi()
   const [banners, setBanners] = useState<any[]>([])
-  const baseURL = "https://luxury-perfume-ecommerce.onrender.com"
+  const baseURL = process.env.NEXT_PUBLIC_API_URL
 
   useEffect(() => {
     const fetchBanners = async () => {

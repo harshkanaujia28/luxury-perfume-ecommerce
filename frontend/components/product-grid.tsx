@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useWishlist } from "@/contexts/wishlist-context";
 import { useCart } from "@/contexts/cart-context";
 
-const baseURL = "https://luxury-perfume-ecommerce.onrender.com";
+const baseURL = "NEXT_PUBLIC_API_URL";
 
 interface Product {
   _id: string;

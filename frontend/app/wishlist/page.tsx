@@ -11,8 +11,7 @@ import { Footer } from "@/components/footer";
 import { Heart } from "lucide-react";
 
 const baseURL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "https://luxury-perfume-ecommerce.onrender.com";
+  process.env.NEXT_PUBLIC_API_URL 
 
 export default function WishlistPage() {
   const { items, addItem, removeItem, isInWishlist } = useWishlist();

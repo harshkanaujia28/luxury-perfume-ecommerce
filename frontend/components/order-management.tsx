@@ -420,7 +420,7 @@ const fetchOrders = async () => {
                         <div className="w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center">
                           {item.image ? (
                             <img
-                              src={item.image.startsWith("http") ? item.image : `https://luxury-perfume-ecommerce.onrender.com${item.image}`}
+                              src={item.image.startsWith("http") ? item.image : `NEXT_PUBLIC_API_URL${item.image}`}
                               alt={item.name}
                               className="w-full h-full object-cover rounded-md"
                             />
