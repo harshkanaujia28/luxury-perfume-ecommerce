@@ -916,35 +916,48 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
         const res = await axios.get(`/products/${id}`);
         return res.data.product;
     };
-    const addProduct = async (data: FormData) => {
-        try {
-            const res = await axios.post("https://luxury-perfume-ecommerce.onrender.com/api/products", data, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-            });
-            return res.data; // backend returns product directly
-        } catch (error: any) {
-            console.error("Failed to add product:", error);
-            throw new Error(error.response?.data?.message || "Failed to add product");
-        }
-    };
+const addProduct = async (data: FormData) => {
+  try {
+    const res = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/products`,
+      data,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    return res.data; // backend returns product directly
+  } catch (error: any) {
+    console.error("❌ Failed to add product:", error);
+    throw new Error(
+      error.response?.data?.message || "Failed to add product"
+    );
+  }
+};
 
-    const editProduct = async (id: string, data: any) => {
-        const res = await axios.put(
-            `https://luxury-perfume-ecommerce.onrender.com/api/products/admin/product/${id}`,
-            data,
-            {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-            }
-        );
+const editProduct = async (id: string, data: any) => {
+  try {
+    const res = await axios.put(
+      `${process.env.NEXT_PUBLIC_API_URL}/products/admin/product/${id}`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    return res.data; // assuming your backend does: res.json(product)
+  } catch (error: any) {
+    console.error("❌ Failed to edit product:", error);
+    throw new Error(
+      error.response?.data?.message || "Failed to edit product"
+    );
+  }
+};
 
-        return res.data; // assuming your backend does: res.json(product)
-    };
 
 
 

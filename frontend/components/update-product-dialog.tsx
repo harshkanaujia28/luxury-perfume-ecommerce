@@ -1034,7 +1034,7 @@ export default function UpdateProductDialog({ product, trigger, onUpdate, onClos
                                                                                     : ""
                                                                         }
                                                                         alt={`Product ${index + 1}`}
-                                                                        className="h-20 w-20 object-cover rounded"
+                                                                        className="h-120 w-120 object-cover rounded"
                                                                     />
 
 
