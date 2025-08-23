@@ -368,7 +368,7 @@ export default function AdminBannersPage() {
                                   src={
                                     banner.imageUrl.startsWith("http")
                                       ? banner.imageUrl
-                                      : `https://luxury-perfume-ecommerce.onrender.com${banner.imageUrl}`
+                                      : `NEXT_PUBLIC_API_URL${banner.imageUrl}`
                                   }
                                   alt={banner.title}
                                   width={400}
@@ -457,7 +457,7 @@ export default function AdminBannersPage() {
                             src={
                               hero.imageUrl?.startsWith("http")
                                 ? hero.imageUrl
-                                : `https://luxury-perfume-ecommerce.onrender.com${hero.imageUrl || "/placeholder.svg"}`
+                                : `NEXT_PUBLIC_API_URL${hero.imageUrl || "/placeholder.svg"}`
                             }
                             alt={hero.title}
                             width={400}
