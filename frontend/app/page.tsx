@@ -47,7 +47,7 @@ export default function HomePage() {
         <Featured/>
         <WhyUs />
         <FeaturedProducts /> {/* pass backend products */}
-        <NewsletterSection />
+        {/* <NewsletterSection /> */}
       </main>
       <Footer />
     </div>

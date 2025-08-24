@@ -44,13 +44,16 @@ const io = new SocketIOServer(server, {
     credentials: true,
   },
 });
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://zafrine.in", // apna domain
+  "https://www.zafrine.in"
+];
+
 app.use(
   cors({
     origin: function (origin, callback) {
-      const vercelRegex = /^https:\/\/luxury-perfume-ecommerce.*\.vercel\.app$/;
-      const isLocalhost = origin === "http://localhost:3000";
-
-      if (!origin || vercelRegex.test(origin) || isLocalhost) {
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
         callback(new Error("Not allowed by CORS"));
@@ -59,6 +62,7 @@ app.use(
     credentials: true,
   })
 );
+
 
 // Middleware
 // app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
