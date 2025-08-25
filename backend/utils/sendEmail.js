@@ -1,21 +1,19 @@
-// backend/utils/sendEmail.js
 import nodemailer from "nodemailer";
 
 export const sendEmail = async (to, subject, html) => {
   try {
-    // Create SMTP transporter for Google Workspace
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,          // TLS port
-      secure: false,      // false for port 587
+      host: process.env.EMAIL_HOST,
+      port: Number(process.env.EMAIL_PORT),
+      secure: false, // TLS
       auth: {
-        user: process.env.EMAIL_USER, // info@zafrine.in
-        pass: process.env.EMAIL_PASS, // app password
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,  // read from .env
       },
     });
 
     const mailOptions = {
-      from: `"Zafrine" <${process.env.EMAIL_USER}>`, // show name + email
+      from: `"Zafrine" <${process.env.EMAIL_USER}>`,
       to,
       subject,
       html,
