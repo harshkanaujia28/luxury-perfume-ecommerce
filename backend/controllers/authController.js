@@ -1,6 +1,7 @@
 import User from "../models/User.js"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
+import { sendEmail } from "../utils/sendEmail.js";
 
 
 
@@ -18,26 +19,27 @@ export const register = async (req, res) => {
 // Forgot Password Handler
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
+
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ status: "error", message: 'User not found' });
+    if (!user) return res.status(404).json({ status: "error", message: "User not found" });
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
     const resetLink = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/reset-password/${token}`;
 
     await sendEmail(
       user.email,
-      'Password Reset Request',
-      `Click the following link to reset your password: ${resetLink}`
+      "Password Reset Request",
+      `<p>Click <a href="${resetLink}">here</a> to reset your password.</p>`
     );
 
-    res.status(200).json({ status: "success", message: 'Reset link sent to your email' });
-
+    res.status(200).json({ status: "success", message: "Reset link sent to your email" });
   } catch (err) {
-    console.error('Forgot Password Error:', err);
-    res.status(500).json({ status: "error", message: 'Server error' });
+    console.error("Forgot Password Error:", err);
+    res.status(500).json({ status: "error", message: "Server error" });
   }
 };
+
 
 // Reset Password Handler
 export const resetPassword = async (req, res) => {
