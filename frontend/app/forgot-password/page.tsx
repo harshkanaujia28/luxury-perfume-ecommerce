@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-
+import axios from "@/utils/axios"; // your Axios instance
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -18,26 +18,7 @@ export default function ForgotPasswordPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/forgot-password`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        }
-      );
-
-      // Safe JSON parsing
-      let data: { status: string; message: string } = {
-        status: "error",
-        message: "Server did not respond correctly",
-      };
-      try {
-        data = await res.json();
-      } catch {
-        console.log(Error)
-        data.message = "Invalid response from server";
-      }
+      const { data } = await axios.post("/auth/forgot-password", { email });
 
       toast({
         title: data.status === "success" ? "Success" : "Error",
@@ -45,10 +26,9 @@ export default function ForgotPasswordPage() {
         variant: data.status === "success" ? "default" : "destructive",
       });
     } catch (err: any) {
-      console.error(err);
       toast({
         title: "Error",
-        description: err.message || "Network error",
+        description: err.response?.data?.message || err.message || "Network error",
         variant: "destructive",
       });
     } finally {

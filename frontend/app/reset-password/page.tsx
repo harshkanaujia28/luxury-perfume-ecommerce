@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import axios from "@/utils/axios"; // your Axios instance
 
 export default function ResetPasswordPage() {
   const { token } = useParams();
@@ -31,12 +32,7 @@ export default function ResetPasswordPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/reset-password/${token}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-      const data = await res.json();
+      const { data } = await axios.post(`/auth/reset-password/${token}`, { password });
 
       toast({
         title: data.status === "success" ? "Success" : "Error",
@@ -44,20 +40,17 @@ export default function ResetPasswordPage() {
         variant: data.status === "success" ? "default" : "destructive",
       });
 
-      if (data.status === "success") {
-        router.push("/auth/login");
-      }
+      if (data.status === "success") router.push("/auth/login");
     } catch (err: any) {
       toast({
         title: "Error",
-        description: err.message || "Something went wrong.",
+        description: err.response?.data?.message || err.message || "Something went wrong.",
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
     }
   };
-
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-4">
@@ -71,9 +64,7 @@ export default function ResetPasswordPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <Label htmlFor="password" className="text-gray-300">
-                  New Password
-                </Label>
+                <Label htmlFor="password" className="text-gray-300">New Password</Label>
                 <Input
                   id="password"
                   type="password"
@@ -86,9 +77,7 @@ export default function ResetPasswordPage() {
               </div>
 
               <div>
-                <Label htmlFor="confirmPassword" className="text-gray-300">
-                  Confirm Password
-                </Label>
+                <Label htmlFor="confirmPassword" className="text-gray-300">Confirm Password</Label>
                 <Input
                   id="confirmPassword"
                   type="password"

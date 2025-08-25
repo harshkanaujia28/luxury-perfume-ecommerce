@@ -19,13 +19,20 @@ export const register = async (req, res) => {
 // Forgot Password Handler
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
+  console.log("Forgot password request for:", email);
 
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ status: "error", message: "User not found" });
+    if (!user) {
+      console.log("User not found:", email);
+      return res.status(404).json({ status: "error", message: "User not found" });
+    }
+
+    console.log("User found:", user.email);
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
     const resetLink = `${process.env.NEXT_PUBLIC_FRONTEND_URL}/reset-password/${token}`;
+    console.log("Reset link:", resetLink);
 
     await sendEmail(
       user.email,
@@ -33,12 +40,14 @@ export const forgotPassword = async (req, res) => {
       `<p>Click <a href="${resetLink}">here</a> to reset your password.</p>`
     );
 
+    console.log("Email successfully sent to:", user.email);
     res.status(200).json({ status: "success", message: "Reset link sent to your email" });
   } catch (err) {
     console.error("Forgot Password Error:", err);
     res.status(500).json({ status: "error", message: "Server error" });
   }
 };
+
 
 // Reset Password Handler
 export const resetPassword = async (req, res) => {
