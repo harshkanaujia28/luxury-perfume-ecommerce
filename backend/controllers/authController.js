@@ -40,7 +40,6 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
-
 // Reset Password Handler
 export const resetPassword = async (req, res) => {
   const { token } = req.params;
