@@ -49,8 +49,8 @@ export const createPaymentIntent = async (req, res) => {
         },
       ],
       mode: 'payment',
-      success_url: `http://localhost:3000/success`,
-      cancel_url: `http://localhost:3000/cancel`,
+      success_url: `https://www.zafrine.in/success`,
+      cancel_url: `https://www.zafrine.in/cancel`,
     });
 
     res.status(200).json({ url: session.url });

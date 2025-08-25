@@ -1,13 +1,15 @@
 import express from "express";
-import { login, register, getProfile, updateProfile } from "../controllers/authController.js";
+import { login, register, getProfile, updateProfile, forgotPassword, resetPassword } from "../controllers/authController.js";
 import { protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/login", login);
-router.post("/register", register);
-router.get("/profile", protect, getProfile);
-router.put("/profile", protect, updateProfile);
-
+// Auth routes
+router.post("/login", login);                // Login user
+router.post("/register", register);          // Register user
+router.get("/profile", protect, getProfile); // Get profile (protected)
+router.put("/profile", protect, updateProfile); // Update profile (protected)
+router.post("/forgot-password", forgotPassword); // Request password reset
+router.post("/reset-password/:token", resetPassword); // Reset password with token
 
 export default router;

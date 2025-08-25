@@ -8,17 +8,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "@/contexts/cart-context";
 import { useWishlist } from "@/contexts/wishlist-context";
 import { useSortedProducts } from "@/hooks/useSortedProducts";
+import { useToast } from "@/hooks/use-toast";
 
 export function FeaturedProducts() {
   const { addToCart } = useCart();
+   const { toast } = useToast()
   const { addItem, removeItem, isInWishlist } = useWishlist();
   const products = useSortedProducts();
-  const bestSellingProducts = products.slice(16, 24); // ✅ 16 to 23
+  const bestSellingProducts = products.slice(16, 24);
 
   return (
-    <section className="py-16 bg-gray-50">
+    <section className="py-16 bg-black">
       <div className="max-w-7xl mx-auto px-4">
-        <h2 className="text-3xl font-bold text-gray-900">Best Selling Products</h2>
+        <h2 className="text-3xl font-bold text-lime-400">
+          Best Selling Products
+        </h2>
+
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
           {bestSellingProducts.map((product) => {
             const inWishlist = isInWishlist(product._id);
@@ -36,7 +41,7 @@ export function FeaturedProducts() {
             return (
               <Card
                 key={product._id}
-                className="border-0 shadow-lg relative overflow-hidden hover:shadow-xl transition"
+                className="border border-lime-400/40 bg-zinc-900 shadow-md hover:shadow-[0_0_25px_rgba(182,255,40,0.4)] transition relative overflow-hidden"
               >
                 <CardContent className="p-0">
                   {/* Wishlist Button */}
@@ -44,25 +49,26 @@ export function FeaturedProducts() {
                     onClick={() =>
                       inWishlist ? removeItem(product._id) : addItem(product)
                     }
-                    className={`absolute top-3 right-3 rounded-full p-2 z-10 ${
-                      inWishlist
-                        ? "bg-pink-100 text-pink-600"
-                        : "bg-white/80 text-gray-500"
-                    }`}
+                    className={`absolute top-3 right-3 rounded-full p-2 z-10 shadow-md ${inWishlist
+                      ? "bg-lime-500 text-black"
+                      : "bg-black/70 text-lime-400 hover:bg-lime-500 hover:text-black"
+                      }`}
                   >
-                    <Heart className={`w-5 h-5 ${inWishlist ? "fill-current" : ""}`} />
+                    <Heart
+                      className={`w-5 h-5 ${inWishlist ? "fill-current" : ""}`}
+                    />
                   </button>
 
                   {/* Offer Badge */}
                   {product.offer?.isActive && (
-                    <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                    <div className="absolute top-3 left-3 bg-lime-500 text-black text-xs font-bold px-2 py-1 rounded">
                       {product.offer.type === "percentage"
                         ? `${product.offer.value}% OFF`
                         : product.offer.type === "fixed"
-                        ? `₹${product.offer.value} OFF`
-                        : product.offer.type === "bogo"
-                        ? "Buy 1 Get 1"
-                        : "Bundle Offer"}
+                          ? `₹${product.offer.value} OFF`
+                          : product.offer.type === "bogo"
+                            ? "Buy 1 Get 1"
+                            : "Bundle Offer"}
                     </div>
                   )}
 
@@ -84,19 +90,20 @@ export function FeaturedProducts() {
 
                   {/* Product Details */}
                   <div className="p-4 space-y-2">
-                    <p className="text-sm text-gray-500">{product.brand}</p>
-                    <h3 className="font-semibold line-clamp-1">{product.name}</h3>
+                    <p className="text-sm text-gray-400">{product.brand}</p>
+                    <h3 className="font-semibold line-clamp-1 text-lime-300">
+                      {product.name}
+                    </h3>
 
                     {/* Rating */}
                     <div className="flex items-center space-x-1">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
-                          className={`w-4 h-4 ${
-                            i < Math.floor(product.rating)
-                              ? "text-yellow-400 fill-current"
-                              : "text-gray-300"
-                          }`}
+                          className={`w-4 h-4 ${i < Math.floor(product.rating)
+                            ? "text-yellow-400 fill-current"
+                            : "text-gray-600"
+                            }`}
                         />
                       ))}
                       <span className="text-xs text-gray-500 ml-1">
@@ -106,7 +113,7 @@ export function FeaturedProducts() {
 
                     {/* Offer Description */}
                     {product.offer?.isActive && product.offer.description && (
-                      <div className="p-1 bg-amber-50 border border-amber-200 rounded text-[11px] text-amber-700">
+                      <div className="p-1 bg-lime-500/10 border border-lime-400/40 rounded text-[11px] text-lime-300">
                         {product.offer.description}
                       </div>
                     )}
@@ -115,7 +122,7 @@ export function FeaturedProducts() {
                     <div className="flex items-center justify-between mt-2">
                       {product.offer?.isActive ? (
                         <div className="flex items-center gap-2">
-                          <span className="font-bold text-green-600">
+                          <span className="font-bold text-lime-400">
                             ₹{finalPrice.toFixed(0)}
                           </span>
                           <span className="text-sm text-gray-500 line-through">
@@ -123,17 +130,53 @@ export function FeaturedProducts() {
                           </span>
                         </div>
                       ) : (
-                        <span className="font-bold">₹{product.price}</span>
+                        <span className="font-bold text-lime-400">
+                          ₹{product.price}
+                        </span>
                       )}
 
                       {/* Add to Cart */}
                       <Button
                         size="icon"
-                        className="bg-green-600 text-white rounded-full w-8 h-8 hover:bg-green-700"
-                        onClick={() => addToCart(product._id, 1)}
+                        className="bg-lime-500 text-black rounded-full w-8 h-8 hover:bg-lime-400 flex items-center justify-center"
+                        onClick={async () => {
+                          if (!product) return;
+
+                          try {
+                            // Calculate final price based on active offer
+                            const originalPrice = product.price;
+                            let finalPrice = originalPrice;
+
+                            if (product.offer?.isActive) {
+                              if (product.offer.type === "percentage") {
+                                finalPrice = originalPrice - (originalPrice * product.offer.value) / 100;
+                              } else if (product.offer.type === "fixed") {
+                                finalPrice = originalPrice - product.offer.value;
+                              }
+                            }
+
+                            // Add to cart with default quantity=1, no size selected
+                            await addToCart(product._id, 1, undefined, finalPrice);
+
+                            console.log(`Added ${product.name} to cart at ₹${finalPrice}`);
+                            toast({
+                              title: "Added to cart",
+                              description: `1 ${product.name} added at ₹${finalPrice.toFixed(2)}`,
+                            });
+                          } catch (err) {
+                            console.error("Failed to add to cart:", err);
+                            toast({
+                              title: "Error",
+                              description: "Failed to add to cart.",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
                       >
                         <ShoppingCart className="w-5 h-5" />
                       </Button>
+
+
                     </div>
                   </div>
                 </CardContent>

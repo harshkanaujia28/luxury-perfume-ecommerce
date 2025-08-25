@@ -54,15 +54,15 @@ export function Header() {
   ];
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-white shadow-sm">
+    <header className="fixed top-0 left-0 w-full z-50 bg-black shadow-md border-b border-lime-400 ">
       <nav className="flex items-center justify-between px-4 py-4 lg:px-12">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
           <div className="relative">
             <Image
               src="/Zafrine_Logo.png"
-              alt="Luxe Fragrances Logo"
-              width={60}           // keep square dimensions
+              alt="Zafrine Perfume Logo"
+              width={60}
               height={60}
               className="object-contain"
               priority
@@ -70,14 +70,13 @@ export function Header() {
           </div>
         </Link>
 
-
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-6">
           {navigation.map((item) => (
             <Link
               key={item.name}
               href={item.href}
-              className="text-sm font-medium text-green-900 hover:text-green-600"
+              className="text-sm font-medium text-lime-400 hover:text-lime-300 transition"
             >
               {item.name}
             </Link>
@@ -89,10 +88,13 @@ export function Header() {
               placeholder="Search products"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-4 pr-10 py-2 rounded-full text-sm bg-white border border-green-300"
+              className="pl-4 pr-10 py-2 rounded-full text-sm bg-neutral-900 border border-lime-400 text-lime-100 placeholder-gray-500"
             />
-            <button type="submit" className="absolute right-3 top-1/2 -translate-y-1/2">
-              <Search className="w-4 h-4 text-green-400" />
+            <button
+              type="submit"
+              className="absolute right-3 top-1/2 -translate-y-1/2"
+            >
+              <Search className="w-4 h-4 text-lime-400" />
             </button>
           </form>
         </div>
@@ -103,7 +105,7 @@ export function Header() {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden text-green-900 hover:text-green-600"
+            className="md:hidden text-lime-400 hover:text-lime-300"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -111,10 +113,10 @@ export function Header() {
 
           {/* Cart */}
           <Link href="/cart" className="relative">
-            <Button variant="ghost" size="icon" className="text-green-900 hover:text-green-600">
+            <Button variant="ghost" size="icon" className="text-lime-400 hover:text-lime-300">
               <ShoppingCart className="h-5 w-5" />
               {state?.itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-lime-400 text-black text-[10px] rounded-full w-5 h-5 flex items-center justify-center">
                   {state.itemCount}
                 </span>
               )}
@@ -123,10 +125,10 @@ export function Header() {
 
           {/* Wishlist */}
           <Link href="/wishlist" className="relative">
-            <Button variant="ghost" size="icon" className="text-green-900 hover:text-green-600">
+            <Button variant="ghost" size="icon" className="text-lime-400 hover:text-lime-300">
               <Heart className="h-5 w-5" />
               {wishlistItems.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-green-500 text-white text-[10px] rounded-full w-5 h-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-lime-400 text-black text-[10px] rounded-full w-5 h-5 flex items-center justify-center">
                   {wishlistItems.length}
                 </span>
               )}
@@ -136,11 +138,11 @@ export function Header() {
           {/* User Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-green-900 hover:text-green-600">
+              <Button variant="ghost" size="icon" className="text-lime-400 hover:text-lime-300">
                 <User className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-48 bg-black text-lime-300 border border-lime-400">
               {user ? (
                 <>
                   <DropdownMenuItem asChild>
@@ -170,74 +172,6 @@ export function Header() {
           </DropdownMenu>
         </div>
       </nav>
-
-      {/* Mobile Menu (Full Screen) */}
-      {isMenuOpen && (
-        <div className="fixed inset-0 z-40 h-screen w-full overflow-y-auto bg-white px-4 py-6 md:hidden">
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="mb-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                type="text"
-                placeholder="Search products"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 pr-4 py-2 w-full border border-green-300 rounded-md"
-              />
-            </div>
-          </form>
-
-          {/* Navigation */}
-          <nav className="space-y-3 mb-6 flex justify-center items-center">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                href={item.href}
-                className="block px-4 py-2 text-base font-medium text-green-900 hover:bg-green-100 rounded-md"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {item.name}
-              </Link>
-            ))}
-          </nav>
-
-          {/* Auth Buttons */}
-          <div className="border-t border-green-200 pt-4 space-y-3">
-            {user ? (
-              <>
-                <Link href="/profile" className="block px-4 py-2 text-green-900 hover:bg-green-100 rounded-md">
-                  Profile
-                </Link>
-                <Link href="/orders" className="block px-4 py-2 text-green-900 hover:bg-green-100 rounded-md">
-                  My Orders
-                </Link>
-                <Link href="/wishlist" className="block px-4 py-2 text-green-900 hover:bg-green-100 rounded-md">
-                  Wishlist
-                </Link>
-                <button
-                  onClick={() => {
-                    logout();
-                    setIsMenuOpen(false);
-                  }}
-                  className="w-full text-left px-4 py-2 text-green-900 hover:bg-green-100 rounded-md"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link href="/login" className="block px-4 py-2 text-green-900 hover:bg-green-100 rounded-md">
-                  Login
-                </Link>
-                <Link href="/register" className="block px-4 py-2 text-green-900 hover:bg-green-100 rounded-md">
-                  Register
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      )}
     </header>
   );
 }

@@ -61,145 +61,143 @@ export default function BrandsPage() {
   })
 
   return (
-    <div className="min-h-screen bg-white pt-18 py-32">
+    <>
       <Header />
-      <main>
-        {/* Hero Section */}
-        <section
-          className="relative bg-cover bg-center bg-no-repeat py-20"
-          style={{
-            backgroundImage: `url('/assets/Parfüm & Düfte _ Offizielle Website _ CHANEL.jpeg')`,
-          }}
-        >
-          {/* Overlay */}
-          <div className="absolute inset-0 bg-white/40" />
+      <div className="min-h-screen bg-black pt-18 py-32 text-lime-300">
 
-          {/* Content */}
-          <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
-            <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">Premium Brands</h1>
-            <p className="text-xl text-gray-600 mb-8">
-              Discover the world's most prestigious fragrance houses and their signature collections
-            </p>
+        <main>
+          {/* Hero Section */}
+          <section
+            className="relative bg-cover bg-center bg-no-repeat py-20"
+            style={{ backgroundImage: `url('/assets/Parfüm & Düfte _ Offizielle Website _ CHANEL.jpeg')` }}
+          >
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-black/50" />
 
-            {/* Search and Sort */}
-            <div className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto">
-              {/* Search Input */}
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <Input
-                  type="text"
-                  placeholder="Search brands..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 pr-4 py-3 w-full"
-                />
+            {/* Content */}
+            <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
+              <h1 className="text-4xl lg:text-5xl font-bold text-lime-400 mb-6">Premium Brands</h1>
+              <p className="text-xl text-lime-300 mb-8">
+                Discover the world's most prestigious fragrance houses and their signature collections
+              </p>
+
+              {/* Search and Sort */}
+              <div className="flex flex-col sm:flex-row gap-4 max-w-2xl mx-auto">
+                {/* Search Input */}
+                <div className="relative flex-1">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-lime-400 w-5 h-5" />
+                  <Input
+                    type="text"
+                    placeholder="Search brands..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-12 pr-4 py-3 w-full bg-black border border-lime-500/40 text-lime-300"
+                  />
+                </div>
+
+                {/* Sort Dropdown */}
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="px-4 py-3 border border-lime-500/40 rounded-md bg-black text-lime-300 text-sm"
+                >
+                  <option value="name">Sort by Name</option>
+                  <option value="rating">Sort by Rating</option>
+                  <option value="products">Sort by Products</option>
+                  <option value="established">Sort by Year</option>
+                </select>
+              </div>
+            </div>
+          </section>
+
+          {/* Brands Grid */}
+          <section className="py-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="mb-8 text-lime-300">
+                Showing {filteredBrands.length} of {brandData.length} brands
               </div>
 
-              {/* Sort Dropdown */}
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-3 border border-gray-300 rounded-md bg-white text-sm"
-              >
-                <option value="name">Sort by Name</option>
-                <option value="rating">Sort by Rating</option>
-                <option value="products">Sort by Products</option>
-                <option value="established">Sort by Year</option>
-              </select>
-            </div>
-          </div>
-        </section>
+              <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {filteredBrands.map((brand) => (
+                  <Card
+                    key={brand.name}
+                    className="group cursor-pointer bg-zinc-900 border border-lime-500/30 shadow-lg rounded-2xl hover:shadow-xl transition-shadow"
+                  >
+                    <CardContent className="p-6">
+                      {/* Brand Logo */}
+                      <div className="text-center mb-6">
+                        <div className="mx-auto mb-4 rounded-xl overflow-hidden w-60 h-30 flex items-center justify-center">
+                          <Image
+                            src={brand.logo}
+                            alt={brand.name}
+                            width={100}
+                            height={150}
+                            className="object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-300 shadow-sm"
+                          />
+                        </div>
 
-        {/* Brands Grid */}
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-8">
-              <p className="text-gray-600">
-                Showing {filteredBrands.length} of {brandData.length} brands
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredBrands.map((brand) => (
-                <Card
-                  key={brand.name}
-                  className="group cursor-pointer border-0 shadow-lg hover:shadow-xl transition-shadow"
-                >
-                  <CardContent className="p-6">
-                    {/* Brand Logo */}
-                    <div className="text-center mb-6">
-                      <div className="mx-auto mb-4 rounded-xl overflow-hidden  w-60 h-30 flex items-center justify-center ">
-                        <Image
-                          src={brand.logo}
-                          alt={brand.name}
-                          width={100}
-                          height={150}
-                          className="object-cover  opacity-80 group-hover:opacity-100 transition-opacity duration-300 shadow-sm"
-                        />
+                        <h3 className="text-xl font-bold text-lime-400 mb-2">{brand.name}</h3>
+                        <p className="text-sm text-lime-300 mb-4">{brand.description}</p>
                       </div>
 
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">{brand.name}</h3>
-                      <p className="text-sm text-gray-600 mb-4">{brand.description}</p>
-                    </div>
+                      {/* Brand Stats */}
+                      <div className="space-y-3 mb-6 text-lime-300">
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Products</span>
+                          <Badge variant="secondary" className="bg-lime-500 text-black">{brand.productCount}</Badge>
+                        </div>
 
-                    {/* Brand Stats */}
-                    <div className="space-y-3 mb-6">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Products</span>
-                        <Badge variant="secondary">{brand.productCount}</Badge>
-                      </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Rating</span>
+                          <div className="flex items-center space-x-1">
+                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                            <span className="text-sm font-medium">{brand.avgRating.toFixed(1)}</span>
+                            <span className="text-xs text-gray-500">({brand.totalReviews})</span>
+                          </div>
+                        </div>
 
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Rating</span>
-                        <div className="flex items-center space-x-1">
-                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                          <span className="text-sm font-medium">{brand.avgRating.toFixed(1)}</span>
-                          <span className="text-xs text-gray-500">({brand.totalReviews})</span>
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Price Range</span>
+                          <span className="text-sm font-medium">${brand.priceRange.min} - ${brand.priceRange.max}</span>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Established</span>
+                          <span className="text-sm font-medium">{brand.established}</span>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                          <span className="text-sm">Specialty</span>
+                          <Badge variant="outline" className="border-lime-500 text-lime-400">{brand.specialty}</Badge>
                         </div>
                       </div>
 
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Price Range</span>
-                        <span className="text-sm font-medium">
-                          ${brand.priceRange.min} - ${brand.priceRange.max}
-                        </span>
+                      {/* Featured Products */}
+                      <div className="mb-6">
+                        <h4 className="font-semibold text-lime-400 mb-3">Popular Products</h4>
+                        <div className="space-y-2">
+                          {brand.featured.map((product) => (
+                            <div key={product.id} className="flex justify-between items-center text-sm text-lime-300">
+                              <span className="truncate">{product.name}</span>
+                              <span className="font-medium text-lime-400">${product.price}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
 
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Established</span>
-                        <span className="text-sm font-medium">{brand.established}</span>
-                      </div>
-
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">Specialty</span>
-                        <Badge variant="outline">{brand.specialty}</Badge>
-                      </div>
-                    </div>
-
-                    {/* Featured Products */}
-                    <div className="mb-6">
-                      <h4 className="font-semibold text-gray-900 mb-3">Popular Products</h4>
-                      <div className="space-y-2">
-                        {brand.featured.map((product) => (
-                          <div key={product.id} className="flex justify-between items-center text-sm">
-                            <span className="text-gray-600 truncate">{product.name}</span>
-                            <span className="font-medium">${product.price}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <Button className="w-full" asChild>
-                      <Link href={`/products?brand=${encodeURIComponent(brand.name)}`}>Explore {brand.name}</Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+                      <Button className="w-full bg-lime-500 hover:bg-lime-400 text-black font-bold" asChild>
+                        <Link href={`/products?brand=${encodeURIComponent(brand.name)}`}>Explore {brand.name}</Link>
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
-      </main>
+          </section>
+        </main>
+      </div>
       <Footer />
-    </div>
+    </>
+
   )
 }

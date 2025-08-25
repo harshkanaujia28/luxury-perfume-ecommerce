@@ -15,12 +15,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useCart } from "@/contexts/cart-context";
 import { useWishlist } from "@/contexts/wishlist-context";
 import { useSortedProducts } from "@/hooks/useSortedProducts";
+import { useToast } from "@/hooks/use-toast";
 
 export default function NewProductsPage() {
   const { addToCart } = useCart();
   const { addItem, removeItem, isInWishlist } = useWishlist();
+  const { toast } = useToast()
   const products = useSortedProducts();
-  const newProducts = products.slice(0, 8); // ✅ first 8 newest products
+  const newProducts = products.slice(0, 8);
   const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -63,19 +65,19 @@ export default function NewProductsPage() {
 
   if (newProducts.length === 0) {
     return (
-      <div className="text-center py-16 text-gray-500 dark:text-gray-400">
+      <div className="text-center py-16 text-gray-400">
         No new arrivals to display.
       </div>
     );
   }
 
   return (
-    <section className="py-12 md:py-16 bg-gray-50 dark:bg-gray-900">
+    <section className="py-12 md:py-16 bg-black">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-xl md:text-4xl font-extrabold text-gray-900 dark:text-gray-50 mb-2 text-start">
+        <h2 className="text-xl md:text-4xl font-extrabold text-lime-400 mb-2 text-start">
           New Arrivals
         </h2>
-        <p className="text-start text-gray-600 dark:text-gray-300 mb-8">
+        <p className="text-start text-gray-300 mb-8">
           Discover our latest luxurious perfumes just arrived.
         </p>
 
@@ -84,7 +86,7 @@ export default function NewProductsPage() {
             variant="ghost"
             size="icon"
             onClick={() => scrollCarousel("left")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 hidden md:flex"
+            className="absolute left-0 top-1/2 -translate-y-1/2 z-10 hidden md:flex text-lime-400 hover:bg-lime-500/10"
           >
             <ChevronLeft className="w-6 h-6" />
           </Button>
@@ -98,7 +100,7 @@ export default function NewProductsPage() {
               return (
                 <Card
                   key={product._id}
-                  className="flex-shrink-0 w-1/2 sm:w-1/3 md:w-1/3 lg:w-1/4 px-2 snap-start"
+                  className="flex-shrink-0 w-1/2 sm:w-1/3 md:w-1/3 lg:w-1/4 px-2 snap-start bg-zinc-900 border border-lime-400/40 hover:shadow-[0_0_20px_rgba(182,255,40,0.4)] transition"
                 >
                   <CardContent className="p-0">
                     <div className="relative w-full aspect-square overflow-hidden rounded-t-lg group">
@@ -111,9 +113,10 @@ export default function NewProductsPage() {
                           }
                           alt={product.name}
                           fill
-                          className="object-cover"
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       </Link>
+                      {/* Wishlist */}
                       <Button
                         variant="ghost"
                         size="icon"
@@ -122,43 +125,91 @@ export default function NewProductsPage() {
                             ? removeItem(product._id)
                             : addItem(product)
                         }
-                        className={`absolute top-3 right-3 ${inWishlist ? "bg-pink-100 text-green-500" : "bg-white/80 text-gray-500"}`}
+                        className={`absolute top-3 right-3 rounded-full shadow-md ${
+                          inWishlist
+                            ? "bg-lime-500 text-black"
+                            : "bg-black/70 text-lime-400 hover:bg-lime-500 hover:text-black"
+                        }`}
                       >
-                        <Heart className={`w-5 h-5 ${inWishlist ? "fill-current" : ""}`} />
+                        <Heart
+                          className={`w-5 h-5 ${
+                            inWishlist ? "fill-current" : ""
+                          }`}
+                        />
                       </Button>
                       {/* Offer Badge */}
                       {product.offer?.isActive && (
-                        <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                        <div className="absolute top-3 left-3 bg-lime-500 text-black text-xs font-bold px-2 py-1 rounded">
                           {product.offer.type === "percentage"
                             ? `${product.offer.value}% OFF`
                             : product.offer.type === "fixed"
-                              ? `₹${product.offer.value} OFF`
-                              : product.offer.type === "bogo"
-                                ? "Buy 1 Get 1"
-                                : "Bundle Offer"}
+                            ? `₹${product.offer.value} OFF`
+                            : product.offer.type === "bogo"
+                            ? "Buy 1 Get 1"
+                            : "Bundle Offer"}
                         </div>
                       )}
                     </div>
                     <div className="p-4 space-y-2">
-                      <h3 className="font-semibold">{product.name}</h3>
-                      <p className="text-sm text-gray-500">{product.brand}</p>
+                      <h3 className="font-semibold text-lime-300">
+                        {product.name}
+                      </h3>
+                      <p className="text-sm text-gray-400">{product.brand}</p>
                       <div className="flex items-center space-x-1">
                         {[...Array(5)].map((_, i) => (
                           <Star
                             key={i}
-                            className={`w-4 h-4 ${i < Math.floor(product.rating) ? "text-yellow-400 fill-current" : "text-gray-300"}`}
+                            className={`w-4 h-4 ${
+                              i < Math.floor(product.rating)
+                                ? "text-yellow-400 fill-current"
+                                : "text-gray-600"
+                            }`}
                           />
                         ))}
                       </div>
                       <div className="flex items-center justify-between pt-2">
-                        <span className="text-xl font-bold">₹{product.price}</span>
-                        {/* <Button
-                          size="icon"
-                          className="bg-green-600 text-white rounded-full w-9 h-9"
-                          onClick={() => addToCart(product._id, 1)}
-                        >
-                          <ShoppingCart className="w-5 h-5" />
-                        </Button> */}
+                        <span className="text-xl font-bold text-lime-400">
+                          ₹{product.price}
+                        </span>
+                         <Button
+                        size="icon"
+                        className="bg-lime-500 text-black rounded-full w-8 h-8 hover:bg-lime-400 flex items-center justify-center"
+                        onClick={async () => {
+                          if (!product) return;
+
+                          try {
+                            // Calculate final price based on active offer
+                            const originalPrice = product.price;
+                            let finalPrice = originalPrice;
+
+                            if (product.offer?.isActive) {
+                              if (product.offer.type === "percentage") {
+                                finalPrice = originalPrice - (originalPrice * product.offer.value) / 100;
+                              } else if (product.offer.type === "fixed") {
+                                finalPrice = originalPrice - product.offer.value;
+                              }
+                            }
+
+                            // Add to cart with default quantity=1, no size selected
+                            await addToCart(product._id, 1, undefined, finalPrice);
+
+                            console.log(`Added ${product.name} to cart at ₹${finalPrice}`);
+                            toast({
+                              title: "Added to cart",
+                              description: `1 ${product.name} added at ₹${finalPrice.toFixed(2)}`,
+                            });
+                          } catch (err) {
+                            console.error("Failed to add to cart:", err);
+                            toast({
+                              title: "Error",
+                              description: "Failed to add to cart.",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                      >
+                        <ShoppingCart className="w-5 h-5" />
+                      </Button>
                       </div>
                     </div>
                   </CardContent>
@@ -171,7 +222,7 @@ export default function NewProductsPage() {
             variant="ghost"
             size="icon"
             onClick={() => scrollCarousel("right")}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 hidden md:flex"
+            className="absolute right-0 top-1/2 -translate-y-1/2 z-10 hidden md:flex text-lime-400 hover:bg-lime-500/10"
           >
             <ChevronRight className="w-6 h-6" />
           </Button>

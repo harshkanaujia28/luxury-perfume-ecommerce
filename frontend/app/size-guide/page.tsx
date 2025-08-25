@@ -108,151 +108,154 @@ export default function SizeGuidePage() {
   ]
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
       <Header />
-      <main>
-        {/* Hero Section */}
-        <section className="luxury-gradient py-40">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">Fragrance Size Guide</h1>
-            <p className="text-xl text-gray-600">Choose the perfect size for your lifestyle and fragrance needs</p>
-          </div>
-        </section>
+      <div className="min-h-screen bg-black text-lime-300">
 
-        {/* Size Options */}
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Bottle Sizes</h2>
-              <p className="text-lg text-gray-600">Find the right size for your fragrance journey</p>
+        <main>
+          {/* Hero Section */}
+          <section className="luxury-gradient py-40">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+              <h1 className="text-4xl lg:text-5xl font-bold text-lime-400 mb-6">Fragrance Size Guide</h1>
+              <p className="text-xl text-lime-300">Choose the perfect size for your lifestyle and fragrance needs</p>
             </div>
+          </section>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-16">
-              {sizeOptions.map((option) => {
-                const Icon = option.icon
-                return (
-                  <Card key={option.size} className="text-center hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Icon className="w-6 h-6 text-white" />
-                      </div>
-                      <CardTitle className="text-2xl font-bold">{option.size}</CardTitle>
-                      <Badge variant="secondary">{option.type}</Badge>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <p className="text-sm text-gray-600">{option.description}</p>
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Sprays:</span>
-                          <span className="font-medium">{option.sprays}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Duration:</span>
-                          <span className="font-medium">{option.duration}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-500">Price Range:</span>
-                          <span className="font-medium">{option.price}</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )
-              })}
-            </div>
-
-            {/* Concentration Guide */}
-            <div className="mb-16">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Fragrance Concentrations</h2>
-                <p className="text-lg text-gray-600">Understanding the different types of fragrances</p>
+          {/* Size Options */}
+          <section className="py-16">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold text-lime-400 mb-4">Bottle Sizes</h2>
+                <p className="text-lg text-lime-300">Find the right size for your fragrance journey</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {concentrationGuide.map((concentration) => (
-                  <Card key={concentration.type}>
-                    <CardHeader>
-                      <CardTitle className="text-xl">{concentration.type}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                      <p className="text-gray-600">{concentration.description}</p>
-                      <div className="grid grid-cols-3 gap-4 text-sm">
-                        <div>
-                          <span className="text-gray-500 block">Concentration</span>
-                          <span className="font-medium">{concentration.concentration}</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-16">
+                {sizeOptions.map((option) => {
+                  const Icon = option.icon;
+                  return (
+                    <Card key={option.size} className="text-center bg-zinc-900 border border-lime-500/30 shadow-lg rounded-2xl hover:shadow-lime-500/50 transition-shadow">
+                      <CardHeader>
+                        <div className="w-12 h-12 bg-lime-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <Icon className="w-6 h-6 text-black" />
                         </div>
-                        <div>
-                          <span className="text-gray-500 block">Longevity</span>
-                          <span className="font-medium">{concentration.longevity}</span>
+                        <CardTitle className="text-2xl font-bold text-lime-400">{option.size}</CardTitle>
+                        <Badge variant="outline" className="text-lime-400 border-lime-400">{option.type}</Badge>
+                      </CardHeader>
+                      <CardContent className="space-y-3 text-lime-300">
+                        <p className="text-sm">{option.description}</p>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span className="text-lime-400">Sprays:</span>
+                            <span className="font-medium">{option.sprays}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-lime-400">Duration:</span>
+                            <span className="font-medium">{option.duration}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-lime-400">Price Range:</span>
+                            <span className="font-medium">{option.price}</span>
+                          </div>
                         </div>
-                        <div>
-                          <span className="text-gray-500 block">Sillage</span>
-                          <span className="font-medium">{concentration.sillage}</span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      </CardContent>
+                    </Card>
+                  )
+                })}
               </div>
-            </div>
 
-            {/* Usage Recommendations */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-2xl">Usage Recommendations</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-6">
+              {/* Concentration Guide */}
+              <div className="mb-16">
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold text-lime-400 mb-4">Fragrance Concentrations</h2>
+                  <p className="text-lg text-lime-300">Understanding the different types of fragrances</p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {concentrationGuide.map((concentration) => (
+                    <Card key={concentration.type} className="bg-zinc-900 border border-lime-500/30 shadow-lg rounded-2xl">
+                      <CardHeader>
+                        <CardTitle className="text-xl text-lime-400">{concentration.type}</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-3 text-lime-300">
+                        <p>{concentration.description}</p>
+                        <div className="grid grid-cols-3 gap-4 text-sm">
+                          <div>
+                            <span className="text-lime-400 block">Concentration</span>
+                            <span className="font-medium">{concentration.concentration}</span>
+                          </div>
+                          <div>
+                            <span className="text-lime-400 block">Longevity</span>
+                            <span className="font-medium">{concentration.longevity}</span>
+                          </div>
+                          <div>
+                            <span className="text-lime-400 block">Sillage</span>
+                            <span className="font-medium">{concentration.sillage}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              {/* Usage Recommendations */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <Card className="bg-zinc-900 border border-lime-500/30 shadow-lg rounded-2xl">
+                  <CardHeader>
+                    <CardTitle className="text-2xl text-lime-400">Usage Recommendations</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6 text-lime-300">
                     {usageTips.map((tip) => (
                       <div key={tip.title}>
-                        <h4 className="font-semibold text-gray-900 mb-2">{tip.title}</h4>
-                        <p className="text-gray-600 text-sm mb-1">{tip.description}</p>
-                        <p className="text-sm font-medium text-blue-600">{tip.recommendation}</p>
+                        <h4 className="font-semibold mb-2 text-lime-400">{tip.title}</h4>
+                        <p className="text-sm mb-1">{tip.description}</p>
+                        <p className="text-sm font-medium text-lime-500">{tip.recommendation}</p>
                       </div>
                     ))}
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-2xl">Application Tips</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">How Many Sprays?</h4>
-                    <ul className="text-gray-600 text-sm space-y-1">
-                      <li>• Light fragrances (EDT): 3-4 sprays</li>
-                      <li>• Medium fragrances (EDP): 2-3 sprays</li>
-                      <li>• Strong fragrances (Parfum): 1-2 sprays</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Where to Apply</h4>
-                    <ul className="text-gray-600 text-sm space-y-1">
-                      <li>• Pulse points (wrists, neck)</li>
-                      <li>• Behind ears</li>
-                      <li>• Inside elbows</li>
-                      <li>• On clothing (test first)</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900 mb-2">Best Practices</h4>
-                    <ul className="text-gray-600 text-sm space-y-1">
-                      <li>• Don't rub after applying</li>
-                      <li>• Apply to clean, moisturized skin</li>
-                      <li>• Store in cool, dark places</li>
-                      <li>• Rotate fragrances to prevent nose blindness</li>
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
+                <Card className="bg-zinc-900 border border-lime-500/30 shadow-lg rounded-2xl">
+                  <CardHeader>
+                    <CardTitle className="text-2xl text-lime-400">Application Tips</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4 text-lime-300">
+                    <div>
+                      <h4 className="font-semibold mb-2 text-lime-400">How Many Sprays?</h4>
+                      <ul className="space-y-1">
+                        <li>• Light fragrances (EDT): 3-4 sprays</li>
+                        <li>• Medium fragrances (EDP): 2-3 sprays</li>
+                        <li>• Strong fragrances (Parfum): 1-2 sprays</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-2 text-lime-400">Where to Apply</h4>
+                      <ul className="space-y-1">
+                        <li>• Pulse points (wrists, neck)</li>
+                        <li>• Behind ears</li>
+                        <li>• Inside elbows</li>
+                        <li>• On clothing (test first)</li>
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold mb-2 text-lime-400">Best Practices</h4>
+                      <ul className="space-y-1">
+                        <li>• Don't rub after applying</li>
+                        <li>• Apply to clean, moisturized skin</li>
+                        <li>• Store in cool, dark places</li>
+                        <li>• Rotate fragrances to prevent nose blindness</li>
+                      </ul>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
-          </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
+          </section>
+        </main>
+
+        <Footer />
+      </div>
+    </>
+
   )
 }

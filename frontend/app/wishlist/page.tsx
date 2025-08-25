@@ -10,8 +10,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Heart } from "lucide-react";
 
-const baseURL =
-  process.env.NEXT_PUBLIC_API_URL 
+const baseURL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function WishlistPage() {
   const { items, addItem, removeItem, isInWishlist } = useWishlist();
@@ -22,15 +21,18 @@ export default function WishlistPage() {
     return (
       <>
         <Header />
-        <div className="flex flex-col items-center justify-center py-36 text-center px-4 space-y-4">
-          <Heart className="w-16 h-16 text-gray-300" />
-          <h2 className="text-2xl font-semibold text-gray-700">
+        <div className="flex flex-col items-center justify-center py-36 text-center px-4 space-y-4 bg-black text-gray-200 min-h-screen">
+          <Heart className="w-16 h-16 text-lime-400" />
+          <h2 className="text-2xl font-semibold text-lime-400">
             Your wishlist is empty
           </h2>
-          <p className="text-gray-500 max-w-md">
+          <p className="text-gray-400 max-w-md">
             Browse our collection and save your favorite products to your
             wishlist.
           </p>
+          <Button asChild className="bg-lime-500 text-black hover:bg-lime-400">
+            <Link href="/products">Explore Products</Link>
+          </Button>
         </div>
         <Footer />
       </>
@@ -40,8 +42,8 @@ export default function WishlistPage() {
   return (
     <>
       <Header />
-      <div className="max-w-7xl mx-auto pt-36 pb-12 px-4">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+      <div className="max-w-7xl mx-auto pt-36 pb-12 px-4 bg-black min-h-screen">
+        <h1 className="text-3xl font-bold text-lime-400 mb-8 text-center">
           My Wishlist
         </h1>
 
@@ -57,8 +59,9 @@ export default function WishlistPage() {
             return (
               <div
                 key={item._id || index}
-                className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+                className="bg-zinc-900 border border-lime-400/40 rounded-2xl overflow-hidden hover:shadow-[0_0_15px_rgba(182,255,40,0.3)] transition"
               >
+                {/* Product Image */}
                 <div className="relative w-full h-56 group">
                   <Link href={`/products/${item._id}`}>
                     <Image
@@ -76,18 +79,20 @@ export default function WishlistPage() {
                     }
                     className={`absolute top-3 right-3 rounded-full p-2 z-10 ${
                       inWishlist
-                        ? "bg-pink-100 text-pink-600"
-                        : "bg-white/80 text-gray-500"
+                        ? "bg-lime-500 text-black"
+                        : "bg-black/60 text-gray-300 border border-lime-400/30"
                     }`}
                   >
                     <Heart
-                      className={`w-5 h-5 ${inWishlist ? "fill-current" : ""}`}
+                      className={`w-5 h-5 ${
+                        inWishlist ? "fill-current" : ""
+                      }`}
                     />
                   </button>
 
                   {/* Offer Badge */}
                   {item.offer?.isActive && (
-                    <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">
+                    <div className="absolute top-3 left-3 bg-lime-500 text-black text-xs font-bold px-2 py-1 rounded">
                       {item.offer.type === "percentage"
                         ? `${item.offer.value}% OFF`
                         : item.offer.type === "fixed"
@@ -99,20 +104,21 @@ export default function WishlistPage() {
                   )}
                 </div>
 
+                {/* Product Info */}
                 <div className="p-4 space-y-2">
                   <Link href={`/products/${item._id}`}>
-                    <h2 className="font-semibold text-lg text-gray-900 line-clamp-2 hover:text-green-600 transition-colors">
+                    <h2 className="font-semibold text-lg text-gray-200 line-clamp-2 hover:text-lime-400 transition-colors">
                       {item.name || "Unnamed Product"}
                     </h2>
                   </Link>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-400">
                     {item.brand || "Unknown Brand"}
                   </p>
 
-                  {/* Price & Offer Price */}
+                  {/* Price */}
                   {item.offer?.isActive && item.offerPrice ? (
                     <div className="flex items-center gap-2">
-                      <p className="text-green-700 font-bold text-lg">
+                      <p className="text-lime-400 font-bold text-lg">
                         ₹{item.offerPrice}
                       </p>
                       <p className="text-gray-500 line-through text-sm">
@@ -120,21 +126,22 @@ export default function WishlistPage() {
                       </p>
                     </div>
                   ) : (
-                    <p className="text-green-700 font-bold text-lg">
+                    <p className="text-lime-400 font-bold text-lg">
                       ₹{item.price || "Price unavailable"}
                     </p>
                   )}
 
+                  {/* Buttons */}
                   <div className="flex gap-3 pt-2">
-                    {/* <Button
-                      className="flex-1 bg-green-600 text-white hover:bg-green-700"
+                    <Button
+                      className="flex-1 bg-lime-500 text-black hover:bg-lime-400"
                       onClick={() => addToCart(item._id, 1)}
                     >
                       Add to Cart
-                    </Button> */}
+                    </Button>
                     <Button
-                      variant="outline"
-                      className="flex-1 text-red-600 border-red-400 hover:bg-red-50"
+                      variant="ghost"
+                      className="flex-1 text-red-500 hover:bg-red-500/20"
                       onClick={() => removeItem(item._id)}
                     >
                       Remove

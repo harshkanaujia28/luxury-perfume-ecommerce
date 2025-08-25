@@ -140,256 +140,288 @@ export default function SupportPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-white">
-      <Header />
-      <main>
-        {/* Hero Section */}
-        <section className="luxury-gradient py-40">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">Customer Support</h1>
-            <p className="text-xl text-gray-600">
-              We're here to help! Get in touch with our support team for any questions or concerns.
-            </p>
-          </div>
-        </section>
+ <>
+  <Header />
+  <div className="min-h-screen bg-black text-lime-300">
+    <main>
+      {/* Hero Section */}
+      <section className="relative py-40 border-b border-lime-500">
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-4xl lg:text-5xl font-bold text-lime-400 mb-6">
+            Customer Support
+          </h1>
+          <p className="text-xl text-lime-300">
+            We're here to help! Get in touch with our support team for any questions or concerns.
+          </p>
+        </div>
+      </section>
 
-        {/* Support Options */}
-        <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">How Can We Help?</h2>
-              <p className="text-lg text-gray-600">Choose the support method that works best for you</p>
+      {/* Support Options */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-lime-400 mb-4">How Can We Help?</h2>
+            <p className="text-lg text-lime-300">Choose the support method that works best for you</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            {supportOptions.map((option) => {
+              const Icon = option.icon;
+              return (
+                <Card
+                  key={option.title}
+                  className="bg-zinc-900 border-lime-500/30 shadow-lg rounded-2xl text-center hover:shadow-xl transition-shadow"
+                >
+                  <CardHeader>
+                    <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Icon className="w-6 h-6 text-lime-400" />
+                    </div>
+                    <CardTitle className="text-xl text-lime-400">{option.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-lime-300">{option.description}</p>
+                    <div className="flex items-center justify-center text-sm text-lime-300">
+                      <Clock className="w-4 h-4 mr-1" />
+                      {option.availability}
+                    </div>
+                    <Button className="w-full bg-lime-500 hover:bg-lime-400 text-black">
+                      {option.action}
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* Common Issues */}
+          <div className="mb-16">
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-lime-400 mb-4">Common Issues</h2>
+              <p className="text-lg text-lime-300">Quick links to help with common questions</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-              {supportOptions.map((option) => {
-                const Icon = option.icon
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {commonIssues.map((issue) => {
+                const Icon = issue.icon;
                 return (
-                  <Card key={option.title} className="text-center hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Icon className="w-6 h-6 text-white" />
+                  <Card
+                    key={issue.title}
+                    className="bg-zinc-900 border-lime-500/30 shadow-lg rounded-2xl hover:shadow-xl transition-shadow"
+                  >
+                    <CardContent className="p-6 text-center">
+                      <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Icon className="w-5 h-5 text-lime-400" />
                       </div>
-                      <CardTitle className="text-xl">{option.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <p className="text-gray-600">{option.description}</p>
-                      <div className="flex items-center justify-center text-sm text-gray-500">
-                        <Clock className="w-4 h-4 mr-1" />
-                        {option.availability}
-                      </div>
-                      <Button className="w-full">{option.action}</Button>
+                      <h3 className="font-semibold text-lime-400 mb-2">{issue.title}</h3>
+                      <p className="text-sm text-lime-300 mb-4">{issue.description}</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        asChild
+                        className="border-lime-500 text-lime-400 hover:bg-lime-500 hover:text-black"
+                      >
+                        <a href={issue.link}>Learn More</a>
+                      </Button>
                     </CardContent>
                   </Card>
-                )
+                );
               })}
             </div>
+          </div>
 
-            {/* Common Issues */}
-            <div className="mb-16">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">Common Issues</h2>
-                <p className="text-lg text-gray-600">Quick links to help with common questions</p>
-              </div>
+          {/* Support Form */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <Card className="bg-zinc-900 border-lime-500/30 shadow-lg rounded-2xl">
+              <CardHeader>
+                <CardTitle className="text-2xl text-lime-400">Submit a Support Request</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="name" className="text-lime-300">Name</Label>
+                      <Input
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleInputChange}
+                        required
+                        className="bg-zinc-900 border border-lime-500 text-lime-300 placeholder-lime-500 focus:ring-lime-500"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="email" className="text-lime-300">Email</Label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                        className="bg-zinc-900 border border-lime-500 text-lime-300 placeholder-lime-500 focus:ring-lime-500"
+                      />
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {commonIssues.map((issue) => {
-                  const Icon = issue.icon
-                  return (
-                    <Card key={issue.title} className="hover:shadow-lg transition-shadow">
-                      <CardContent className="p-6 text-center">
-                        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <Icon className="w-5 h-5 text-gray-600" />
-                        </div>
-                        <h3 className="font-semibold text-gray-900 mb-2">{issue.title}</h3>
-                        <p className="text-sm text-gray-600 mb-4">{issue.description}</p>
-                        <Button variant="outline" size="sm" asChild>
-                          <a href={issue.link}>Learn More</a>
-                        </Button>
-                      </CardContent>
-                    </Card>
-                  )
-                })}
-              </div>
-            </div>
+                  <div>
+                    <Label htmlFor="orderNumber" className="text-lime-300">Order Number (Optional)</Label>
+                    <Input
+                      id="orderNumber"
+                      name="orderNumber"
+                      value={formData.orderNumber}
+                      onChange={handleInputChange}
+                      placeholder="ORD-12345"
+                      className="bg-zinc-900 border border-lime-500 text-lime-300 placeholder-lime-500 focus:ring-lime-500"
+                    />
+                  </div>
 
-            {/* Support Form */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <Card>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="category" className="text-lime-300">Category</Label>
+                      <Select onValueChange={(value) => handleSelectChange("category", value)}>
+                        <SelectTrigger className="bg-zinc-900 border border-lime-500 text-lime-300">
+                          <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-zinc-900 text-lime-300">
+                          <SelectItem value="product_issue">Product Issue</SelectItem>
+                          <SelectItem value="shipping_issue">Shipping Issue</SelectItem>
+                          <SelectItem value="billing">Billing</SelectItem>
+                          <SelectItem value="general">General</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="priority" className="text-lime-300">Priority</Label>
+                      <Select onValueChange={(value) => handleSelectChange("priority", value)}>
+                        <SelectTrigger className="bg-zinc-900 border border-lime-500 text-lime-300">
+                          <SelectValue placeholder="Select priority" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-zinc-900 text-lime-300">
+                          <SelectItem value="low">Low</SelectItem>
+                          <SelectItem value="medium">Medium</SelectItem>
+                          <SelectItem value="high">High</SelectItem>
+                          <SelectItem value="urgent">Urgent</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="subject" className="text-lime-300">Subject</Label>
+                    <Input
+                      id="subject"
+                      name="subject"
+                      value={formData.subject}
+                      onChange={handleInputChange}
+                      required
+                      className="bg-zinc-900 border border-lime-500 text-lime-300 placeholder-lime-500 focus:ring-lime-500"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="message" className="text-lime-300">Message</Label>
+                    <Textarea
+                      id="message"
+                      name="message"
+                      rows={6}
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      placeholder="Please describe your issue in detail..."
+                      required
+                      className="bg-zinc-900 border border-lime-500 text-lime-300 placeholder-lime-500 focus:ring-lime-500"
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-lime-500 hover:bg-lime-400 text-black"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Submitting..." : "Submit Request"}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+
+            <div className="space-y-6">
+              <Card className="bg-zinc-900 border-lime-500/30 shadow-lg rounded-2xl">
                 <CardHeader>
-                  <CardTitle className="text-2xl">Submit a Support Request</CardTitle>
+                  <CardTitle className="text-xl text-lime-400">Contact Information</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="name">Name</Label>
-                        <Input id="name" name="name" value={formData.name} onChange={handleInputChange} required />
-                      </div>
-                      <div>
-                        <Label htmlFor="email">Email</Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          required
-                        />
-                      </div>
-                    </div>
-
+                <CardContent className="space-y-4 text-lime-300">
+                  <div className="flex items-center space-x-3">
+                    <Phone className="w-5 h-5 text-lime-400" />
                     <div>
-                      <Label htmlFor="orderNumber">Order Number (Optional)</Label>
-                      <Input
-                        id="orderNumber"
-                        name="orderNumber"
-                        value={formData.orderNumber}
-                        onChange={handleInputChange}
-                        placeholder="ORD-12345"
-                      />
+                      <p className="font-medium">Phone Support</p>
+                      <p className="text-sm"> (555) 123-4567</p>
                     </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="category">Category</Label>
-                        <Select onValueChange={(value) => handleSelectChange("category", value)}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="product_issue">Product Issue</SelectItem>
-                            <SelectItem value="shipping_issue">Shipping Issue</SelectItem>
-                            <SelectItem value="billing">Billing</SelectItem>
-                            <SelectItem value="general">General</SelectItem>
-
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <Label htmlFor="priority">Priority</Label>
-                        <Select onValueChange={(value) => handleSelectChange("priority", value)}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select priority" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="low">Low</SelectItem>
-                            <SelectItem value="medium">Medium</SelectItem>
-                            <SelectItem value="high">High</SelectItem>
-                            <SelectItem value="urgent">Urgent</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Mail className="w-5 h-5 text-lime-400" />
                     <div>
-                      <Label htmlFor="subject">Subject</Label>
-                      <Input
-                        id="subject"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleInputChange}
-                        required
-                      />
+                      <p className="font-medium">Email Support</p>
+                      <p className="text-sm">support@luxefragrances.com</p>
                     </div>
-
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Clock className="w-5 h-5 text-lime-400" />
                     <div>
-                      <Label htmlFor="message">Message</Label>
-                      <Textarea
-                        id="message"
-                        name="message"
-                        rows={6}
-                        value={formData.message}
-                        onChange={handleInputChange}
-                        placeholder="Please describe your issue in detail..."
-                        required
-                      />
+                      <p className="font-medium">Business Hours</p>
+                      <p className="text-sm">Mon-Fri: 9AM-6PM EST</p>
+                      <p className="text-sm">Sat: 10AM-4PM EST</p>
+                      <p className="text-sm">Sun: Closed</p>
                     </div>
-
-                    <Button type="submit" className="w-full" disabled={isLoading}>
-                      {isLoading ? "Submitting..." : "Submit Request"}
-                    </Button>
-                  </form>
+                  </div>
                 </CardContent>
               </Card>
 
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-xl">Contact Information</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="flex items-center space-x-3">
-                      <Phone className="w-5 h-5 text-gray-600" />
-                      <div>
-                        <p className="font-medium">Phone Support</p>
-                        <p className="text-sm text-gray-600">(555) 123-4567</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Mail className="w-5 h-5 text-gray-600" />
-                      <div>
-                        <p className="font-medium">Email Support</p>
-                        <p className="text-sm text-gray-600">support@luxefragrances.com</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <Clock className="w-5 h-5 text-gray-600" />
-                      <div>
-                        <p className="font-medium">Business Hours</p>
-                        <p className="text-sm text-gray-600">Mon-Fri: 9AM-6PM EST</p>
-                        <p className="text-sm text-gray-600">Sat: 10AM-4PM EST</p>
-                        <p className="text-sm text-gray-600">Sun: Closed</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+              <Card className="bg-zinc-900 border-lime-500/30 shadow-lg rounded-2xl">
+                <CardHeader>
+                  <CardTitle className="text-xl text-lime-400">Response Times</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-lime-300">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Live Chat</span>
+                    <span className="text-sm font-medium">Immediate</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Phone Support</span>
+                    <span className="text-sm font-medium">Immediate</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Email (High Priority)</span>
+                    <span className="text-sm font-medium">2-4 hours</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm">Email (Standard)</span>
+                    <span className="text-sm font-medium">24 hours</span>
+                  </div>
+                </CardContent>
+              </Card>
 
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-xl">Response Times</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Live Chat</span>
-                      <span className="text-sm font-medium">Immediate</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Phone Support</span>
-                      <span className="text-sm font-medium">Immediate</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Email (High Priority)</span>
-                      <span className="text-sm font-medium">2-4 hours</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm">Email (Standard)</span>
-                      <span className="text-sm font-medium">24 hours</span>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-xl">Before You Contact Us</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2 text-sm text-gray-600">
-                      <li>• Check your order confirmation email for tracking information</li>
-                      <li>• Review our FAQ section for quick answers</li>
-                      <li>• Have your order number ready if contacting about an order</li>
-                      <li>• Check your spam folder for our responses</li>
-                      <li>• Try clearing your browser cache for website issues</li>
-                    </ul>
-                  </CardContent>
-                </Card>
-              </div>
+              <Card className="bg-zinc-900 border-lime-500/30 shadow-lg rounded-2xl">
+                <CardHeader>
+                  <CardTitle className="text-xl text-lime-400">Before You Contact Us</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2 text-sm text-lime-300">
+                    <li>• Check your order confirmation email for tracking information</li>
+                    <li>• Review our FAQ section for quick answers</li>
+                    <li>• Have your order number ready if contacting about an order</li>
+                    <li>• Check your spam folder for our responses</li>
+                    <li>• Try clearing your browser cache for website issues</li>
+                  </ul>
+                </CardContent>
+              </Card>
             </div>
           </div>
-        </section>
-      </main>
-      <Footer />
-    </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <Footer />
+</>
+
   )
 }

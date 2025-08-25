@@ -12,7 +12,6 @@ import {
   RadioGroupItem,
 } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { cn } from "@/lib/utils";
 
 interface ProductFiltersProps {
   selectedCategoryType: string;
@@ -53,26 +52,31 @@ export const ProductFilters = ({
   }, [selectedGender, selectedCategoryType]);
 
   return (
-    <aside className="w-full md:w-[240px] shrink-0 space-y-4 px-2 md:px-0">
+    <aside className="w-full md:w-[240px] shrink-0 space-y-4">
       {/* Type Selector */}
-      <Card className="rounded-xl shadow-sm">
+      <Card className="rounded-xl bg-zinc-900 border border-lime-400/20 shadow-md">
         <CardHeader>
-          <CardTitle className="text-base font-medium">Type</CardTitle>
+          <CardTitle className="text-base font-semibold text-white">Type</CardTitle>
         </CardHeader>
         <CardContent>
-          <RadioGroup
-            value={selectedCategoryType}
-            onValueChange={onCategoryTypeChange}
-          >
+          <RadioGroup value={selectedCategoryType} onValueChange={onCategoryTypeChange}>
             <div className="flex items-center space-x-2 py-1">
-              <RadioGroupItem value="Perfume" id="perfume" />
-              <Label htmlFor="perfume" className="cursor-pointer text-sm">
+              <RadioGroupItem
+                value="Perfume"
+                id="perfume"
+                className="data-[state=checked]:bg-lime-400 data-[state=checked]:border-lime-400"
+              />
+              <Label htmlFor="perfume" className="cursor-pointer text-sm text-gray-300 hover:text-lime-400">
                 Perfume
               </Label>
             </div>
             <div className="flex items-center space-x-2 py-1">
-              <RadioGroupItem value="Attar" id="attar" />
-              <Label htmlFor="attar" className="cursor-pointer text-sm">
+              <RadioGroupItem
+                value="Attar"
+                id="attar"
+                className="data-[state=checked]:bg-lime-400 data-[state=checked]:border-lime-400"
+              />
+              <Label htmlFor="attar" className="cursor-pointer text-sm text-gray-300 hover:text-lime-400">
                 Attar
               </Label>
             </div>
@@ -81,24 +85,29 @@ export const ProductFilters = ({
       </Card>
 
       {/* Gender Selector */}
-      <Card className="rounded-xl shadow-sm">
+      <Card className="rounded-xl bg-zinc-900 border border-lime-400/20 shadow-md">
         <CardHeader>
-          <CardTitle className="text-base font-medium">Gender</CardTitle>
+          <CardTitle className="text-base font-semibold text-white">Gender</CardTitle>
         </CardHeader>
         <CardContent>
-          <RadioGroup
-            value={selectedGender}
-            onValueChange={onGenderChange}
-          >
+          <RadioGroup value={selectedGender} onValueChange={onGenderChange}>
             <div className="flex items-center space-x-2 py-1">
-              <RadioGroupItem value="Men" id="men" />
-              <Label htmlFor="men" className="cursor-pointer text-sm">
+              <RadioGroupItem
+                value="Men"
+                id="men"
+                className="data-[state=checked]:bg-lime-400 data-[state=checked]:border-lime-400"
+              />
+              <Label htmlFor="men" className="cursor-pointer text-sm text-gray-300 hover:text-lime-400">
                 Men
               </Label>
             </div>
             <div className="flex items-center space-x-2 py-1">
-              <RadioGroupItem value="Women" id="women" />
-              <Label htmlFor="women" className="cursor-pointer text-sm">
+              <RadioGroupItem
+                value="Women"
+                id="women"
+                className="data-[state=checked]:bg-lime-400 data-[state=checked]:border-lime-400"
+              />
+              <Label htmlFor="women" className="cursor-pointer text-sm text-gray-300 hover:text-lime-400">
                 Women
               </Label>
             </div>
@@ -107,19 +116,20 @@ export const ProductFilters = ({
       </Card>
 
       {/* SubCategory Selector */}
-      <Card className="rounded-xl shadow-sm">
+      <Card className="rounded-xl bg-zinc-900 border border-lime-400/20 shadow-md">
         <CardHeader>
-          <CardTitle className="text-base font-medium">Category</CardTitle>
+          <CardTitle className="text-base font-semibold text-white">Category</CardTitle>
         </CardHeader>
         <CardContent>
-          <RadioGroup
-            value={selectedSubCategory}
-            onValueChange={onSubCategoryChange}
-          >
+          <RadioGroup value={selectedSubCategory} onValueChange={onSubCategoryChange}>
             {subCategoriesList.map((sub) => (
               <div key={sub} className="flex items-center space-x-2 py-1">
-                <RadioGroupItem value={sub} id={sub} />
-                <Label htmlFor={sub} className="cursor-pointer text-sm">
+                <RadioGroupItem
+                  value={sub}
+                  id={sub}
+                  className="data-[state=checked]:bg-lime-400 data-[state=checked]:border-lime-400"
+                />
+                <Label htmlFor={sub} className="cursor-pointer text-sm text-gray-300 hover:text-lime-400">
                   {sub}
                 </Label>
               </div>
@@ -129,33 +139,49 @@ export const ProductFilters = ({
       </Card>
 
       {/* Sort By */}
-      <Card className="rounded-xl shadow-sm">
+      <Card className="rounded-xl bg-zinc-900 border border-lime-400/20 shadow-md">
         <CardHeader>
-          <CardTitle className="text-base font-medium">Sort By</CardTitle>
+          <CardTitle className="text-base font-semibold text-white">Sort By</CardTitle>
         </CardHeader>
         <CardContent>
           <RadioGroup value={sortBy} onValueChange={onSortChange}>
             <div className="flex items-center space-x-2 py-1">
-              <RadioGroupItem value="newest" id="newest" />
-              <Label htmlFor="newest" className="cursor-pointer text-sm">
+              <RadioGroupItem
+                value="newest"
+                id="newest"
+                className="data-[state=checked]:bg-lime-400 data-[state=checked]:border-lime-400"
+              />
+              <Label htmlFor="newest" className="cursor-pointer text-sm text-gray-300 hover:text-lime-400">
                 Newest
               </Label>
             </div>
             <div className="flex items-center space-x-2 py-1">
-              <RadioGroupItem value="price-low" id="low-to-high" />
-              <Label htmlFor="low-to-high" className="cursor-pointer text-sm">
+              <RadioGroupItem
+                value="price-low"
+                id="low-to-high"
+                className="data-[state=checked]:bg-lime-400 data-[state=checked]:border-lime-400"
+              />
+              <Label htmlFor="low-to-high" className="cursor-pointer text-sm text-gray-300 hover:text-lime-400">
                 Price: Low to High
               </Label>
             </div>
             <div className="flex items-center space-x-2 py-1">
-              <RadioGroupItem value="price-high" id="high-to-low" />
-              <Label htmlFor="high-to-low" className="cursor-pointer text-sm">
+              <RadioGroupItem
+                value="price-high"
+                id="high-to-low"
+                className="data-[state=checked]:bg-lime-400 data-[state=checked]:border-lime-400"
+              />
+              <Label htmlFor="high-to-low" className="cursor-pointer text-sm text-gray-300 hover:text-lime-400">
                 Price: High to Low
               </Label>
             </div>
             <div className="flex items-center space-x-2 py-1">
-              <RadioGroupItem value="rating" id="rating" />
-              <Label htmlFor="rating" className="cursor-pointer text-sm">
+              <RadioGroupItem
+                value="rating"
+                id="rating"
+                className="data-[state=checked]:bg-lime-400 data-[state=checked]:border-lime-400"
+              />
+              <Label htmlFor="rating" className="cursor-pointer text-sm text-gray-300 hover:text-lime-400">
                 Rating
               </Label>
             </div>

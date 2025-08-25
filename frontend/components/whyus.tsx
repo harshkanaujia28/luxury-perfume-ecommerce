@@ -25,12 +25,12 @@ export default function WhyUs() {
   if (banners.length === 0) return null
 
   return (
-    <section className="py-20 px-4">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <section className="py-20 px-4 bg-black">
+      <div className="max-w-7xl mx-auto space-y-8">
         {banners.map((banner, index) => (
           <div
             key={index}
-            className="w-full overflow-hidden rounded-lg shadow"
+            className="w-full overflow-hidden rounded-2xl border border-lime-400/40 bg-zinc-900 shadow-lg hover:shadow-[0_0_35px_rgba(182,255,40,0.4)] transition"
           >
             <div className="relative w-full aspect-[1920/500]">
               <Image
@@ -41,9 +41,17 @@ export default function WhyUs() {
                 }
                 alt={banner.title || `Banner ${index + 1}`}
                 fill
-                className="object-contain w-full h-full"
+                className="object-cover w-full h-full rounded-2xl"
                 priority
               />
+              {/* Overlay Title (if any) */}
+              {banner.title && (
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <h3 className="text-3xl md:text-4xl font-bold text-lime-400 drop-shadow-lg">
+                    {banner.title}
+                  </h3>
+                </div>
+              )}
             </div>
           </div>
         ))}

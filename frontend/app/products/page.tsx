@@ -36,7 +36,7 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
-  // Filter products by type, gender, subcategory
+  // Filter products
   const filteredProducts = useMemo(() => {
     return allProducts.filter((product) => {
       const matchesType = selectedCategoryType ? product.category?.type === selectedCategoryType : true;
@@ -46,8 +46,7 @@ export default function ProductsPage() {
     });
   }, [allProducts, selectedCategoryType, selectedGender, selectedSubCategory]);
 
-
-  // Sort filtered products
+  // Sort products
   const sortedProducts = useMemo(() => {
     return [...filteredProducts].sort((a, b) => {
       switch (sortBy) {
@@ -66,35 +65,37 @@ export default function ProductsPage() {
   }, [filteredProducts, sortBy]);
 
   return (
-    <div className="min-h-screen bg-white pt-32">
+    <div className="min-h-screen bg-zinc-950 text-white pt-32">
       <Header />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
-          <aside className="lg:w-64 flex-shrink-0">
+          {/* Sidebar Filters */}
+          <aside className="lg:w-64 flex-shrink-0 bg-zinc-900 p-4 rounded-xl border border-lime-400/10 shadow-md">
             <ProductFilters
               selectedCategoryType={selectedCategoryType}
               selectedGender={selectedGender}
               selectedSubCategory={selectedSubCategory}
               sortBy={sortBy}
-              onCategoryTypeChange={setSelectedCategoryType} // ✅ Now works
+              onCategoryTypeChange={setSelectedCategoryType}
               onGenderChange={setSelectedGender}
               onSubCategoryChange={setSelectedSubCategory}
               onSortChange={setSortBy}
             />
           </aside>
 
+          {/* Main Products */}
           <div className="flex-1">
             <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {selectedCategoryType} Products
+              <h1 className="text-3xl font-bold text-white mb-2">
+                {selectedCategoryType || "All"} Products
               </h1>
-              <p className="text-gray-600">
+              <p className="text-gray-400">
                 Showing {sortedProducts.length} product{sortedProducts.length !== 1 && "s"}
               </p>
             </div>
 
             {loading ? (
-              <p>Loading...</p>
+              <p className="text-lime-400 animate-pulse">Loading products...</p>
             ) : (
               <ProductGrid products={sortedProducts} />
             )}

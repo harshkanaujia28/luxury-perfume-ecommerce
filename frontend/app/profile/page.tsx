@@ -11,17 +11,16 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useApi } from "@/contexts/api-context";
 import { useToast } from "@/hooks/use-toast";
-import { User } from "@/contexts/api-context"; // ✅ make sure User interface is defined
+import { User } from "@/contexts/api-context";
 
 export default function ProfilePage() {
-  const { user, getProfile, updateProfile } = useApi();
+  const { getProfile, updateProfile } = useApi();
   const { toast } = useToast();
   const router = useRouter();
 
   const [profileData, setProfileData] = useState<Partial<User>>({});
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch profile on mount
   useEffect(() => {
     const fetchData = async () => {
       const profile = await getProfile();
@@ -62,136 +61,159 @@ export default function ProfilePage() {
   if (!profileData.email) return null;
 
   return (
-    <div className="min-h-screen bg-white">
+    <>
       <Header />
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">My Account</h1>
+      <div className="min-h-screen bg-black py-28">
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h1 className="text-3xl font-bold text-lime-400 mb-8">My Account</h1>
 
-        <Tabs defaultValue="profile" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            {/* <TabsTrigger value="orders">Orders</TabsTrigger> */}
-            <TabsTrigger value="addresses">Addresses</TabsTrigger>
-          </TabsList>
+          <Tabs defaultValue="profile" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-zinc-900 border border-lime-400/30 rounded-xl">
+              <TabsTrigger
+                value="profile"
+                className="data-[state=active]:bg-lime-500 data-[state=active]:text-black text-gray-300"
+              >
+                Profile
+              </TabsTrigger>
+              <TabsTrigger
+                value="addresses"
+                className="data-[state=active]:bg-lime-500 data-[state=active]:text-black text-gray-300"
+              >
+                Addresses
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Profile Tab */}
-          <TabsContent value="profile" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Profile Information</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="name">Full Name</Label>
-                      <Input
-                        id="name"
-                        name="name"
-                        value={profileData.name || ""}
-                        onChange={handleChange}
-                        required
-                      />
+            {/* Profile Tab */}
+            <TabsContent value="profile" className="mt-6">
+              <Card className="bg-zinc-900 border border-lime-400/30 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-lime-400">
+                    Profile Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="name" className="text-gray-300">
+                          Full Name
+                        </Label>
+                        <Input
+                          id="name"
+                          name="name"
+                          value={profileData.name || ""}
+                          onChange={handleChange}
+                          required
+                          className="bg-black border-gray-700 text-gray-200 focus:border-lime-400"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="email" className="text-gray-300">
+                          Email
+                        </Label>
+                        <Input
+                          id="email"
+                          name="email"
+                          value={profileData.email || ""}
+                          onChange={handleChange}
+                          disabled
+                          className="bg-black border-gray-700 text-gray-400"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="phone" className="text-gray-300">
+                          Phone
+                        </Label>
+                        <Input
+                          id="phone"
+                          name="phone"
+                          value={profileData.phone || ""}
+                          onChange={handleChange}
+                          className="bg-black border-gray-700 text-gray-200 focus:border-lime-400"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <Label htmlFor="email">Email</Label>
-                      <Input
-                        id="email"
-                        name="email"
-                        value={profileData.email || ""}
-                        onChange={handleChange}
-                        disabled
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="phone">Phone</Label>
-                      <Input
-                        id="phone"
-                        name="phone"
-                        value={profileData.phone || ""}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-                  <Button type="submit" disabled={isLoading}>
-                    {isLoading ? "Updating..." : "Update Profile"}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      className="bg-lime-500 text-black hover:bg-lime-400"
+                    >
+                      {isLoading ? "Updating..." : "Update Profile"}
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          {/* Orders Tab */}
-          {/* <TabsContent value="orders" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Order History</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center py-8">
-                  <p className="text-gray-600">No orders found.</p>
-                  <Button className="mt-4" asChild>
-                    <a href="/products">Start Shopping</a>
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent> */}
-
-          {/* Address Tab */}
-          <TabsContent value="addresses" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Saved Addresses</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form className="space-y-4">
-                  <div>
-                    <Label htmlFor="address">Address</Label>
-                    <Input
-                      id="address"
-                      name="address"
-                      value={profileData.address || ""}
-                      onChange={handleChange}
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Address Tab */}
+            <TabsContent value="addresses" className="mt-6">
+              <Card className="bg-zinc-900 border border-lime-400/30 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="text-lime-400">Saved Addresses</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <form className="space-y-4" onSubmit={handleSubmit}>
                     <div>
-                      <Label htmlFor="city">City</Label>
+                      <Label htmlFor="address" className="text-gray-300">
+                        Address
+                      </Label>
                       <Input
-                        id="city"
-                        name="city"
-                        value={profileData.city || ""}
+                        id="address"
+                        name="address"
+                        value={profileData.address || ""}
                         onChange={handleChange}
+                        className="bg-black border-gray-700 text-gray-200 focus:border-lime-400"
                       />
                     </div>
-                    <div>
-                      <Label htmlFor="state">State</Label>
-                      <Input
-                        id="state"
-                        name="state"
-                        value={profileData.state || ""}
-                        onChange={handleChange}
-                      />
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <Label htmlFor="city" className="text-gray-300">
+                          City
+                        </Label>
+                        <Input
+                          id="city"
+                          name="city"
+                          value={profileData.city || ""}
+                          onChange={handleChange}
+                          className="bg-black border-gray-700 text-gray-200 focus:border-lime-400"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="state" className="text-gray-300">
+                          State
+                        </Label>
+                        <Input
+                          id="state"
+                          name="state"
+                          value={profileData.state || ""}
+                          onChange={handleChange}
+                          className="bg-black border-gray-700 text-gray-200 focus:border-lime-400"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="zipCode" className="text-gray-300">
+                          ZIP Code
+                        </Label>
+                        <Input
+                          id="zipCode"
+                          name="zipCode"
+                          value={profileData.zipCode || ""}
+                          onChange={handleChange}
+                          className="bg-black border-gray-700 text-gray-200 focus:border-lime-400"
+                        />
+                      </div>
                     </div>
-                    <div>
-                      <Label htmlFor="zipCode">ZIP Code</Label>
-                      <Input
-                        id="zipCode"
-                        name="zipCode"
-                        value={profileData.zipCode || ""}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-                  <Button onClick={handleSubmit}>Save Address</Button>
-                </form>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </main>
+                    <Button className="bg-lime-500 text-black hover:bg-lime-400">
+                      Save Address
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </main>
+      </div>
       <Footer />
-    </div>
+    </>
   );
 }
