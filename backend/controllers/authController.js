@@ -53,30 +53,48 @@ export const forgotPassword = async (req, res) => {
 export const resetPassword = async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
+  console.log(`[Reset Password] Request received with token: ${token}`);
 
   try {
+    // Verify JWT token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.userId);
 
-    if (!user)
-      return res
-        .status(404)
-        .json({ status: "error", message: "User not found" });
+    if (!user) {
+      console.log(`[Reset Password] No user found for token: ${token}`);
+      return res.status(404).json({
+        status: "error",
+        message: "User not found. Please request a new password reset.",
+      });
+    }
 
-    const hashed = await bcrypt.hash(password, 10);
-    user.password = hashed;
+    // Hash the new password and save
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
     await user.save();
 
-    res
-      .status(200)
-      .json({ status: "success", message: "Password reset successful" });
+    console.log(`[Reset Password] Password successfully reset for: ${user.email}`);
+
+    // Respond to frontend so it can redirect to login
+    return res.status(200).json({
+      status: "success",
+      message: "Password has been reset successfully. You can now log in.",
+    });
   } catch (err) {
-    console.error("Reset Password Error:", err);
-    res
-      .status(400)
-      .json({ status: "error", message: "Invalid or expired token" });
+    console.error("[Reset Password] Error:", err);
+
+    const message =
+      err.name === "TokenExpiredError"
+        ? "The reset link has expired. Please request a new one."
+        : "Invalid reset link. Please request a new password reset.";
+
+    return res.status(400).json({
+      status: "error",
+      message,
+    });
   }
 };
+
 
 export const login = async (req, res) => {
   try {

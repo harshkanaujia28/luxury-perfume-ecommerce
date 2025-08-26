@@ -15,12 +15,16 @@ export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
+    const trimmedPassword = password.trim();
+    const trimmedConfirm = confirmPassword.trim();
+
+    if (trimmedPassword !== trimmedConfirm) {
       toast({
         title: "Error",
         description: "Passwords do not match",
@@ -29,10 +33,21 @@ export default function ResetPasswordPage() {
       return;
     }
 
+    if (trimmedPassword.length < 8) {
+      toast({
+        title: "Weak Password",
+        description: "Password must be at least 8 characters long",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      const { data } = await axios.post(`/auth/reset-password/${token}`, { password });
+      const { data } = await axios.post(`/auth/reset-password/${token}`, {
+        password: trimmedPassword,
+      });
 
       toast({
         title: data.status === "success" ? "Success" : "Error",
@@ -40,11 +55,15 @@ export default function ResetPasswordPage() {
         variant: data.status === "success" ? "default" : "destructive",
       });
 
-      if (data.status === "success") router.push("/auth/login");
+      if (data.status === "success") {
+        setIsSuccess(true); // disables form
+        setTimeout(() => router.push("/auth/login"), 2000); // redirect after 2s
+      }
     } catch (err: any) {
       toast({
         title: "Error",
-        description: err.response?.data?.message || err.message || "Something went wrong.",
+        description:
+          err.response?.data?.message || err.message || "Something went wrong.",
         variant: "destructive",
       });
     } finally {
@@ -64,26 +83,32 @@ export default function ResetPasswordPage() {
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <Label htmlFor="password" className="text-gray-300">New Password</Label>
+                <Label htmlFor="password" className="text-gray-300">
+                  New Password
+                </Label>
                 <Input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={isSuccess}
                   className="mt-1 bg-black text-gray-200 border-gray-700 focus:border-lime-400"
                   placeholder="Enter new password"
                 />
               </div>
 
               <div>
-                <Label htmlFor="confirmPassword" className="text-gray-300">Confirm Password</Label>
+                <Label htmlFor="confirmPassword" className="text-gray-300">
+                  Confirm Password
+                </Label>
                 <Input
                   id="confirmPassword"
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
+                  disabled={isSuccess}
                   className="mt-1 bg-black text-gray-200 border-gray-700 focus:border-lime-400"
                   placeholder="Confirm new password"
                 />
@@ -92,9 +117,13 @@ export default function ResetPasswordPage() {
               <Button
                 type="submit"
                 className="w-full bg-lime-500 text-black hover:bg-lime-400 transition"
-                disabled={isLoading}
+                disabled={isLoading || isSuccess}
               >
-                {isLoading ? "Resetting..." : "Reset Password"}
+                {isLoading
+                  ? "Resetting..."
+                  : isSuccess
+                  ? "Password Reset!"
+                  : "Reset Password"}
               </Button>
             </form>
           </CardContent>
