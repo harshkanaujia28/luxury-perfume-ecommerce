@@ -45,7 +45,7 @@ export default function ResetPasswordPage() {
     setIsLoading(true);
 
     try {
-      const { data } = await axios.post(`/auth/reset-password/${token}`, {
+      const { data } = await axios.post(`/reset-password/${token}`, {
         password: trimmedPassword,
       });
 
@@ -57,7 +57,7 @@ export default function ResetPasswordPage() {
 
       if (data.status === "success") {
         setIsSuccess(true); // disables form
-        setTimeout(() => router.push("/auth/login"), 2000); // redirect after 2s
+        setTimeout(() => router.push("/login"), 2000); // redirect after 2s
       }
     } catch (err: any) {
       toast({
