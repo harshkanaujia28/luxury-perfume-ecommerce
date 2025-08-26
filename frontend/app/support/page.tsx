@@ -150,7 +150,7 @@ export default function SupportPage() {
           <h1 className="text-4xl lg:text-5xl font-bold text-lime-400 mb-6">
             Customer Support
           </h1>
-          <p className="text-xl text-lime-300">
+          <p className="text-xl text-white">
             We're here to help! Get in touch with our support team for any questions or concerns.
           </p>
         </div>
@@ -161,7 +161,7 @@ export default function SupportPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-lime-400 mb-4">How Can We Help?</h2>
-            <p className="text-lg text-lime-300">Choose the support method that works best for you</p>
+            <p className="text-lg text-white">Choose the support method that works best for you</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
@@ -179,7 +179,7 @@ export default function SupportPage() {
                     <CardTitle className="text-xl text-lime-400">{option.title}</CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <p className="text-lime-300">{option.description}</p>
+                    <p className="text-white">{option.description}</p>
                     <div className="flex items-center justify-center text-sm text-lime-300">
                       <Clock className="w-4 h-4 mr-1" />
                       {option.availability}
@@ -213,7 +213,7 @@ export default function SupportPage() {
                         <Icon className="w-5 h-5 text-lime-400" />
                       </div>
                       <h3 className="font-semibold text-lime-400 mb-2">{issue.title}</h3>
-                      <p className="text-sm text-lime-300 mb-4">{issue.description}</p>
+                      <p className="text-sm text-white mb-4">{issue.description}</p>
                       <Button
                         variant="outline"
                         size="sm"
@@ -351,26 +351,26 @@ export default function SupportPage() {
                 </CardHeader>
                 <CardContent className="space-y-4 text-lime-300">
                   <div className="flex items-center space-x-3">
-                    <Phone className="w-5 h-5 text-lime-400" />
+                    <Phone className="w-5 h-5 text-white" />
                     <div>
                       <p className="font-medium">Phone Support</p>
-                      <p className="text-sm"> (555) 123-4567</p>
+                      <p className="text-sm text-white"> (555) 123-4567</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <Mail className="w-5 h-5 text-lime-400" />
+                    <Mail className="w-5 h-5 text-white" />
                     <div>
                       <p className="font-medium">Email Support</p>
-                      <p className="text-sm">support@luxefragrances.com</p>
+                      <p className="text-sm text-white">support@luxefragrances.com</p>
                     </div>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <Clock className="w-5 h-5 text-lime-400" />
+                    <Clock className="w-5 h-5 text-white" />
                     <div>
-                      <p className="font-medium">Business Hours</p>
-                      <p className="text-sm">Mon-Fri: 9AM-6PM EST</p>
-                      <p className="text-sm">Sat: 10AM-4PM EST</p>
-                      <p className="text-sm">Sun: Closed</p>
+                      <p className="font-medium ">Business Hours</p>
+                      <p className="text-sm text-white">Mon-Fri: 9AM-6PM EST</p>
+                      <p className="text-sm text-white">Sat: 10AM-4PM EST</p>
+                      <p className="text-sm text-white">Sun: Closed</p>
                     </div>
                   </div>
                 </CardContent>
@@ -383,19 +383,19 @@ export default function SupportPage() {
                 <CardContent className="space-y-3 text-lime-300">
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Live Chat</span>
-                    <span className="text-sm font-medium">Immediate</span>
+                    <span className="text-sm font-medium text-white">Immediate</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Phone Support</span>
-                    <span className="text-sm font-medium">Immediate</span>
+                    <span className="text-sm font-medium text-white">Immediate</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Email (High Priority)</span>
-                    <span className="text-sm font-medium">2-4 hours</span>
+                    <span className="text-sm font-medium text-white">2-4 hours</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm">Email (Standard)</span>
-                    <span className="text-sm font-medium">24 hours</span>
+                    <span className="text-sm font-medium text-white">24 hours</span>
                   </div>
                 </CardContent>
               </Card>
@@ -405,7 +405,7 @@ export default function SupportPage() {
                   <CardTitle className="text-xl text-lime-400">Before You Contact Us</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <ul className="space-y-2 text-sm text-lime-300">
+                  <ul className="space-y-2 text-sm text-white">
                     <li>• Check your order confirmation email for tracking information</li>
                     <li>• Review our FAQ section for quick answers</li>
                     <li>• Have your order number ready if contacting about an order</li>

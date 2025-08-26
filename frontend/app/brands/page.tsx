@@ -69,16 +69,21 @@ export default function BrandsPage() {
           {/* Hero Section */}
           <section
             className="relative bg-cover bg-center bg-no-repeat py-20"
-            style={{ backgroundImage: `url('/assets/Parfüm & Düfte _ Offizielle Website _ CHANEL.jpeg')` }}
+            style={{
+              backgroundImage: `url('/assets/Parfüm & Düfte _ Offizielle Website _ CHANEL.jpeg')`,
+            }}
           >
             {/* Overlay */}
             <div className="absolute inset-0 bg-black/50" />
 
             {/* Content */}
             <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center z-10">
-              <h1 className="text-4xl lg:text-5xl font-bold text-lime-400 mb-6">Premium Brands</h1>
-              <p className="text-xl text-lime-300 mb-8">
-                Discover the world's most prestigious fragrance houses and their signature collections
+              <h1 className="text-4xl lg:text-5xl font-bold text-lime-400 mb-6">
+                Premium Brands
+              </h1>
+              <p className="text-xl text-white mb-8">
+                Discover the world's most prestigious fragrance houses and their
+                signature collections
               </p>
 
               {/* Search and Sort */}
@@ -91,7 +96,7 @@ export default function BrandsPage() {
                     placeholder="Search brands..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-12 pr-4 py-3 w-full bg-black border border-lime-500/40 text-lime-300"
+                    className="pl-12 pr-4 py-3 w-full bg-black border border-lime-500/40 text-white"
                   />
                 </div>
 
@@ -99,7 +104,7 @@ export default function BrandsPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="px-4 py-3 border border-lime-500/40 rounded-md bg-black text-lime-300 text-sm"
+                  className="px-4 py-3 border border-lime-500/40 rounded-md bg-black text-white text-sm"
                 >
                   <option value="name">Sort by Name</option>
                   <option value="rating">Sort by Rating</option>
@@ -113,7 +118,7 @@ export default function BrandsPage() {
           {/* Brands Grid */}
           <section className="py-16">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="mb-8 text-lime-300">
+              <div className="mb-8 text-white">
                 Showing {filteredBrands.length} of {brandData.length} brands
               </div>
 
@@ -136,29 +141,42 @@ export default function BrandsPage() {
                           />
                         </div>
 
-                        <h3 className="text-xl font-bold text-lime-400 mb-2">{brand.name}</h3>
-                        <p className="text-sm text-lime-300 mb-4">{brand.description}</p>
+                        <h3 className="text-xl font-bold text-lime-400 mb-2">
+                          {brand.name}
+                        </h3>
+                        <p className="text-sm text-white mb-4">{brand.description}</p>
                       </div>
 
                       {/* Brand Stats */}
-                      <div className="space-y-3 mb-6 text-lime-300">
+                      <div className="space-y-3 mb-6 text-white">
                         <div className="flex justify-between items-center">
                           <span className="text-sm">Products</span>
-                          <Badge variant="secondary" className="bg-lime-500 text-black">{brand.productCount}</Badge>
+                          <Badge
+                            variant="secondary"
+                            className="bg-lime-500 text-black"
+                          >
+                            {brand.productCount}
+                          </Badge>
                         </div>
 
                         <div className="flex justify-between items-center">
                           <span className="text-sm">Rating</span>
                           <div className="flex items-center space-x-1">
                             <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                            <span className="text-sm font-medium">{brand.avgRating.toFixed(1)}</span>
-                            <span className="text-xs text-gray-500">({brand.totalReviews})</span>
+                            <span className="text-sm font-medium">
+                              {brand.avgRating.toFixed(1)}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              ({brand.totalReviews})
+                            </span>
                           </div>
                         </div>
 
                         <div className="flex justify-between items-center">
                           <span className="text-sm">Price Range</span>
-                          <span className="text-sm font-medium">${brand.priceRange.min} - ${brand.priceRange.max}</span>
+                          <span className="text-sm font-medium">
+                            ${brand.priceRange.min} - ${brand.priceRange.max}
+                          </span>
                         </div>
 
                         <div className="flex justify-between items-center">
@@ -168,25 +186,39 @@ export default function BrandsPage() {
 
                         <div className="flex justify-between items-center">
                           <span className="text-sm">Specialty</span>
-                          <Badge variant="outline" className="border-lime-500 text-lime-400">{brand.specialty}</Badge>
+                          <Badge
+                            variant="outline"
+                            className="border-lime-500 text-lime-400"
+                          >
+                            {brand.specialty}
+                          </Badge>
                         </div>
                       </div>
 
                       {/* Featured Products */}
                       <div className="mb-6">
-                        <h4 className="font-semibold text-lime-400 mb-3">Popular Products</h4>
+                        <h4 className="font-semibold text-lime-400 mb-3">
+                          Popular Products
+                        </h4>
                         <div className="space-y-2">
                           {brand.featured.map((product) => (
-                            <div key={product.id} className="flex justify-between items-center text-sm text-lime-300">
+                            <div
+                              key={product.id}
+                              className="flex justify-between items-center text-sm text-white"
+                            >
                               <span className="truncate">{product.name}</span>
-                              <span className="font-medium text-lime-400">${product.price}</span>
+                              <span className="font-medium text-lime-400">
+                                ${product.price}
+                              </span>
                             </div>
                           ))}
                         </div>
                       </div>
 
                       <Button className="w-full bg-lime-500 hover:bg-lime-400 text-black font-bold" asChild>
-                        <Link href={`/products?brand=${encodeURIComponent(brand.name)}`}>Explore {brand.name}</Link>
+                        <Link href={`/products?brand=${encodeURIComponent(brand.name)}`}>
+                          Explore {brand.name}
+                        </Link>
                       </Button>
                     </CardContent>
                   </Card>
@@ -195,6 +227,7 @@ export default function BrandsPage() {
             </div>
           </section>
         </main>
+
       </div>
       <Footer />
     </>

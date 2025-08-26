@@ -73,11 +73,11 @@ export function HeroSection() {
                     priority={index === 0}
                     className="object-cover object-center opacity-70"
                   />
-                  <div className="absolute inset-0 bg-black/60" />
+                  {/* <div className="absolute inset-0 bg-black/60" /> */}
                 </div>
 
                 {/* Content */}
-                <div className="relative z-10 max-w-7xl h-full mx-auto px-4 sm:px-6 md:px-8 lg:px-12 flex items-center justify-center sm:justify-start">
+                {/* <div className="relative z-10 max-w-7xl h-full mx-auto px-4 sm:px-6 md:px-8 lg:px-12 flex items-center justify-center sm:justify-start">
                   <div className="space-y-4 text-center sm:text-left">
                     <h1 className="text-lime-400 text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-wide drop-shadow-lg">
                       {slide.title}
@@ -105,7 +105,7 @@ export function HeroSection() {
                       </Button>
                     </div>
                   </div>
-                </div>
+                </div> */}
               </div>
             );
           })}

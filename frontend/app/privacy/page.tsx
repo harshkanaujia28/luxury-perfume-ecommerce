@@ -31,11 +31,11 @@ export default function PrivacyPage() {
                     content: (
                       <>
                         <h4 className="font-semibold mb-2 text-lime-400">Personal Information</h4>
-                        <p>
+                        <p className="text-white">
                           We collect information you provide directly to us, such as when you create an account, make a
                           purchase, or contact us. This may include:
                         </p>
-                        <ul className="list-disc list-inside mt-2 space-y-1">
+                        <ul className="list-disc list-inside mt-2 space-y-1 text-white">
                           <li>Name, email address, and phone number</li>
                           <li>Billing and shipping addresses</li>
                           <li>Payment information (processed securely by our payment providers)</li>
@@ -47,7 +47,7 @@ export default function PrivacyPage() {
                         <p>
                           We automatically collect certain information when you visit our website:
                         </p>
-                        <ul className="list-disc list-inside mt-2 space-y-1">
+                        <ul className="list-disc list-inside mt-2 space-y-1 text-white">
                           <li>IP address and device information</li>
                           <li>Browser type and version</li>
                           <li>Pages visited and time spent on our site</li>
@@ -62,7 +62,7 @@ export default function PrivacyPage() {
                     content: (
                       <>
                         <p className="mb-4">We use the information we collect to:</p>
-                        <ul className="list-disc list-inside space-y-1">
+                        <ul className="list-disc list-inside space-y-1 text-white">
                           <li>Process and fulfill your orders</li>
                           <li>Communicate with you about your orders and account</li>
                           <li>Provide customer support</li>
@@ -78,16 +78,16 @@ export default function PrivacyPage() {
                     title: "3. Information Sharing",
                     content: (
                       <>
-                        <p>We do not sell, trade, or rent your personal information to third parties. We may share your
+                        <p className="text-white">We do not sell, trade, or rent your personal information to third parties. We may share your
                         information in the following circumstances:</p>
                         <h4 className="font-semibold mb-2 mt-2 text-lime-400">Service Providers</h4>
-                        <p>We work with trusted third-party service providers who help us operate our business, such as
+                        <p className="text-white">We work with trusted third-party service providers who help us operate our business, such as
                         payment processors, shipping companies, and email service providers.</p>
                         <h4 className="font-semibold mb-2 mt-2 text-lime-400">Legal Requirements</h4>
-                        <p>We may disclose your information if required by law or in response to valid legal requests from
+                        <p className="text-white">We may disclose your information if required by law or in response to valid legal requests from
                         government authorities.</p>
                         <h4 className="font-semibold mb-2 mt-2 text-lime-400">Business Transfers</h4>
-                        <p>In the event of a merger, acquisition, or sale of assets, your information may be transferred as
+                        <p className="text-white">In the event of a merger, acquisition, or sale of assets, your information may be transferred as
                         part of the transaction.</p>
                       </>
                     ),

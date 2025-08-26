@@ -22,16 +22,12 @@ export function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const { state } = useCart();
   const { user, logout } = useApi();
-  const { items: wishlistItems, clearWishlist } = useWishlist();
+  const { items: wishlistItems } = useWishlist();
   const router = useRouter();
 
   // Disable scroll when mobile menu is open
   useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = isMenuOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
@@ -54,20 +50,18 @@ export function Header() {
   ];
 
   return (
-    <header className="fixed top-0 left-0 w-full z-50 bg-black shadow-md border-b border-lime-400 ">
+    <header className="fixed top-0 left-0 w-full z-50 bg-black shadow-md border-b border-lime-400">
       <nav className="flex items-center justify-between px-4 py-4 lg:px-12">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
-          <div className="relative">
-            <Image
-              src="/Zafrine_Logo.png"
-              alt="Zafrine Perfume Logo"
-              width={60}
-              height={60}
-              className="object-contain"
-              priority
-            />
-          </div>
+          <Image
+            src="/Zafrine_Logo.png"
+            alt="Zafrine Perfume Logo"
+            width={60}
+            height={60}
+            className="object-contain"
+            priority
+          />
         </Link>
 
         {/* Desktop Navigation */}
@@ -76,7 +70,7 @@ export function Header() {
             <Link
               key={item.name}
               href={item.href}
-              className="text-sm font-medium text-lime-400 hover:text-lime-300 transition"
+              className="text-sm font-medium text-white hover:text-lime-300 transition"
             >
               {item.name}
             </Link>
@@ -88,7 +82,7 @@ export function Header() {
               placeholder="Search products"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-4 pr-10 py-2 rounded-full text-sm bg-neutral-900 border border-lime-400 text-lime-100 placeholder-gray-500"
+              className="pl-4 pr-10 py-2 rounded-full text-sm bg-neutral-900 border border-lime-400 text-white placeholder-gray-500"
             />
             <button
               type="submit"
@@ -113,7 +107,11 @@ export function Header() {
 
           {/* Cart */}
           <Link href="/cart" className="relative">
-            <Button variant="ghost" size="icon" className="text-lime-400 hover:text-lime-300">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-lime-400 hover:text-lime-300"
+            >
               <ShoppingCart className="h-5 w-5" />
               {state?.itemCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-lime-400 text-black text-[10px] rounded-full w-5 h-5 flex items-center justify-center">
@@ -125,7 +123,11 @@ export function Header() {
 
           {/* Wishlist */}
           <Link href="/wishlist" className="relative">
-            <Button variant="ghost" size="icon" className="text-lime-400 hover:text-lime-300">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-lime-400 hover:text-lime-300"
+            >
               <Heart className="h-5 w-5" />
               {wishlistItems.length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-lime-400 text-black text-[10px] rounded-full w-5 h-5 flex items-center justify-center">
@@ -138,11 +140,18 @@ export function Header() {
           {/* User Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-lime-400 hover:text-lime-300">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-lime-400 hover:text-lime-300"
+              >
                 <User className="h-5 w-5" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48 bg-black text-lime-300 border border-lime-400">
+            <DropdownMenuContent
+              align="end"
+              className="w-48 bg-black text-lime-300 border border-lime-400"
+            >
               {user ? (
                 <>
                   <DropdownMenuItem asChild>
@@ -172,6 +181,42 @@ export function Header() {
           </DropdownMenu>
         </div>
       </nav>
+
+      {/* ✅ Mobile Menu Content */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-black border-t border-lime-400 px-6 py-6 space-y-6">
+          {/* Search */}
+          <form onSubmit={handleSearch} className="relative">
+            <Input
+              type="text"
+              placeholder="Search products"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-4 pr-10 py-2 rounded-full text-sm bg-neutral-900 border border-lime-400 text-white placeholder-gray-500 w-full"
+            />
+            <button
+              type="submit"
+              className="absolute right-3 top-1/2 -translate-y-1/2"
+            >
+              <Search className="w-4 h-4 text-lime-400" />
+            </button>
+          </form>
+
+          {/* Navigation Links */}
+          <div className="flex flex-col space-y-4">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                href={item.href}
+                className="text-white hover:text-lime-300 text-base font-medium transition"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </header>
   );
 }

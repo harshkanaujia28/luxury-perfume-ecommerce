@@ -155,111 +155,111 @@ export default function FAQPage() {
 
   return (
     <><Header />
-    <div className="min-h-screen bg-black text-lime-300">
-      
-      <main>
-        {/* Hero Section */}
-        <section className="relative py-40 border-b border-lime-500">
-          <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold text-lime-400 mb-6">
-              Frequently Asked Questions
-            </h1>
-            <p className="text-xl text-lime-300 mb-8">
-              Find answers to common questions about our products, shipping, and policies
-            </p>
+      <div className="min-h-screen bg-black text-lime-300">
 
-            {/* Search Bar */}
-            <div className="relative max-w-md mx-auto">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-lime-500 w-5 h-5" />
-              <Input
-                type="text"
-                placeholder="Search FAQs..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-12 pr-4 py-3 w-full text-lg bg-zinc-900 border border-lime-500 text-lime-300 placeholder-lime-500 focus:outline-none focus:ring-2 focus:ring-lime-500 rounded-md"
-              />
-            </div>
-          </div>
-        </section>
+        <main>
+          {/* Hero Section */}
+          <section className="relative py-40 border-b border-lime-500">
+            <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+              <h1 className="text-4xl lg:text-5xl font-bold text-lime-400 mb-6">
+                Frequently Asked Questions
+              </h1>
+              <p className="text-xl text-white mb-8">
+                Find answers to common questions about our products, shipping, and policies
+              </p>
 
-        {/* FAQ Content */}
-        <section className="py-16">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            {filteredFAQ.length === 0 ? (
-              <div className="text-center py-12">
-                <p className="text-lg text-lime-300">No FAQs found matching your search.</p>
+              {/* Search Bar */}
+              <div className="relative max-w-md mx-auto">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-lime-500 w-5 h-5" />
+                <Input
+                  type="text"
+                  placeholder="Search FAQs..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-12 pr-4 py-3 w-full text-lg bg-zinc-900 border border-lime-500 text-white placeholder-lime-500 focus:outline-none focus:ring-2 focus:ring-lime-500 rounded-md"
+                />
               </div>
-            ) : (
-              <div className="space-y-8">
-                {filteredFAQ.map((category) => (
-                  <div key={category.category}>
-                    <h2 className="text-2xl font-bold text-lime-400 mb-6">{category.category}</h2>
-                    <div className="space-y-4">
-                      {category.questions.map((faq, index) => {
-                        const itemId = `${category.category}-${index}`;
-                        const isOpen = openItems.includes(itemId);
+            </div>
+          </section>
 
-                        return (
-                          <Card
-                            key={itemId}
-                            className="bg-zinc-900 border-lime-500/30 shadow-lg rounded-2xl"
-                          >
-                            <CardContent className="p-0">
-                              <button
-                                onClick={() => toggleItem(itemId)}
-                                className="w-full text-left p-6 flex justify-between items-center hover:bg-zinc-800 transition-colors rounded-t-2xl"
-                              >
-                                <h3 className="text-lg font-semibold text-lime-400 pr-4">{faq.question}</h3>
-                                {isOpen ? (
-                                  <ChevronUp className="w-5 h-5 text-lime-300 flex-shrink-0" />
-                                ) : (
-                                  <ChevronDown className="w-5 h-5 text-lime-300 flex-shrink-0" />
+          {/* FAQ Content */}
+          <section className="py-16">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              {filteredFAQ.length === 0 ? (
+                <div className="text-center py-12">
+                  <p className="text-lg text-white">No FAQs found matching your search.</p>
+                </div>
+              ) : (
+                <div className="space-y-8">
+                  {filteredFAQ.map((category) => (
+                    <div key={category.category}>
+                      <h2 className="text-2xl font-bold text-lime-400 mb-6">{category.category}</h2>
+                      <div className="space-y-4">
+                        {category.questions.map((faq, index) => {
+                          const itemId = `${category.category}-${index}`;
+                          const isOpen = openItems.includes(itemId);
+
+                          return (
+                            <Card
+                              key={itemId}
+                              className="bg-zinc-900 border-lime-500/30 shadow-lg rounded-2xl"
+                            >
+                              <CardContent className="p-0">
+                                <button
+                                  onClick={() => toggleItem(itemId)}
+                                  className="w-full text-left p-6 flex justify-between items-center hover:bg-zinc-800 transition-colors rounded-t-2xl"
+                                >
+                                  <h3 className="text-lg font-semibold text-lime-400 pr-4">{faq.question}</h3>
+                                  {isOpen ? (
+                                    <ChevronUp className="w-5 h-5 text-white flex-shrink-0" />
+                                  ) : (
+                                    <ChevronDown className="w-5 h-5 text-white flex-shrink-0" />
+                                  )}
+                                </button>
+                                {isOpen && (
+                                  <div className="px-6 pb-6">
+                                    <p className="text-white leading-relaxed">{faq.answer}</p>
+                                  </div>
                                 )}
-                              </button>
-                              {isOpen && (
-                                <div className="px-6 pb-6">
-                                  <p className="text-lime-300 leading-relaxed">{faq.answer}</p>
-                                </div>
-                              )}
-                            </CardContent>
-                          </Card>
-                        );
-                      })}
+                              </CardContent>
+                            </Card>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Contact Section */}
-        <section className="py-16 bg-zinc-900">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl font-bold text-lime-400 mb-4">Still Have Questions?</h2>
-            <p className="text-lg text-lime-300 mb-8">
-              Can't find what you're looking for? Our customer service team is here to help.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="/contact"
-                className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-black bg-lime-500 hover:bg-lime-400 transition-colors"
-              >
-                Contact Support
-              </a>
-              <a
-                href="mailto:support@luxefragrances.com"
-                className="inline-flex items-center justify-center px-6 py-3 border border-lime-500 text-lime-400 bg-zinc-900 hover:bg-lime-500 hover:text-black text-base font-medium rounded-md transition-colors"
-              >
-                Email Us
-              </a>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        </section>
-      </main>
-      
-    </div>
-    <Footer />
+          </section>
+
+          {/* Contact Section */}
+          <section className="py-16 bg-zinc-900">
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+              <h2 className="text-3xl font-bold text-lime-400 mb-4">Still Have Questions?</h2>
+              <p className="text-lg text-white mb-8">
+                Can't find what you're looking for? Our customer service team is here to help.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                  href="/contact"
+                  className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-black bg-lime-500 hover:bg-lime-400 transition-colors"
+                >
+                  Contact Support
+                </a>
+                <a
+                  href="mailto:support@luxefragrances.com"
+                  className="inline-flex items-center justify-center px-6 py-3 border border-lime-500 text-white bg-zinc-900 hover:bg-lime-500 hover:text-black text-base font-medium rounded-md transition-colors"
+                >
+                  Email Us
+                </a>
+              </div>
+            </div>
+          </section>
+        </main>
+
+      </div>
+      <Footer />
     </>
 
   )

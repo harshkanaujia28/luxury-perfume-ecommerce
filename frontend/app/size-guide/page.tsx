@@ -117,7 +117,9 @@ export default function SizeGuidePage() {
           <section className="luxury-gradient py-40">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
               <h1 className="text-4xl lg:text-5xl font-bold text-lime-400 mb-6">Fragrance Size Guide</h1>
-              <p className="text-xl text-lime-300">Choose the perfect size for your lifestyle and fragrance needs</p>
+              <p className="text-xl text-white">
+                Choose the perfect size for your lifestyle and fragrance needs
+              </p>
             </div>
           </section>
 
@@ -126,14 +128,17 @@ export default function SizeGuidePage() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
               <div className="text-center mb-12">
                 <h2 className="text-3xl font-bold text-lime-400 mb-4">Bottle Sizes</h2>
-                <p className="text-lg text-lime-300">Find the right size for your fragrance journey</p>
+                <p className="text-lg text-white">Find the right size for your fragrance journey</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-16">
                 {sizeOptions.map((option) => {
                   const Icon = option.icon;
                   return (
-                    <Card key={option.size} className="text-center bg-zinc-900 border border-lime-500/30 shadow-lg rounded-2xl hover:shadow-lime-500/50 transition-shadow">
+                    <Card
+                      key={option.size}
+                      className="text-center bg-zinc-900 border border-lime-500/30 shadow-lg rounded-2xl hover:shadow-lime-500/50 transition-shadow"
+                    >
                       <CardHeader>
                         <div className="w-12 h-12 bg-lime-500 rounded-full flex items-center justify-center mx-auto mb-4">
                           <Icon className="w-6 h-6 text-black" />
@@ -141,7 +146,7 @@ export default function SizeGuidePage() {
                         <CardTitle className="text-2xl font-bold text-lime-400">{option.size}</CardTitle>
                         <Badge variant="outline" className="text-lime-400 border-lime-400">{option.type}</Badge>
                       </CardHeader>
-                      <CardContent className="space-y-3 text-lime-300">
+                      <CardContent className="space-y-3 text-white">
                         <p className="text-sm">{option.description}</p>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
@@ -167,7 +172,7 @@ export default function SizeGuidePage() {
               <div className="mb-16">
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-bold text-lime-400 mb-4">Fragrance Concentrations</h2>
-                  <p className="text-lg text-lime-300">Understanding the different types of fragrances</p>
+                  <p className="text-lg text-white">Understanding the different types of fragrances</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -176,7 +181,7 @@ export default function SizeGuidePage() {
                       <CardHeader>
                         <CardTitle className="text-xl text-lime-400">{concentration.type}</CardTitle>
                       </CardHeader>
-                      <CardContent className="space-y-3 text-lime-300">
+                      <CardContent className="space-y-3 text-white">
                         <p>{concentration.description}</p>
                         <div className="grid grid-cols-3 gap-4 text-sm">
                           <div>
@@ -204,7 +209,7 @@ export default function SizeGuidePage() {
                   <CardHeader>
                     <CardTitle className="text-2xl text-lime-400">Usage Recommendations</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-6 text-lime-300">
+                  <CardContent className="space-y-6 text-white">
                     {usageTips.map((tip) => (
                       <div key={tip.title}>
                         <h4 className="font-semibold mb-2 text-lime-400">{tip.title}</h4>
@@ -219,7 +224,7 @@ export default function SizeGuidePage() {
                   <CardHeader>
                     <CardTitle className="text-2xl text-lime-400">Application Tips</CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-4 text-lime-300">
+                  <CardContent className="space-y-4 text-white">
                     <div>
                       <h4 className="font-semibold mb-2 text-lime-400">How Many Sprays?</h4>
                       <ul className="space-y-1">
@@ -255,6 +260,7 @@ export default function SizeGuidePage() {
 
         <Footer />
       </div>
+
     </>
 
   )

@@ -46,10 +46,10 @@ export default function WhyUs() {
               />
               {/* Overlay Title (if any) */}
               {banner.title && (
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                  <h3 className="text-3xl md:text-4xl font-bold text-lime-400 drop-shadow-lg">
+                <div className="absolute inset-0  flex items-center justify-center">
+                  {/* <h3 className="text-3xl md:text-4xl font-bold text-lime-400 drop-shadow-lg">
                     {banner.title}
-                  </h3>
+                  </h3> */}
                 </div>
               )}
             </div>
