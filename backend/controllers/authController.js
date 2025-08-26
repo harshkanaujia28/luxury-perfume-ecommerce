@@ -68,18 +68,16 @@ export const resetPassword = async (req, res) => {
       });
     }
 
-    // Hash the new password and save
-    const hashedPassword = await bcrypt.hash(password, 10);
-    user.password = hashedPassword;
+    // ✅ Let the pre('save') hook handle hashing
+    user.password = password; 
     await user.save();
 
     console.log(`[Reset Password] Password successfully reset for: ${user.email}`);
 
-    // ✅ Tell frontend where to redirect (login path)
     return res.status(200).json({
       status: "success",
       message: "Password has been reset successfully. Please log in.",
-      redirect: "/login", // 👈 frontend can use this to navigate
+      redirect: "/login",
     });
   } catch (err) {
     console.error("[Reset Password] Error:", err);
@@ -95,6 +93,7 @@ export const resetPassword = async (req, res) => {
     });
   }
 };
+
 
 
 
