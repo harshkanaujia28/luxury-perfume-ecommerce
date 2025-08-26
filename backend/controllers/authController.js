@@ -75,10 +75,11 @@ export const resetPassword = async (req, res) => {
 
     console.log(`[Reset Password] Password successfully reset for: ${user.email}`);
 
-    // Respond to frontend so it can redirect to login
+    // ✅ Tell frontend where to redirect (login path)
     return res.status(200).json({
       status: "success",
-      message: "Password has been reset successfully. You can now log in.",
+      message: "Password has been reset successfully. Please log in.",
+      redirect: "/login", // 👈 frontend can use this to navigate
     });
   } catch (err) {
     console.error("[Reset Password] Error:", err);
@@ -94,6 +95,7 @@ export const resetPassword = async (req, res) => {
     });
   }
 };
+
 
 
 export const login = async (req, res) => {
