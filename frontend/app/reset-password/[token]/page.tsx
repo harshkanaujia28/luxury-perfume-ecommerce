@@ -45,7 +45,7 @@ export default function ResetPasswordPage() {
     setIsLoading(true);
 
     try {
-      const { data } = await axios.post(`/reset-password/${token}`, {
+      const { data } = await axios.post(`auth/reset-password/${token}`, {
         password: trimmedPassword,
       });
 
