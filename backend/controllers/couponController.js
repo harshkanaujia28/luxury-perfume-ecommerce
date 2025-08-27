@@ -1,11 +1,11 @@
-import { Coupon } from "../models/couponModel.js"
-import order from "../models/Order.js"
+import { Coupon } from "../models/couponModel.js";
+import order from "../models/Order.js";
 
 // Get all coupons
 export const getCoupons = async (req, res) => {
-  const coupons = await Coupon.find()
-  res.json(coupons)
-}
+  const coupons = await Coupon.find();
+  res.json(coupons);
+};
 
 // Get one coupon
 export const getCouponById = async (req, res) => {
@@ -14,14 +14,16 @@ export const getCouponById = async (req, res) => {
     if (!coupon) return res.status(404).json({ message: "Coupon not found" });
 
     // 🔍 Find orders where this coupon was used
-    const orders = await order.find({ couponCode: coupon.code }).select("email customer");
+    const orders = await order
+      .find({ couponCode: coupon.code })
+      .select("email customer");
 
     res.json({
       coupon,
-      usageCount: orders.length, // ✅ overwrite usedCount with real usage
-      users: orders.map((order) => ({
-        email: order.email,
-        customer: order.customer,
+      usageCount: orders.length,
+      users: orders.map((o) => ({
+        email: o.email,
+        customer: o.customer,
       })),
     });
   } catch (error) {
@@ -32,38 +34,48 @@ export const getCouponById = async (req, res) => {
 
 // Create a new coupon
 export const createCoupon = async (req, res) => {
-  const newCoupon = new Coupon(req.body)
-  const saved = await newCoupon.save()
-  res.status(201).json(saved)
-}
+  const newCoupon = new Coupon(req.body);
+  const saved = await newCoupon.save();
+  res.status(201).json(saved);
+};
 
 // Update coupon
 export const updateCoupon = async (req, res) => {
-  const updated = await Coupon.findByIdAndUpdate(req.params.id, req.body, { new: true })
-  if (!updated) return res.status(404).json({ message: "Coupon not found" })
-  res.json(updated)
-}
+  const updated = await Coupon.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+  if (!updated) return res.status(404).json({ message: "Coupon not found" });
+  res.json(updated);
+};
 
 // Delete coupon
 export const deleteCoupon = async (req, res) => {
-  const deleted = await Coupon.findByIdAndDelete(req.params.id)
-  if (!deleted) return res.status(404).json({ message: "Coupon not found" })
-  res.json({ message: "Coupon deleted" })
-}
+  const deleted = await Coupon.findByIdAndDelete(req.params.id);
+  if (!deleted) return res.status(404).json({ message: "Coupon not found" });
+  res.json({ message: "Coupon deleted" });
+};
 
 export const validateCouponByCode = async (req, res) => {
   try {
     const { code, orderTotal } = req.query;
     const userId = req.user?._id;
 
-    if (!code) return res.status(400).json({ valid: false, message: "Coupon code is required" });
+    if (!code)
+      return res
+        .status(400)
+        .json({ valid: false, message: "Coupon code is required" });
 
     const coupon = await Coupon.findOne({ code });
-    if (!coupon) return res.status(404).json({ valid: false, message: "Coupon not found" });
+    if (!coupon)
+      return res
+        .status(404)
+        .json({ valid: false, message: "Coupon not found" });
 
     // status
     if (coupon.status !== "Active") {
-      return res.status(400).json({ valid: false, message: "Coupon is not active" });
+      return res
+        .status(400)
+        .json({ valid: false, message: "Coupon is not active" });
     }
 
     // expiry
@@ -73,19 +85,28 @@ export const validateCouponByCode = async (req, res) => {
 
     // usage limit
     if (coupon.usedCount >= coupon.totalLimit) {
-      return res.status(400).json({ valid: false, message: "Coupon usage limit reached" });
+      return res
+        .status(400)
+        .json({ valid: false, message: "Coupon usage limit reached" });
     }
 
     // min order
     if (orderTotal && Number(orderTotal) < coupon.minOrder) {
-      return res.status(400).json({ valid: false, message: `Minimum order amount is ${coupon.minOrder}` });
+      return res
+        .status(400)
+        .json({
+          valid: false,
+          message: `Minimum order amount is ${coupon.minOrder}`,
+        });
     }
 
     // per-user limit
     if (userId && coupon.perUserLimit) {
       const userOrders = await order.find({ user: userId, couponCode: code });
       if (userOrders.length >= coupon.perUserLimit) {
-        return res.status(400).json({ valid: false, message: "You have already used this coupon" });
+        return res
+          .status(400)
+          .json({ valid: false, message: "You have already used this coupon" });
       }
     }
 

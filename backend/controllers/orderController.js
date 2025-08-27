@@ -51,15 +51,16 @@ export const placeOrder = async (req, res) => {
       total,
       status,
       shippingAddress,
-      couponCode: couponCode || null,
+      couponCode: appliedCoupon ? appliedCoupon.code : null, // ✅ store code
+      coupon: appliedCoupon ? appliedCoupon._id : null, // ✅ optional: also store reference
     };
 
     const order = await Order.create(orderData);
 
     // 📈 Increment coupon usage count AFTER successful order
     if (appliedCoupon) {
-      await Coupon.findOneAndUpdate(
-        { code: appliedCoupon.code },
+      await Coupon.updateOne(
+        { _id: appliedCoupon._id },
         { $inc: { usedCount: 1 } }
       );
     }
