@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const couponSchema = new mongoose.Schema(
   {
@@ -18,14 +18,11 @@ const couponSchema = new mongoose.Schema(
       required: [true, "Coupon value is required"],
     },
     minOrder: {
-      type: String, // As per your interface
-    },
-    usage: {
-      type: String,
+      type: String, // keep string if you want to allow empty
     },
     usedCount: {
       type: Number,
-      default: 0,
+      default: 0, // ✅ tracks how many times the coupon has been used
     },
     totalLimit: {
       type: Number,
@@ -37,11 +34,11 @@ const couponSchema = new mongoose.Schema(
       default: "Active",
     },
     expiry: {
-      type: String, // Can be changed to Date if you prefer stricter typing
+      type: String, // could be Date if you want strict validation
     },
     createdDate: {
       type: String,
-      default: () => new Date().toISOString(), // match interface string type
+      default: () => new Date().toISOString(),
     },
     startDate: {
       type: String,
@@ -51,6 +48,6 @@ const couponSchema = new mongoose.Schema(
     },
   },
   { timestamps: true }
-)
+);
 
-export const Coupon = mongoose.model("Coupon", couponSchema)
+export const Coupon = mongoose.model("Coupon", couponSchema);

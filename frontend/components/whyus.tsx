@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
+import Link from "next/link"   // 👈 add this
 import { useApi } from "@/contexts/api-context"
 
 export default function WhyUs() {
@@ -27,34 +28,41 @@ export default function WhyUs() {
   return (
     <section className="py-20 px-4 bg-black">
       <div className="max-w-7xl mx-auto space-y-8">
-        {banners.map((banner, index) => (
-          <div
-            key={index}
-            className="w-full overflow-hidden rounded-2xl border border-lime-400/40 bg-zinc-900 shadow-lg hover:shadow-[0_0_35px_rgba(182,255,40,0.4)] transition"
-          >
-            <div className="relative w-full aspect-[1920/500]">
-              <Image
-                src={
-                  banner.imageUrl.startsWith("http")
-                    ? banner.imageUrl
-                    : `${baseURL}${banner.imageUrl}`
-                }
-                alt={banner.title || `Banner ${index + 1}`}
-                fill
-                className="object-cover w-full h-full rounded-2xl"
-                priority
-              />
-              {/* Overlay Title (if any) */}
-              {banner.title && (
-                <div className="absolute inset-0  flex items-center justify-center">
-                  {/* <h3 className="text-3xl md:text-4xl font-bold text-lime-400 drop-shadow-lg">
-                    {banner.title}
-                  </h3> */}
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
+        {banners
+          .filter((banner) => banner.isActive) // ✅ only active banners
+          .map((banner, index) => {
+            const image = (
+              <div className="relative w-full aspect-[1920/500]">
+                <Image
+                  src={
+                    banner.imageUrl.startsWith("http")
+                      ? banner.imageUrl
+                      : `${baseURL}${banner.imageUrl}`
+                  }
+                  alt={banner.title || `Banner ${index + 1}`}
+                  fill
+                  className="object-cover w-full h-full rounded-2xl"
+                  priority
+                />
+              </div>
+            )
+
+            // ✅ if linkUrl exists → wrap with <Link>
+            return (
+              <div
+                key={banner._id || index}
+                className="w-full overflow-hidden rounded-2xl border border-lime-400/40 bg-zinc-900 shadow-lg hover:shadow-[0_0_35px_rgba(182,255,40,0.4)] transition"
+              >
+                {banner.linkUrl ? (
+                  <Link href={banner.linkUrl}>
+                    {image}
+                  </Link>
+                ) : (
+                  image
+                )}
+              </div>
+            )
+          })}
       </div>
     </section>
   )

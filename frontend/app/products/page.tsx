@@ -1,29 +1,67 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState, useMemo } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import axios from "@/utils/axios";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { ProductGrid } from "@/components/product-grid";
 import { ProductFilters } from "@/components/product-filters";
 
+interface Product {
+  _id: string;
+  name: string;
+  price: number;
+  rating?: number;
+  createdAt: string;
+  category?: {
+    type?: string;
+    gender?: string;
+    subCategory?: string;
+  };
+  image: string;
+}
+
 export default function ProductsPage() {
   const searchParams = useSearchParams();
-  const initialType = searchParams.get("type") || ""; // Start with all products
-  const [selectedCategoryType, setSelectedCategoryType] = useState(initialType);
-  const [selectedGender, setSelectedGender] = useState("");
-  const [selectedSubCategory, setSelectedSubCategory] = useState("");
-  const [sortBy, setSortBy] = useState("newest");
-  const [allProducts, setAllProducts] = useState<any[]>([]);
+  const router = useRouter();
+
+  // Initialize state from URL query
+  const [selectedCategoryType, setSelectedCategoryType] = useState(
+    searchParams.get("categoryType") || ""
+  );
+  const [selectedGender, setSelectedGender] = useState(
+    searchParams.get("gender") || ""
+  );
+  const [selectedSubCategory, setSelectedSubCategory] = useState(
+    searchParams.get("subCategory") || ""
+  );
+  const [sortBy, setSortBy] = useState(searchParams.get("sortBy") || "newest");
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Sync state with URL query whenever it changes
+  useEffect(() => {
+    const categoryType = searchParams.get("categoryType") || "";
+    const gender = searchParams.get("gender") || "";
+    const subCategory = searchParams.get("subCategory") || "";
+    const sort = searchParams.get("sortBy") || "newest";
+
+    setSelectedCategoryType(categoryType);
+    setSelectedGender(gender);
+    setSelectedSubCategory(subCategory);
+    setSortBy(sort);
+  }, [searchParams]);
+
+  // Fetch all products
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
         const res = await axios.get("/products");
-        const data = Array.isArray(res.data) ? res.data : res.data.products || [];
+        const data: Product[] = Array.isArray(res.data)
+          ? res.data
+          : res.data.products || [];
         setAllProducts(data);
       } catch (err) {
         console.error("Error fetching products:", err);
@@ -36,12 +74,29 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
+  // Update URL whenever filters change
+  useEffect(() => {
+    const query = new URLSearchParams();
+    if (selectedCategoryType) query.set("categoryType", selectedCategoryType);
+    if (selectedGender) query.set("gender", selectedGender);
+    if (selectedSubCategory) query.set("subCategory", selectedSubCategory);
+    if (sortBy) query.set("sortBy", sortBy);
+
+    router.replace(`/products?${query.toString()}`, { scroll: false });
+  }, [selectedCategoryType, selectedGender, selectedSubCategory, sortBy, router]);
+
   // Filter products
   const filteredProducts = useMemo(() => {
     return allProducts.filter((product) => {
-      const matchesType = selectedCategoryType ? product.category?.type === selectedCategoryType : true;
-      const matchesGender = selectedGender ? product.category?.gender === selectedGender : true;
-      const matchesSubCategory = selectedSubCategory ? product.category?.subCategory === selectedSubCategory : true;
+      const matchesType = selectedCategoryType
+        ? product.category?.type === selectedCategoryType
+        : true;
+      const matchesGender = selectedGender
+        ? product.category?.gender === selectedGender
+        : true;
+      const matchesSubCategory = selectedSubCategory
+        ? product.category?.subCategory === selectedSubCategory
+        : true;
       return matchesType && matchesGender && matchesSubCategory;
     });
   }, [allProducts, selectedCategoryType, selectedGender, selectedSubCategory]);
@@ -55,9 +110,11 @@ export default function ProductsPage() {
         case "price-high":
           return b.price - a.price;
         case "rating":
-          return b.rating - a.rating;
+          return (b.rating || 0) - (a.rating || 0);
         case "newest":
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
         default:
           return a.name.localeCompare(b.name);
       }
@@ -90,12 +147,15 @@ export default function ProductsPage() {
                 {selectedCategoryType || "All"} Products
               </h1>
               <p className="text-gray-400">
-                Showing {sortedProducts.length} product{sortedProducts.length !== 1 && "s"}
+                Showing {sortedProducts.length} product
+                {sortedProducts.length !== 1 && "s"}
               </p>
             </div>
 
             {loading ? (
               <p className="text-lime-400 animate-pulse">Loading products...</p>
+            ) : sortedProducts.length === 0 ? (
+              <p className="text-gray-400">No products found for selected filters.</p>
             ) : (
               <ProductGrid products={sortedProducts} />
             )}

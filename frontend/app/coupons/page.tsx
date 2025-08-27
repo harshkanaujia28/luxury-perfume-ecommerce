@@ -47,7 +47,7 @@ interface Coupon {
 }
 export default function CouponsPage() {
   const { getCoupons, getCouponById, addCoupon, updateCoupon, deleteCoupon } = useApi()
-    const { toast } = useToast();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("")
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -107,9 +107,12 @@ export default function CouponsPage() {
 
   const handleView = async (id: string) => {
     try {
-      const data = await getCouponById(id)
+      const data = await getCouponById(id);
+
       setSelectedCoupon({
         ...data,
+        usedCount: data.usedCount ?? 0,      // ✅ default to 0
+        totalLimit: data.totalLimit ?? 1,    // ✅ default to 1
         analytics: {
           totalRevenue: 0,
           avgOrderValue: 0,
@@ -119,12 +122,14 @@ export default function CouponsPage() {
         categories: [],
         brands: [],
         customerType: ""
-      })
-      setIsViewDialogOpen(true)
+      });
+
+      setIsViewDialogOpen(true);
     } catch (error) {
-      console.error("Failed to fetch coupon details", error)
+      console.error("Failed to fetch coupon details", error);
     }
-  }
+  };
+
 
   const handleEdit = (coupon: Coupon) => {
     setSelectedCoupon({
@@ -145,36 +150,36 @@ export default function CouponsPage() {
   }
 
 
-const handleEditSave = async () => {
-  if (!editingCoupon || !editingCoupon._id) {
-    console.error("Missing editingCoupon or coupon ID")
-    return
-  }
-
-  try {
-    const updated = await updateCoupon(editingCoupon._id, editingCoupon)
-
-    if (!updated || !updated._id) {
-      console.error("Invalid updateCoupon response", updated)
+  const handleEditSave = async () => {
+    if (!editingCoupon || !editingCoupon._id) {
+      console.error("Missing editingCoupon or coupon ID")
       return
     }
 
-    setCoupons((prev) =>
-      Array.isArray(prev)
-        ? prev.map((c) => (c._id === updated._id ? updated : c))
-        : []
-    )
+    try {
+      const updated = await updateCoupon(editingCoupon._id, editingCoupon)
+
+      if (!updated || !updated._id) {
+        console.error("Invalid updateCoupon response", updated)
+        return
+      }
+
+      setCoupons((prev) =>
+        Array.isArray(prev)
+          ? prev.map((c) => (c._id === updated._id ? updated : c))
+          : []
+      )
       toast({
         title: "Coupon updated",
         description: "Coupon has been updated successfully.",
       });
-  } catch (error) {
-    console.error("Failed to update coupon", error)
-  } finally {
-    // setIsEditDialogOpen(false)
-    setEditingCoupon(null)
+    } catch (error) {
+      console.error("Failed to update coupon", error)
+    } finally {
+      // setIsEditDialogOpen(false)
+      setEditingCoupon(null)
+    }
   }
-}
 
 
 
@@ -213,7 +218,7 @@ const handleEditSave = async () => {
     try {
       await deleteCoupon(id)
       setCoupons((prev) => prev.filter((c) => c._id !== id))
-        toast({ title: "Coupon deleted", description: "Coupon has been deleted successfully." });
+      toast({ title: "Coupon deleted", description: "Coupon has been deleted successfully." });
     } catch (error) {
       console.error("Failed to delete coupon", error)
     }
@@ -493,37 +498,49 @@ const handleEditSave = async () => {
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
+                          {/* Usage Stats */}
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
                               <span className="font-medium">Times Used:</span>
-                              <p className="text-muted-foreground">{selectedCoupon.usedCount}</p>
+                              <p className="text-muted-foreground">
+                                {selectedCoupon?.usedCount ?? 0}
+                              </p>
                             </div>
                             <div>
                               <span className="font-medium">Usage Limit:</span>
-                              <p className="text-muted-foreground">{selectedCoupon.totalLimit}</p>
+                              <p className="text-muted-foreground">
+                                {selectedCoupon?.totalLimit ?? 1}
+                              </p>
                             </div>
                             <div>
                               <span className="font-medium">Remaining:</span>
                               <p className="text-muted-foreground">
-                                {selectedCoupon.totalLimit - selectedCoupon.usedCount}
+                                {(selectedCoupon?.totalLimit ?? 1) - (selectedCoupon?.usedCount ?? 0)}
                               </p>
                             </div>
                             <div>
                               <span className="font-medium">Usage Rate:</span>
                               <p className="text-muted-foreground">
-                                {((selectedCoupon.usedCount / selectedCoupon.totalLimit) * 100).toFixed(1)}%
+                                {selectedCoupon?.totalLimit
+                                  ? (((selectedCoupon?.usedCount ?? 0) / selectedCoupon.totalLimit) * 100).toFixed(1)
+                                  : 0}%
                               </p>
                             </div>
                           </div>
+
+                          {/* Progress Bar */}
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
                               className="bg-purple-600 h-2 rounded-full"
                               style={{
-                                width: `${(selectedCoupon.usedCount / selectedCoupon.totalLimit) * 100}%`,
+                                width: `${selectedCoupon?.totalLimit
+                                  ? ((selectedCoupon?.usedCount ?? 0) / selectedCoupon.totalLimit) * 100
+                                  : 0}%`,
                               }}
                             ></div>
                           </div>
                         </CardContent>
+
                       </Card>
                     </div>
                   </TabsContent>

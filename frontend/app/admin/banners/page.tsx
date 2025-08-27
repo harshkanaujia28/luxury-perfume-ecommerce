@@ -257,12 +257,28 @@ export default function AdminBannersPage() {
   }
 
   const handleToggleActive = async (id: string) => {
-    await toggleBannerStatus(id)
-    const updated = await getHeroBanners()
-    setHeroImages(updated)
-    setSaveStatus("success")
-    setTimeout(() => setSaveStatus("idle"), 3000)
+    // ⚡ Optimistic update UI me turant state change
+    setHeroImages((prev) =>
+      prev.map((b) =>
+        b._id === id ? { ...b, isActive: !b.isActive } : b
+      )
+    )
+
+    try {
+      // backend update
+      await toggleBannerStatus(id)
+
+      // backend se fresh sync
+      const updated = await getHeroBanners()
+      setHeroImages(updated)
+    } catch (err) {
+      console.error("Failed to toggle banner:", err)
+    }
   }
+
+
+
+
   const handleReorderHeroImage = async (id: string, direction: "up" | "down") => {
     try {
       console.log("🔃 Reordering", id, direction)
@@ -389,17 +405,15 @@ export default function AdminBannersPage() {
                                 <div className="flex items-center space-x-2">
                                   <Switch
                                     checked={banner.isActive}
-                                    onCheckedChange={() =>
-                                      handleToggleActive(banner._id, "banner")
-                                    }
+                                    onCheckedChange={() => handleToggleActive(banner._id)}
                                   />
-                                  <Badge
-                                    variant={banner.isActive ? "default" : "secondary"}
-                                  >
+                                  <Badge variant={banner.isActive ? "default" : "secondary"}>
                                     {banner.isActive ? "Active" : "Inactive"}
                                   </Badge>
                                 </div>
                               </TableCell>
+
+
                               <TableCell>
                                 <Badge variant="outline">{banner.priority ?? "-"}</Badge>
                               </TableCell>
@@ -602,6 +616,18 @@ export default function AdminBannersPage() {
                       />
                     </div>
                     <div className="space-y-2">
+                      <Label htmlFor="linkUrl">Link URL</Label>
+                      <Input
+                        id="linkUrl"
+                        type="text"
+                        value={bannerForm.linkUrl ?? ""}
+                        onChange={(e) =>
+                          setBannerForm((prev) => ({ ...prev, linkUrl: e.target.value }))
+                        }
+                        placeholder="Enter banner link URL"
+                      />
+                    </div>
+                    <div className="space-y-2">
                       <Label htmlFor="priority">Priority</Label>
                       <Select
                         value={(bannerForm.priority ?? 1).toString()}
@@ -641,32 +667,32 @@ export default function AdminBannersPage() {
                             type="file"
                             accept="image/*"
                             className="hidden"
-                          onChange={async (e) => {
-                            const file = e.target.files?.[0];
-                            if (!file) return;
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
 
-                            try {
-                              const formData = new FormData();
-                              formData.append("file", file);
-                              formData.append("upload_preset", "myCloud"); // 🔁 replace with your Cloudinary upload preset
+                              try {
+                                const formData = new FormData();
+                                formData.append("file", file);
+                                formData.append("upload_preset", "myCloud"); // 🔁 replace with your Cloudinary upload preset
 
-                              const res = await fetch("https://api.cloudinary.com/v1_1/datxfosoi/image/upload", {
-                                method: "POST",
-                                body: formData,
-                              });
+                                const res = await fetch("https://api.cloudinary.com/v1_1/datxfosoi/image/upload", {
+                                  method: "POST",
+                                  body: formData,
+                                });
 
-                              const data = await res.json();
+                                const data = await res.json();
 
-                              if (data.secure_url) {
-                                setBannerForm((prev) => ({ ...prev, imageUrl: data.secure_url }));
-                              } else {
-                                throw new Error("No secure_url from Cloudinary");
+                                if (data.secure_url) {
+                                  setBannerForm((prev) => ({ ...prev, imageUrl: data.secure_url }));
+                                } else {
+                                  throw new Error("No secure_url from Cloudinary");
+                                }
+                              } catch (err) {
+                                console.error("Hero Image Upload Failed", err);
                               }
-                            } catch (err) {
-                              console.error("Hero Image Upload Failed", err);
-                            }
-                          }}
-                        />
+                            }}
+                          />
                           <Button asChild variant="outline" size="sm">
                             <span className="cursor-pointer flex items-center space-x-2">
                               <Upload className="h-4 w-4" />

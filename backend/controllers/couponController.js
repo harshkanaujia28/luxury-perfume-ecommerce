@@ -13,15 +13,15 @@ export const getCouponById = async (req, res) => {
     const coupon = await Coupon.findById(req.params.id);
     if (!coupon) return res.status(404).json({ message: "Coupon not found" });
 
-    // 🔍 Find orders where this coupon was used
-    const orders = await order.find({ couponCode: coupon.code }).select("email customer");
+    // ✅ Count orders where this coupon was applied
+    const orders = await Order.find({ couponCode: coupon.code }).select("email customer");
 
     res.json({
-      coupon,
-      usageCount: orders.length,
-      users: orders.map((order) => ({
-        email: order.email,
-        customer: order.customer,
+      ...coupon.toObject(),
+      usedCount: orders.length, // ✅ overwrite usedCount with real usage
+      users: orders.map((o) => ({
+        email: o.email,
+        customer: o.customer,
       })),
     });
   } catch (error) {
