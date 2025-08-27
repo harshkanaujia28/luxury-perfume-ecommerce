@@ -39,6 +39,7 @@ interface Coupon {
   usage?: string
   usedCount?: number
   totalLimit: number
+  perUserLimit?: number
   status: string
   expiry?: string
   createdDate?: string
@@ -64,6 +65,7 @@ export default function CouponsPage() {
     type: "Percentage",
     value: 0,
     totalLimit: 1,
+    perUserLimit: 1,
     status: "Active",
     minOrder: "",
     usage: "",
@@ -107,12 +109,9 @@ export default function CouponsPage() {
 
   const handleView = async (id: string) => {
     try {
-      const data = await getCouponById(id);
-
+      const data = await getCouponById(id)
       setSelectedCoupon({
         ...data,
-        usedCount: data.usedCount ?? 0,      // ✅ default to 0
-        totalLimit: data.totalLimit ?? 1,    // ✅ default to 1
         analytics: {
           totalRevenue: 0,
           avgOrderValue: 0,
@@ -122,14 +121,12 @@ export default function CouponsPage() {
         categories: [],
         brands: [],
         customerType: ""
-      });
-
-      setIsViewDialogOpen(true);
+      })
+      setIsViewDialogOpen(true)
     } catch (error) {
-      console.error("Failed to fetch coupon details", error);
+      console.error("Failed to fetch coupon details", error)
     }
-  };
-
+  }
 
   const handleEdit = (coupon: Coupon) => {
     setSelectedCoupon({
@@ -245,86 +242,154 @@ export default function CouponsPage() {
                 Add Coupon
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Add New Coupon</DialogTitle>
+                <DialogTitle className="flex items-center gap-2">
+                  Add New Coupon
+                </DialogTitle>
               </DialogHeader>
+
               <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="coupon-code">Coupon Code</Label>
-                  <Input id="coupon-code" placeholder="Enter coupon code" />
+                {/* Coupon Code + Discount Type */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="coupon-code">Coupon Code</Label>
+                    <Input
+                      id="coupon-code"
+                      placeholder="Enter coupon code"
+                      value={newCoupon.code}
+                      onChange={(e) => setNewCoupon({ ...newCoupon, code: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="discount-type">Discount Type</Label>
+                    <Select
+                      value={newCoupon.type}
+                      onValueChange={(value) => setNewCoupon({ ...newCoupon, type: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select discount type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Percentage">Percentage</SelectItem>
+                        <SelectItem value="Fixed Amount">Fixed Amount</SelectItem>
+                        <SelectItem value="Free Shipping">Free Shipping</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
+
+                {/* Value + Minimum Order */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="discount-value">Discount Value</Label>
+                    <Input
+                      id="discount-value"
+                      type="number"
+                      placeholder="Enter value"
+                      value={newCoupon.value}
+                      onChange={(e) =>
+                        setNewCoupon({ ...newCoupon, value: Number.parseInt(e.target.value) || 0 })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="min-order">Minimum Order</Label>
+                    <Input
+                      id="min-order"
+                      type="number"
+                      placeholder="Enter min order"
+                      value={newCoupon.minOrder}
+                      onChange={(e) => setNewCoupon({ ...newCoupon, minOrder: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                {/* Description */}
                 <div className="space-y-2">
-                  <Label htmlFor="discount-type">Discount Type</Label>
-                  <Select>
+                  <Label htmlFor="description">Description</Label>
+                  <Textarea
+                    id="description"
+                    rows={3}
+                    placeholder="Write a short description..."
+                    value={newCoupon.description}
+                    onChange={(e) => setNewCoupon({ ...newCoupon, description: e.target.value })}
+                  />
+                </div>
+
+                {/* Start Date + Expiry Date + Usage Limit */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="start-date">Start Date</Label>
+                    <Input
+                      id="start-date"
+                      type="date"
+                      value={newCoupon.startDate}
+                      onChange={(e) => setNewCoupon({ ...newCoupon, startDate: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="expiry-date">Expiry Date</Label>
+                    <Input
+                      id="expiry-date"
+                      type="date"
+                      value={newCoupon.expiry}
+                      onChange={(e) => setNewCoupon({ ...newCoupon, expiry: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="usage-limit">Usage Limit</Label>
+                    <Input
+                      id="usage-limit"
+                      type="number"
+                      value={newCoupon.totalLimit}
+                      onChange={(e) =>
+                        setNewCoupon({ ...newCoupon, totalLimit: Number.parseInt(e.target.value) || 0 })
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="per-user-limit">Per User Limit</Label>
+                    <Input
+                      id="per-user-limit"
+                      type="number"
+                      value={newCoupon.perUserLimit}
+                      onChange={(e) =>
+                        setNewCoupon({ ...newCoupon, perUserLimit: Number.parseInt(e.target.value) || 1 })
+                      }
+                    />
+                  </div>
+
+                </div>
+
+                {/* Status */}
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <Select
+                    value={newCoupon.status}
+                    onValueChange={(value) => setNewCoupon({ ...newCoupon, status: value })}
+                  >
                     <SelectTrigger>
-                      <SelectValue placeholder="Select discount type" />
+                      <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="percentage">Percentage</SelectItem>
-                      <SelectItem value="fixed">Fixed Amount</SelectItem>
-                      <SelectItem value="free-shipping">Free Shipping</SelectItem>
+                      <SelectItem value="Active">Active</SelectItem>
+                      <SelectItem value="Inactive">Inactive</SelectItem>
+                      <SelectItem value="Expired">Expired</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="discount-value">Discount Value</Label>
-                  <Input
-                    placeholder="Coupon Code"
-                    value={newCoupon.code}
-                    onChange={(e) => setNewCoupon({ ...newCoupon, code: e.target.value })}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="min-order">Minimum Order Amount</Label>
-                  <Input
-                    id="min-order"
-                    placeholder="Enter minimum order amount"
-                    value={newCoupon.minOrder}
-                    onChange={(e) => setNewCoupon({ ...newCoupon, minOrder: e.target.value })}
-                  />
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="usage-limit">Usage Limit</Label>
-                  <Input
-                    id="usage-limit"
-                    placeholder="Enter usage limit"
-                    value={newCoupon.usage}
-                    onChange={(e) => setNewCoupon({ ...newCoupon, usage: e.target.value })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="expiry-date">Expiry Date</Label>
-                  <Input
-                    id="expiry-date"
-                    type="date"
-                    value={newCoupon.expiry}
-                    onChange={(e) => setNewCoupon({ ...newCoupon, expiry: e.target.value })}
-                  />
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="active-coupon" />
-                  <Label htmlFor="active-coupon">Active</Label>
-                </div>
-                <div className="flex justify-end space-x-2">
+                {/* Footer */}
+                <div className="flex justify-end space-x-2 pt-4">
                   <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
                     Cancel
                   </Button>
-                  <Button
-                    onClick={async () => {
-                      await handleAddSave()
-                      setIsAddDialogOpen(false)
-                    }}
-                  >
-                    Add Coupon
-                  </Button>
-
+                  <Button onClick={handleAddSave}>Add Coupon</Button>
                 </div>
               </div>
             </DialogContent>
+
           </Dialog>
         </div>
 
@@ -352,6 +417,7 @@ export default function CouponsPage() {
                   <TableHead>Value</TableHead>
                   <TableHead>Min Order</TableHead>
                   <TableHead>Usage</TableHead>
+                  <TableHead>Per User</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Expiry</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -374,6 +440,8 @@ export default function CouponsPage() {
                     </TableCell>
                     <TableCell>{coupon.minOrder || "-"}</TableCell>
                     <TableCell>{coupon.usage || "-"}</TableCell>
+                    <TableCell>{coupon.perUserLimit || "-"}</TableCell>
+
                     <TableCell>
                       <Badge className={getStatusColor(coupon.status)} variant="secondary">
                         {coupon.status}
@@ -498,50 +566,73 @@ export default function CouponsPage() {
                           </CardTitle>
                         </CardHeader>
                         <CardContent className="space-y-3">
-                          {/* Usage Stats */}
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
                               <span className="font-medium">Times Used:</span>
-                              <p className="text-muted-foreground">
-                                {selectedCoupon?.usedCount ?? 0}
-                              </p>
+                              <p className="text-muted-foreground">{selectedCoupon.usedCount}</p>
                             </div>
                             <div>
                               <span className="font-medium">Usage Limit:</span>
-                              <p className="text-muted-foreground">
-                                {selectedCoupon?.totalLimit ?? 1}
-                              </p>
+                              <p className="text-muted-foreground">{selectedCoupon.totalLimit}</p>
                             </div>
+                            <div>
+                              <span className="font-medium">Per User Limit:</span>
+                              <p className="text-muted-foreground">{selectedCoupon.perUserLimit}</p>
+                            </div>
+
                             <div>
                               <span className="font-medium">Remaining:</span>
                               <p className="text-muted-foreground">
-                                {(selectedCoupon?.totalLimit ?? 1) - (selectedCoupon?.usedCount ?? 0)}
+                                {selectedCoupon.totalLimit
+                                  ? selectedCoupon.totalLimit - (selectedCoupon.usedCount || 0)
+                                  : "-"}
                               </p>
                             </div>
                             <div>
                               <span className="font-medium">Usage Rate:</span>
                               <p className="text-muted-foreground">
-                                {selectedCoupon?.totalLimit
-                                  ? (((selectedCoupon?.usedCount ?? 0) / selectedCoupon.totalLimit) * 100).toFixed(1)
-                                  : 0}%
+                                {selectedCoupon.totalLimit
+                                  ? `${((selectedCoupon.usedCount || 0) / selectedCoupon.totalLimit * 100).toFixed(1)}%`
+                                  : "0%"}
                               </p>
                             </div>
                           </div>
-
-                          {/* Progress Bar */}
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
                               className="bg-purple-600 h-2 rounded-full"
                               style={{
-                                width: `${selectedCoupon?.totalLimit
-                                  ? ((selectedCoupon?.usedCount ?? 0) / selectedCoupon.totalLimit) * 100
-                                  : 0}%`,
+                                width: selectedCoupon.totalLimit
+                                  ? `${((selectedCoupon.usedCount || 0) / selectedCoupon.totalLimit) * 100}%`
+                                  : "0%",
                               }}
                             ></div>
                           </div>
-                        </CardContent>
 
+                        </CardContent>
                       </Card>
+                      <Card>
+                        <CardHeader>
+                          <CardTitle className="flex items-center gap-2">
+                            <Users className="h-5 w-5" />
+                            Users Who Used This Coupon
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          {selectedCoupon?.users && selectedCoupon.users.length > 0 ? (
+                            <div className="space-y-2">
+                              {selectedCoupon.users.map((u, idx) => (
+                                <div key={idx} className="flex justify-between p-2 bg-gray-50 rounded">
+                                  <span>{u.customer}</span>
+                                  <span className="text-sm text-muted-foreground">{u.email}</span>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-muted-foreground">No users have used this coupon yet.</p>
+                          )}
+                        </CardContent>
+                      </Card>
+
                     </div>
                   </TabsContent>
 
@@ -727,7 +818,7 @@ export default function CouponsPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="edit-start-date">Start Date</Label>
                     <Input
@@ -757,6 +848,18 @@ export default function CouponsPage() {
                       }
                     />
                   </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-per-user-limit">Per User Limit</Label>
+                    <Input
+                      id="edit-per-user-limit"
+                      type="number"
+                      value={editingCoupon.perUserLimit}
+                      onChange={(e) =>
+                        setEditingCoupon({ ...editingCoupon, perUserLimit: Number.parseInt(e.target.value) || 1 })
+                      }
+                    />
+                  </div>
+
                 </div>
 
                 <div className="space-y-2">

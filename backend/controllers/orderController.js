@@ -2,27 +2,35 @@ import Order from "../models/Order.js";
 import ReturnRequest from "../models/Return.js";
 import { Coupon } from "../models/couponModel.js";
 
-
-
 export const placeOrder = async (req, res) => {
   try {
     const { _id, name, email } = req.user;
-    const {
-      products,
-      total,
-      status,
-      shippingAddress,
-      couponCode,
-    } = req.body;
+    const { products, total, status, shippingAddress, couponCode } = req.body;
 
     // 🔒 Optional: Check coupon usage limit
     if (couponCode) {
-      const coupon = await coupon.findOne({ code: couponCode });
+      const coupon = await Coupon.findOne({ code: couponCode });
       if (!coupon) return res.status(400).json({ message: "Invalid coupon" });
-      
+
+      if (coupon.expiry && new Date() > coupon.expiry) {
+        return res.status(400).json({ message: "Coupon expired" });
+      }
 
       if (coupon.usedCount >= coupon.totalLimit) {
         return res.status(400).json({ message: "Coupon usage limit reached" });
+      }
+
+      if (total < coupon.minOrder) {
+        return res
+          .status(400)
+          .json({ message: `Minimum order amount is ${coupon.minOrder}` });
+      }
+
+      const userOrders = await Order.find({ user: _id, couponCode });
+      if (userOrders.length >= coupon.perUserLimit) {
+        return res
+          .status(400)
+          .json({ message: "You have already used this coupon" });
       }
     }
 
@@ -53,8 +61,6 @@ export const placeOrder = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
-
-
 
 export const getOrderById = async (req, res) => {
   try {
@@ -99,8 +105,6 @@ export const trackOrder = async (req, res) => {
   }
 };
 
-
-
 export const requestReturn = async (req, res) => {
   try {
     const { name, email, id: userId } = req.user;
@@ -110,8 +114,8 @@ export const requestReturn = async (req, res) => {
     const newRequest = new ReturnRequest({
       customer: name,
       email,
-      user: userId,       // Optional, if your schema supports `user`
-      orderId,            // ✅ Add this to fix the validation error
+      user: userId, // Optional, if your schema supports `user`
+      orderId, // ✅ Add this to fix the validation error
       reason,
       items,
       totalRefund,
@@ -120,14 +124,14 @@ export const requestReturn = async (req, res) => {
 
     await newRequest.save();
 
-    res.status(201).json({ message: "Return request submitted", request: newRequest });
+    res
+      .status(201)
+      .json({ message: "Return request submitted", request: newRequest });
   } catch (err) {
     console.error("❌ Return request failed:", err);
     res.status(500).json({ message: err.message });
   }
 };
-
-
 
 // ✅ Admin - Update order status
 export const updateOrderStatusByAdmin = async (req, res) => {
@@ -195,7 +199,11 @@ export const cancelOrder = async (req, res) => {
 
     // Prevent cancelling delivered or already cancelled orders
     if (["delivered", "cancelled"].includes(order.status)) {
-      return res.status(400).json({ message: `Order cannot be cancelled. Current status: ${order.status}` });
+      return res
+        .status(400)
+        .json({
+          message: `Order cannot be cancelled. Current status: ${order.status}`,
+        });
     }
 
     order.status = "cancelled";

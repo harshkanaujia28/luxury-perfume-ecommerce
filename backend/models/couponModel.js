@@ -18,15 +18,20 @@ const couponSchema = new mongoose.Schema(
       required: [true, "Coupon value is required"],
     },
     minOrder: {
-      type: String, // keep string if you want to allow empty
+      type: Number,
+      default: 0, // ✅ use number for comparisons
     },
     usedCount: {
       type: Number,
-      default: 0, // ✅ tracks how many times the coupon has been used
+      default: 0, // ✅ total global usage so far
     },
     totalLimit: {
       type: Number,
       required: [true, "Total usage limit is required"],
+    },
+    perUserLimit: {
+      type: Number,
+      default: 1, // ✅ NEW: max times a single user can use this coupon
     },
     status: {
       type: String,
@@ -34,14 +39,14 @@ const couponSchema = new mongoose.Schema(
       default: "Active",
     },
     expiry: {
-      type: String, // could be Date if you want strict validation
+      type: Date, // ✅ real date for proper comparisons
     },
     createdDate: {
-      type: String,
-      default: () => new Date().toISOString(),
+      type: Date,
+      default: Date.now,
     },
     startDate: {
-      type: String,
+      type: Date,
     },
     description: {
       type: String,
