@@ -916,47 +916,47 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
         const res = await axios.get(`/products/${id}`);
         return res.data.product;
     };
-const addProduct = async (data: FormData) => {
-  try {
-    const res = await axios.post(
-      `${process.env.NEXT_PUBLIC_API_URL}/products`,
-      data,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-    return res.data; // backend returns product directly
-  } catch (error: any) {
-    console.error("❌ Failed to add product:", error);
-    throw new Error(
-      error.response?.data?.message || "Failed to add product"
-    );
-  }
-};
+    const addProduct = async (data: FormData) => {
+        try {
+            const res = await axios.post(
+                `${process.env.NEXT_PUBLIC_API_URL}/products`,
+                data,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+            );
+            return res.data; // backend returns product directly
+        } catch (error: any) {
+            console.error("❌ Failed to add product:", error);
+            throw new Error(
+                error.response?.data?.message || "Failed to add product"
+            );
+        }
+    };
 
-const editProduct = async (id: string, data: any) => {
-  try {
-    const res = await axios.put(
-      `${process.env.NEXT_PUBLIC_API_URL}/products/admin/product/${id}`,
-      data,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      }
-    );
-    return res.data; // assuming your backend does: res.json(product)
-  } catch (error: any) {
-    console.error("❌ Failed to edit product:", error);
-    throw new Error(
-      error.response?.data?.message || "Failed to edit product"
-    );
-  }
-};
+    const editProduct = async (id: string, data: any) => {
+        try {
+            const res = await axios.put(
+                `${process.env.NEXT_PUBLIC_API_URL}/products/admin/product/${id}`,
+                data,
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    },
+                }
+            );
+            return res.data; // assuming your backend does: res.json(product)
+        } catch (error: any) {
+            console.error("❌ Failed to edit product:", error);
+            throw new Error(
+                error.response?.data?.message || "Failed to edit product"
+            );
+        }
+    };
 
 
 
@@ -1143,14 +1143,19 @@ const editProduct = async (id: string, data: any) => {
         return res.data?.coupon ?? res.data  // fallback if your backend returns just the coupon
     }
     const validateCoupon = async (
-        code: string
+        code: string,
+        orderTotal: number
     ): Promise<{ valid: boolean; value?: number; type?: string; message?: string }> => {
         try {
-            const res = await axios.get(`/coupons/validate?code=${code}`);
+            const res = await axios.get(`/coupons/validate`, {
+                params: { code, orderTotal }, // ✅ send both
+            });
+
             return {
                 valid: true,
                 value: res.data.value,
                 type: res.data.type,
+                message: res.data.message,
             };
         } catch (error: any) {
             console.error("Coupon validation failed:", error?.response?.data || error.message);
@@ -1160,6 +1165,7 @@ const editProduct = async (id: string, data: any) => {
             };
         }
     };
+
 
 
     const deleteCoupon = async (id: string): Promise<void> => {

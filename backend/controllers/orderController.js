@@ -7,33 +7,42 @@ export const placeOrder = async (req, res) => {
     const { _id, name, email } = req.user;
     const { products, total, status, shippingAddress, couponCode } = req.body;
 
-    // 🔒 Optional: Check coupon usage limit
-    if (couponCode) {
-      const coupon = await Coupon.findOne({ code: couponCode });
-      if (!coupon) return res.status(400).json({ message: "Invalid coupon" });
+    let appliedCoupon = null;
 
-      if (coupon.expiry && new Date() > coupon.expiry) {
+    // 🔒 Validate coupon
+    if (couponCode) {
+      appliedCoupon = await Coupon.findOne({ code: couponCode });
+      if (!appliedCoupon) {
+        return res.status(400).json({ message: "Invalid coupon" });
+      }
+
+      // Expiry check
+      if (appliedCoupon.expiry && new Date() > appliedCoupon.expiry) {
         return res.status(400).json({ message: "Coupon expired" });
       }
 
-      if (coupon.usedCount >= coupon.totalLimit) {
+      // Global usage limit
+      if (appliedCoupon.usedCount >= appliedCoupon.totalLimit) {
         return res.status(400).json({ message: "Coupon usage limit reached" });
       }
 
-      if (total < coupon.minOrder) {
-        return res
-          .status(400)
-          .json({ message: `Minimum order amount is ${coupon.minOrder}` });
+      // Min order amount
+      if (total < appliedCoupon.minOrder) {
+        return res.status(400).json({
+          message: `Minimum order amount is ${appliedCoupon.minOrder}`,
+        });
       }
 
+      // Per-user limit
       const userOrders = await Order.find({ user: _id, couponCode });
-      if (userOrders.length >= coupon.perUserLimit) {
+      if (userOrders.length >= appliedCoupon.perUserLimit) {
         return res
           .status(400)
           .json({ message: "You have already used this coupon" });
       }
     }
 
+    // ✅ Create order
     const orderData = {
       user: _id,
       customer: name,
@@ -42,15 +51,15 @@ export const placeOrder = async (req, res) => {
       total,
       status,
       shippingAddress,
-      couponCode,
+      couponCode: couponCode || null,
     };
 
     const order = await Order.create(orderData);
 
-    // 📈 Increment usedCount
-    if (couponCode) {
+    // 📈 Increment coupon usage count AFTER successful order
+    if (appliedCoupon) {
       await Coupon.findOneAndUpdate(
-        { code: couponCode },
+        { code: appliedCoupon.code },
         { $inc: { usedCount: 1 } }
       );
     }
@@ -199,11 +208,9 @@ export const cancelOrder = async (req, res) => {
 
     // Prevent cancelling delivered or already cancelled orders
     if (["delivered", "cancelled"].includes(order.status)) {
-      return res
-        .status(400)
-        .json({
-          message: `Order cannot be cancelled. Current status: ${order.status}`,
-        });
+      return res.status(400).json({
+        message: `Order cannot be cancelled. Current status: ${order.status}`,
+      });
     }
 
     order.status = "cancelled";
