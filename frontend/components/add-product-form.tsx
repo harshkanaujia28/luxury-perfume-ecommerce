@@ -151,63 +151,56 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
       reviews: prev.reviews.filter((_, i) => i !== index),
     }));
   };
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    try {
-      const data = new FormData();
-      data.append("name", formData.name);
-      data.append("brand", formData.brand);
-      data.append("description", formData.description);
-      data.append("price", formData.price.toString());
-      data.append("stock", formData.stock.toString());
-      data.append("features", JSON.stringify(formData.features));
+  try {
+    const data = new FormData();
+    data.append("name", formData.name);
+    data.append("brand", formData.brand);
+    data.append("description", formData.description);
+    data.append("price", formData.price.toString());
+    data.append("stock", formData.stock.toString());
+    data.append("features", JSON.stringify(formData.features));
 
-      // ✅ Main image (first uploaded image)
-      if (formData.images.length > 0) {
-        data.append("image", formData.images[0]); // main image
-      }
-
-      // ✅ All images as JSON array
-      data.append("images", JSON.stringify(formData.images));
-
-      // Category object
-      const category = {
-        type: formData.type,
-        gender: formData.gender,
-        subCategory: formData.subCategory,
-      };
-      data.append("category", JSON.stringify(category));
-
-      // Specs, seller, reviews, quantity
-      data.append("specifications", JSON.stringify(formData.specifications));
-      data.append("seller", formData.seller);
-      data.append("reviews", JSON.stringify(formData.reviews));
-      data.append("quantity", JSON.stringify(formData.quantity));
-
-      const savedProduct = await addProduct(data);
-
-      if (formData.offer.isActive && formData.offer.value > 0) {
-        await createOffer({
-          title: formData.name + " Offer",
-          discountType:
-            formData.offer.type === "fixed" ? "flat" : "percentage",
-          discountValue: formData.offer.value,
-          startDate: new Date(formData.offer.startDate),
-          endDate: new Date(formData.offer.endDate),
-          product: savedProduct._id,
-          isActive: true,
-        });
-      }
-
-      alert("Product added successfully!");
-      setIsDialogOpen(false);
-      if (onProductAdded) onProductAdded();
-    } catch (error) {
-      console.error("Failed to add product:", error);
-      alert("Failed to add product");
+    // ✅ Main image (first uploaded image)
+    if (formData.images.length > 0) {
+      data.append("image", formData.images[0]); // main image
     }
-  };
+
+    // ✅ All images as JSON array
+    data.append("images", JSON.stringify(formData.images));
+
+    // ✅ Category object
+    const category = {
+      type: formData.type,
+      gender: formData.gender,
+      subCategory: formData.subCategory,
+    };
+    data.append("category", JSON.stringify(category));
+
+    // ✅ Specs, seller, reviews, quantity
+    data.append("specifications", JSON.stringify(formData.specifications));
+    data.append("seller", formData.seller);
+    data.append("reviews", JSON.stringify(formData.reviews));
+    data.append("quantity", JSON.stringify(formData.quantity));
+
+    // ✅ Offer (directly product ke andar save hoga)
+    data.append("offer", JSON.stringify(formData.offer));
+
+    // 🔥 Backend call
+    const savedProduct = await addProduct(data);
+
+    alert("✅ Product added successfully with offer!");
+    setIsDialogOpen(false);
+    if (onProductAdded) onProductAdded();
+  } catch (error) {
+    console.error("Failed to add product:", error);
+    alert("❌ Failed to add product");
+  }
+};
+
+
 
 
 
@@ -398,14 +391,14 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
                     {/* Gender */}
                     <div className="space-y-1.5 sm:space-y-2">
                       <Label htmlFor="gender" className="text-sm font-semibold text-slate-700">
-                        Gender
+                        Category
                       </Label>
                       <Select
                         value={formData.gender}
                         onValueChange={(value) => handleChange("gender", value)}
                       >
                         <SelectTrigger className="h-10 sm:h-11 border-slate-300 focus:border-green-500 focus:ring-green-500/20 rounded-lg transition-all duration-200 text-sm sm:text-base">
-                          <SelectValue placeholder="Select gender" />
+                          <SelectValue placeholder="Select Category" />
                         </SelectTrigger>
                         <SelectContent className="rounded-lg sm:rounded-xl border-slate-200 shadow-xl max-h-60 sm:max-h-80">
                           {["Men", "Women"].map((gender) => (
@@ -661,10 +654,11 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
                         </CardTitle>
                         <Switch
                           id="offerActive"
-                          checked={formData.offer.isActive}
+                          checked={formData.offer?.isActive ?? false}
                           onCheckedChange={(checked) => handleOfferChange("isActive", checked)}
                           className="data-[state=checked]:bg-amber-500"
                         />
+
                       </div>
                     </CardHeader>
                     {formData.offer.isActive && (
@@ -967,7 +961,7 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
               </Card>
             </TabsContent>
 
-           
+
           </Tabs>
         </form>
       </div>

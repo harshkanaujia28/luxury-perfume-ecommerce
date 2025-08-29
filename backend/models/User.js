@@ -12,11 +12,17 @@ const userSchema = new mongoose.Schema(
     state: String,
     country: String,
     role: { type: String, enum: ["admin", "user", "vendor"], default: "user" },
+
+    // OTP fields for verification
+    isVerified: { type: Boolean, default: false },
+    otp: Number,
+    otpExpires: Date,
   },
   { timestamps: true }
 );
-userSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) return next();
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);

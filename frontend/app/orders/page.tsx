@@ -110,7 +110,7 @@ export default function OrdersPage() {
                 <CardContent className="space-y-5 p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-300">
                     <p>
-                      <strong>Total:</strong> ₹{order.total}
+                      <strong>Total:</strong> ₹{order.finalTotal}
                     </p>
                     <p>
                       <strong>Placed on:</strong>{" "}

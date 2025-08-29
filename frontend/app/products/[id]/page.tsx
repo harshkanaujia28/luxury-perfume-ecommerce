@@ -20,13 +20,14 @@ import { useApi } from "@/contexts/api-context";
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import jwt_decode from "jwt-decode";
+import { useCheckout } from "@/contexts/checkoutContext"
 import axios from "axios"
 const baseURL = "NEXT_PUBLIC_API_URL";
 
 export default function ProductDetailPage() {
   const params = useParams();
   const id = params?.id as string;
-
+  const { setDelivery } = useCheckout();
   const { addToCart } = useCart()
   const { toast } = useToast()
 
@@ -42,6 +43,10 @@ export default function ProductDetailPage() {
   const [reviewName, setReviewName] = useState("");
   const [reviewComment, setReviewComment] = useState("");
   const [reviewStars, setReviewStars] = useState(0);
+  const [pincode, setPincode] = useState("");
+  const [result, setResult] = useState(null);
+  const [success, setSuccess] = useState("");
+
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -62,17 +67,17 @@ export default function ProductDetailPage() {
   if (!product) {
     return (
       <>
-       <Header />
-      <div className="flex flex-col min-h-screen bg-black">
-       
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-lime-400">Product not found</h1>
-          </div>
-        </main>
-        
-      </div>
-      <Footer />
+        <Header />
+        <div className="flex flex-col min-h-screen bg-black">
+
+          <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-lime-400">Product not found</h1>
+            </div>
+          </main>
+
+        </div>
+        <Footer />
       </>
     )
   }
@@ -196,16 +201,17 @@ export default function ProductDetailPage() {
 
 
 
- if (loading) {
-  return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="flex items-center">
-        <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-400 border-t-transparent" />
-        <span className="ml-4 text-gray-400">Loading product...</span>
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="flex items-center">
+          <div className="animate-spin rounded-full h-10 w-10 border-4 border-gray-400 border-t-transparent" />
+          <span className="ml-4 text-gray-400">Loading product...</span>
+        </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 
 
 
@@ -453,7 +459,28 @@ export default function ProductDetailPage() {
                     <Share2 className="w-5 h-5" />
                   </Button>
                 </div>
+                {/* <div className="space-y-2">
+                  <input
+                    type="text"
+                    placeholder="Enter Pincode"
+                    value={pincode}
+                    onChange={(e) => setPincode(e.target.value)}
+                    className="border p-2 rounded"
+                  />
+                  <button
+                    onClick={checkDelivery}
+                    disabled={loading}
+                    className="bg-blue-600 text-white px-4 py-2 rounded"
+                  >
+                    {loading ? "Checking..." : "Check Delivery"}
+                  </button>
 
+                  {/* Error message */}
+                  {/* {error && <p className="text-red-500">{error}</p>} */}
+
+                  {/* ✅ Success message */}
+                  {/* {success && <p className="text-green-500">{success}</p>} */}
+                {/* </div>  */}
 
               </div>
               <div className="flex items-center space-x-4 mb-4">
@@ -567,12 +594,12 @@ export default function ProductDetailPage() {
                     <div className="border border-lime-400/30 rounded-lg p-4 bg-black/30">
                       <h3 className="font-semibold text-lime-400 mb-2">Write a Review</h3>
                       <div className="space-y-3">
-                        <Input
+                        {/* <Input
                           placeholder="Your name"
                           value={reviewName}
                           onChange={(e) => setReviewName(e.target.value)}
                           className="bg-zinc-800 border-lime-400/30 text-gray-200"
-                        />
+                        /> */}
                         <Textarea
                           placeholder="Write your comment..."
                           value={reviewComment}
@@ -618,8 +645,8 @@ export default function ProductDetailPage() {
                                   <Star
                                     key={i}
                                     className={`w-4 h-4 ${i < review.stars
-                                        ? "text-yellow-400 fill-current"
-                                        : "text-gray-600"
+                                      ? "text-yellow-400 fill-current"
+                                      : "text-gray-600"
                                       }`}
                                   />
                                 ))}

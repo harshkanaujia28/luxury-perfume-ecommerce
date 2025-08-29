@@ -13,6 +13,7 @@ export function AdminDashboard() {
   const router = useRouter();
   const { getAdminStats, getRevenue } = useApi();
  const [totalRevenue, setTotalRevenue] = useState(0)
+ const [totalDeliveredOrders, setTotalDeliveredOrders] = useState(0);
   const [stats, setStats] = useState<any>(null);
   const [recentOrders, setRecentOrders] = useState<any[]>([]);
   const [topProducts, setTopProducts] = useState<any[]>([]);
@@ -38,14 +39,16 @@ export function AdminDashboard() {
       fetchRevenue()
     }, [])
   
-    const fetchRevenue = async () => {
-      try {
-        const revenue = await getRevenue()
-        setTotalRevenue(revenue)
-      } catch (err) {
-        console.error("Failed to fetch revenue", err)
-      }
-    }
+  
+const fetchRevenue = async () => {
+  try {
+    const data = await getRevenue(); // API call
+    setTotalRevenue(data.totalRevenue ?? 0);
+    setTotalDeliveredOrders(data.totalOrders ?? 0);
+  } catch (err) {
+    console.error("Failed to fetch revenue", err);
+  }
+};
 
   const handleLogout = () => {
     localStorage.clear(); // remove token
@@ -58,7 +61,7 @@ export function AdminDashboard() {
   }
 
  const statCards = [
-  {
+ {
     title: "Total Revenue",
     value: new Intl.NumberFormat("en-IN", {
       style: "currency",
@@ -188,11 +191,11 @@ export function AdminDashboard() {
                           <td className="py-3 px-4">{order._id}</td>
                           <td className="py-3 px-4">{order.customer}</td>
                           <td className="py-3 px-4">{order.email}</td>
-                          <td className="py-3 px-4">₹{order.total}</td>
+                          <td className="py-3 px-4">₹{order.finalTotal}</td>
                           <td className="py-3 px-4 capitalize">
                              <Badge className={getStatusColor(order.status)}>{order.status}</Badge>
                           </td>
-                          <td className="py-3 px-4">{new Date(order.date).toLocaleDateString()}</td>
+                          <td className="py-3 px-4">{new Date(order.createdAt).toLocaleDateString()}</td>
                         </tr>
                       ))
                     )}

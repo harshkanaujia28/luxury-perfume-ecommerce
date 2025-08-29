@@ -9,6 +9,7 @@ import {
   getOrdersByUser,
   getOrderById,
   cancelOrder,
+  deleteOrder
  
 } from "../controllers/orderController.js";
 import { protect } from "../middlewares/authMiddleware.js";
@@ -25,6 +26,7 @@ router.put("/:id/status", protect, isAdmin, updateOrderStatusByAdmin);
 router.patch("/:id/cancel", protect, cancelOrder); // ⬅️ Add this line
 router.post("/", protect, isUser, placeOrder);
 router.get("/", protect, getOrders);
+router.delete("/:orderId", protect, isAdmin, deleteOrder);
 // ⛔ Always keep this last
 router.get("/:id", protect, getOrderById);
 

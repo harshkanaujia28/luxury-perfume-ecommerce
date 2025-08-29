@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Separator } from "@/components/ui/separator"
 import { useToast } from "@/hooks/use-toast"
 import { useApi } from "@/contexts/api-context"
+import axios from "@/utils/axios"
 
 export interface Product {
   _id?: string
@@ -47,28 +48,30 @@ export function OrderManagement() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [paymentFilter, setPaymentFilter] = useState("all")
   const [totalRevenue, setTotalRevenue] = useState(0)
+  const [totalDeliveredOrders, setTotalDeliveredOrders] = useState(0);
   const [selectedOrder, setSelectedOrder] = useState<any>(null)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [loading, setLoading] = useState(false);
   const { toast } = useToast()
   const router = useRouter()
 
-useEffect(() => {
-  fetchOrders()
-}, [])
+  useEffect(() => {
+    fetchOrders()
+  }, [])
 
-const fetchOrders = async () => {
-  try {
-    const data = await getOrders()
-    
-    // Sort by date descending (newest first)
-    const sortedOrders = data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  const fetchOrders = async () => {
+    try {
+      const data = await getOrders()
 
-    setOrders(sortedOrders)
-    console.log(sortedOrders)
-  } catch (err) {
-    console.error("Failed to fetch orders", err)
+      // Sort by date descending (newest first)
+      const sortedOrders = data.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+
+      setOrders(sortedOrders)
+      console.log(sortedOrders)
+    } catch (err) {
+      console.error("Failed to fetch orders", err)
+    }
   }
-}
 
 
   useEffect(() => {
@@ -78,12 +81,14 @@ const fetchOrders = async () => {
 
   const fetchRevenue = async () => {
     try {
-      const revenue = await getRevenue()
-      setTotalRevenue(revenue)
+      const data = await getRevenue(); // API call
+      setTotalRevenue(data.totalRevenue ?? 0);
+      setTotalDeliveredOrders(data.totalOrders ?? 0);
+      console.log(data);
     } catch (err) {
-      console.error("Failed to fetch revenue", err)
+      console.error("Failed to fetch revenue", err);
     }
-  }
+  };
 
   const handleStatusUpdate = async (orderId: string, newStatus: string) => {
     try {
@@ -104,14 +109,19 @@ const fetchOrders = async () => {
   }
 
   const filteredOrders = orders.filter((order) => {
+    const search = searchTerm.toLowerCase();
+
     const matchesSearch =
-      order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer.email.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesStatus = statusFilter === "all" || order.status === statusFilter
-    const matchesPayment = paymentFilter === "all" || order.paymentStatus === paymentFilter
-    return matchesSearch && matchesStatus && matchesPayment
-  })
+      (order._id?.toLowerCase() || "").includes(search) ||
+      (order.customer?.toLowerCase() || "").includes(search) ||
+      (order.email?.toLowerCase() || "").includes(search);
+
+    const matchesStatus = statusFilter === "all" || order.status === statusFilter;
+    const matchesPayment = paymentFilter === "all" || (order.paymentStatus || "").toLowerCase() === paymentFilter.toLowerCase();
+
+    return matchesSearch && matchesStatus && matchesPayment;
+  });
+
 
   const totalOrders = orders.length
   const pendingOrders = orders.filter((order) => order.status === "pending").length
@@ -151,6 +161,28 @@ const fetchOrders = async () => {
         return "bg-gray-100 text-gray-800 border-gray-200"
     }
   }
+  const deleteOrderHandler = async (id: string) => {
+    try {
+      await axios.delete(`/orders/${id}`);
+      toast({ title: "Order deleted" });
+      // reload or update state
+    } catch (err) {
+      toast({ title: "Failed to delete order", variant: "destructive" });
+    }
+  };
+  interface Props {
+    order: {
+      itemsTotal: number;
+      taxAmount?: number;
+      deliveryFee: number;
+      finalTotal: number;
+      couponCode?: string;
+    };
+  }
+
+
+
+
 
   return (
     <div className="flex flex-col">
@@ -202,7 +234,12 @@ const fetchOrders = async () => {
                       currency: "INR",
                     }).format(totalRevenue)}
                   </p>
+                  <p className="text-xs text-muted-foreground">
+                    ({totalDeliveredOrders} delivered orders)
+                  </p>
+
                 </div>
+
               </div>
             </CardContent>
           </Card>
@@ -272,16 +309,16 @@ const fetchOrders = async () => {
                 <tbody>
                   {filteredOrders.map((order) => (
                     <tr key={order._id} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-4 font-medium text-purple-600">#{order._id}</td>
+                      <td className="py-3 px-4 font-medium text-purple-600"> ORD-{order._id.slice(-6).toUpperCase()} </td>
                       <td className="py-3 px-4">
                         <p className="font-medium">{order.customer}</p>
                         <p className="text-sm text-gray-600">{order.email}</p>
                       </td>
                       <td className="py-3 px-4 text-sm">
                         {order.products.map((p: any) => p.name).join(", ")}
-                        </td>
+                      </td>
                       <td className="py-3 px-4 text-sm">{new Date(order.createdAt).toLocaleDateString()}</td>
-                      <td className="py-3 px-4 font-medium">₹{order.total?.toFixed(2)}</td>
+                      <td className="py-3 px-4 font-medium">₹{order.finalTotal}</td>
                       <td className="py-3 px-4">
                         <Badge className={getStatusColor(order.status)}>{order.status}</Badge>
                       </td>
@@ -309,7 +346,13 @@ const fetchOrders = async () => {
                               <SelectItem value="cancelled">Cancelled</SelectItem>
                             </SelectContent>
                           </Select>
-
+                          <button
+                            className="bg-red-500 text-white px-3 py-1 rounded"
+                            onClick={() => deleteOrderHandler(order._id)}
+                            disabled={loading}
+                          >
+                            Delete
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -333,7 +376,12 @@ const fetchOrders = async () => {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
-              <span>Order Details - #{selectedOrder?._id}</span>
+              <span className="text-purple-600">
+                {selectedOrder
+                  ? `Order Details -ORD-${selectedOrder._id.slice(-6).toUpperCase()}`
+                  : "Order Details"}
+              </span>
+
               <Button variant="ghost" size="sm" onClick={() => setIsDialogOpen(false)}>
                 <X className="h-4 w-4" />
               </Button>
@@ -342,41 +390,45 @@ const fetchOrders = async () => {
 
           {selectedOrder && (
             <div className="space-y-6">
-              {/* Order Summary */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+              {/* Order Status */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <Card>
-                  <CardContent className="p-4">
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">Order Status</p>
-                      <Badge className={getStatusColor(selectedOrder.status)}>{selectedOrder.status}</Badge>
-                    </div>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">Order Status</p>
+                    <Badge className={getStatusColor(selectedOrder.status)}>
+                      {selectedOrder.status}
+                    </Badge>
                   </CardContent>
                 </Card>
+
                 <Card>
-                  <CardContent className="p-4">
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">Payment Status</p>
-                      <Badge className={getPaymentStatusColor(selectedOrder.paymentStatus)}>
-                        {selectedOrder.paymentStatus}
-                      </Badge>
-                    </div>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">Payment Status</p>
+                    <Badge className={getPaymentStatusColor(selectedOrder.paymentStatus)}>
+                      {selectedOrder.paymentStatus}
+                    </Badge>
                   </CardContent>
                 </Card>
+
                 <Card>
-                  <CardContent className="p-4">
-                    <div className="space-y-2">
-                      <p className="text-sm text-muted-foreground">Order Date</p>
-                      <p className="font-medium">{new Date(selectedOrder.createdAt).toLocaleDateString()}</p>
-                    </div>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">Payment Method</p>
+                    <p className="font-medium">{selectedOrder.paymentMethod || "N/A"}</p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground">Order Date</p>
+                    <p className="font-medium">{new Date(selectedOrder.createdAt).toLocaleString()}</p>
                   </CardContent>
                 </Card>
               </div>
 
-              {/* Customer Information */}
+              {/* Customer Info */}
               <Card>
-                <CardHeader>
-                  <CardTitle>Customer Information</CardTitle>
-                </CardHeader>
+                <CardHeader><CardTitle>Customer Information</CardTitle></CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -387,12 +439,6 @@ const fetchOrders = async () => {
                       <p className="text-sm text-muted-foreground">Email</p>
                       <p className="font-medium">{selectedOrder.email}</p>
                     </div>
-                    {selectedOrder.customer?.phone && (
-                      <div>
-                        <p className="text-sm text-muted-foreground">Phone</p>
-                        <p className="font-medium">{selectedOrder.phone}</p>
-                      </div>
-                    )}
                     {selectedOrder.shippingAddress && (
                       <div className="md:col-span-2">
                         <p className="text-sm text-muted-foreground">Shipping Address</p>
@@ -400,124 +446,129 @@ const fetchOrders = async () => {
                           {selectedOrder.shippingAddress.address}, {selectedOrder.shippingAddress.city},{" "}
                           {selectedOrder.shippingAddress.state} {selectedOrder.shippingAddress.zipCode}
                         </p>
-                        <p className="text-sm text-muted-foreground mt-1">Phone: {selectedOrder.shippingAddress.phone}</p>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Phone: {selectedOrder.shippingAddress.phone}
+                        </p>
                       </div>
                     )}
-
                   </div>
                 </CardContent>
               </Card>
 
               {/* Order Items */}
               <Card>
-                <CardHeader>
-                  <CardTitle>Order Items ({selectedOrder.products?.length || 0})</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {selectedOrder.products?.map((item: any, index: number) => (
-                      <div key={index} className="flex items-center space-x-4 p-4 border rounded-lg">
-                        <div className="w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center">
-                          {item.image ? (
-                            <img
-                              src={item.image.startsWith("http") ? item.image : `NEXT_PUBLIC_API_URL${item.image}`}
-                              alt={item.name}
-                              className="w-full h-full object-cover rounded-md"
-                            />
-                          ) : (
-                            <Package className="w-8 h-8 text-gray-400" />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <h4 className="font-medium">{item.name}</h4>
-                          <p className="text-sm text-muted-foreground">Brand: {item.brand}</p>
-                          <p className="text-sm text-muted-foreground">Size: {item.selectedSize}</p>
-                          <p className="text-sm text-muted-foreground">Product ID: {item.product}</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-medium">Qty: {item.quantity}</p>
-                          <p className="text-sm text-muted-foreground">₹{item.price?.toFixed(2)}</p>
-                          <p className="font-medium">
-                            ₹{(item.price * item.quantity).toFixed(2)}
-                          </p>
-                        </div>
+                <CardHeader><CardTitle>Order Items ({selectedOrder.products?.length || 0})</CardTitle></CardHeader>
+                <CardContent className="space-y-4">
+                  {selectedOrder.products?.map((item: any, idx: number) => (
+                    <div key={idx} className="flex items-center space-x-4 p-4 border rounded-lg">
+                      <div className="w-16 h-16 bg-gray-100 rounded-md flex items-center justify-center">
+                        {item.image ? (
+                          <img
+                            src={item.image.startsWith("http") ? item.image : `${process.env.NEXT_PUBLIC_API_URL}${item.image}`}
+                            alt={item.name}
+                            className="w-full h-full object-cover rounded-md"
+                          />
+                        ) : (
+                          <Package className="w-8 h-8 text-gray-400" />
+                        )}
                       </div>
-                    ))}
-                  </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium">{item.name}</h4>
+                        <p className="text-sm text-muted-foreground">Brand: {item.brand}</p>
+                        <p className="text-sm text-muted-foreground">Size: {item.selectedSize}</p>
+                        <p className="text-sm text-muted-foreground">Product ID: {item.product}</p>
+                        {item.offer?.isActive && (
+                          <p className="text-sm text-green-600">
+                            Offer Applied: {item.offer.value}{item.offer.type === "percentage" ? "%" : "₹"}
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-right">
+                        <p className="font-medium">Qty: {item.quantity}</p>
+                        <p className="text-sm text-muted-foreground">Unit: ₹{item.price.toFixed(2)}</p>
+                        <p className="font-medium">Total: ₹{(item.price * item.quantity - (item.offer?.discountApplied || 0)).toFixed(2)}</p>
+                      </div>
+                    </div>
+                  ))}
                 </CardContent>
               </Card>
 
-
+              {/* Order Summary */}
               {/* Order Summary */}
               <Card>
                 <CardHeader>
                   <CardTitle>Order Summary</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
+                <CardContent className="space-y-2">
+                  {/* Subtotal before any offer */}
+                  <div className="flex justify-between">
+                    <span>Subtotal</span>
+                    <span>
+                      ₹
+                      {selectedOrder.products
+                        ?.reduce((sum: number, p: any) => sum + p.price * p.quantity, 0)
+                        .toFixed(2)}
+                    </span>
+                  </div>
+
+                  {/* Offer Discount */}
+                  {selectedOrder.products?.some(p => p.offer?.discountApplied > 0) && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Offer Applied</span>
+                      <span>
+                        -₹
+                        {selectedOrder.products
+                          .reduce((sum: number, p: any) => sum + (p.offer?.discountApplied || 0), 0)
+                          .toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Coupon Discount */}
+                  {selectedOrder.couponCode && (selectedOrder.discount || 0) > 0 && (
+                    <div className="flex justify-between text-green-600">
+                      <span>Coupon ({selectedOrder.couponCode})</span>
+                      <span>-₹{selectedOrder.discount.toFixed(2)}</span>
+                    </div>
+                  )}
+
+
+                  {/* Tax */}
+                  <div className="flex justify-between">
+                    <span>Tax (10%)</span>
+                    <span>
+                      ₹
+                      {(
+                        selectedOrder.taxAmount ||
+                        (selectedOrder.products.reduce((sum: number, p: any) => sum + (p.price * p.quantity - (p.offer?.discountApplied || 0)), 0) * 0.1)
+                      ).toFixed(2)}
+                    </span>
+                  </div>
+
+                  {/* Delivery Fee */}
+                  {selectedOrder.deliveryFee && (
                     <div className="flex justify-between">
-                      <span>Subtotal</span>
-                      <span>₹{selectedOrder.subtotal?.toFixed(2) || selectedOrder.total?.toFixed(2)}</span>
+                      <span>Delivery Fee</span>
+                      <span>₹{selectedOrder.deliveryFee.toFixed(2)}</span>
                     </div>
-                    {selectedOrder.tax && (
-                      <div className="flex justify-between">
-                        <span>Tax</span>
-                        <span>₹{selectedOrder.tax.toFixed(2)}</span>
-                      </div>
-                    )}
-                    {selectedOrder.shipping && (
-                      <div className="flex justify-between">
-                        <span>Shipping</span>
-                        <span>₹{selectedOrder.shipping.toFixed(2)}</span>
-                      </div>
-                    )}
-                    {selectedOrder.discount && (
-                      <div className="flex justify-between text-green-600">
-                        <span>Discount</span>
-                        <span>-₹{selectedOrder.discount.toFixed(2)}</span>
-                      </div>
-                    )}
-                    <Separator />
-                    <div className="flex justify-between font-bold text-lg">
-                      <span>Total</span>
-                      <span>₹{selectedOrder.total?.toFixed(2)}</span>
-                    </div>
+                  )}
+
+                  <Separator />
+
+                  {/* Final Total */}
+                  <div className="flex justify-between font-bold text-lg">
+                    <span>Total</span>
+                    <span>₹{selectedOrder.finalTotal.toFixed(2)}</span>
                   </div>
                 </CardContent>
               </Card>
 
-              {/* Additional Information */}
-              {(selectedOrder.notes || selectedOrder.fragrances?.length > 0) && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Additional Information</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {selectedOrder.notes && (
-                      <div className="mb-4">
-                        <p className="text-sm text-muted-foreground">Order Notes</p>
-                        <p className="font-medium">{selectedOrder.notes}</p>
-                      </div>
-                    )}
-                    {selectedOrder.fragrances?.length > 0 && (
-                      <div>
-                        <p className="text-sm text-muted-foreground">Selected Fragrances</p>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {selectedOrder.fragrances.map((fragrance: string, index: number) => (
-                            <Badge key={index} variant="outline">
-                              {fragrance}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
+
             </div>
           )}
         </DialogContent>
       </Dialog>
+
     </div>
   )
 }

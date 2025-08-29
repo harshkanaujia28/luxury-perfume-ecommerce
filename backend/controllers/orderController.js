@@ -1,63 +1,156 @@
 import Order from "../models/Order.js";
 import ReturnRequest from "../models/Return.js";
 import { Coupon } from "../models/couponModel.js";
+import Zone from "../models/Zone.js";
+import Offer from "../models/Offer.js";
+import Product from "../models/Product.js";
 
 export const placeOrder = async (req, res) => {
   try {
-    const { _id, name, email } = req.user;
-    const { products, total, status, shippingAddress, couponCode } = req.body;
+    const { _id: userId, name, email } = req.user;
+    const { products, shippingAddress, couponCode } = req.body;
 
-    let appliedCoupon = null;
+    let itemsTotal = 0;
+    let totalQuantity = 0;
+    const processedProducts = [];
 
-    // 🔒 Validate coupon
-    if (couponCode) {
-      appliedCoupon = await Coupon.findOne({ code: couponCode });
-      if (!appliedCoupon) {
-        return res.status(400).json({ message: "Invalid coupon" });
+    // 1️⃣ Process each product
+    for (const item of products) {
+      const dbProduct = await Product.findById(item.product);
+      if (!dbProduct) {
+        return res
+          .status(400)
+          .json({ message: `Product not found: ${item.product}` });
       }
 
-      // Expiry check
+      let price = dbProduct.price;
+      let offerSnapshot = {
+        isActive: false,
+        type: null,
+        value: 0,
+        discountApplied: 0,
+      };
+
+      totalQuantity += item.quantity;
+
+      // ✅ Apply product-level offer if active
+      let discountApplied = 0;
+      if (dbProduct.offer && dbProduct.offer.isActive) {
+        if (item.quantity < (dbProduct.offer.minQuantity || 1)) {
+          return res.status(400).json({
+            message: `Minimum quantity ${dbProduct.offer.minQuantity} required to apply offer on ${dbProduct.name}`,
+          });
+        }
+
+        if (dbProduct.offer.type === "percentage") {
+          discountApplied = (price * item.quantity * dbProduct.offer.value) / 100;
+        } else if (dbProduct.offer.type === "fixed" || dbProduct.offer.type === "flat") {
+          discountApplied = dbProduct.offer.value * item.quantity; // multiply by quantity
+        }
+
+        offerSnapshot = {
+          isActive: true,
+          type: dbProduct.offer.type,
+          value: dbProduct.offer.value,
+          discountApplied,
+        };
+      }
+
+      itemsTotal += price * item.quantity - discountApplied;
+
+      processedProducts.push({
+        ...item,
+        product: dbProduct._id,
+        name: dbProduct.name,
+        price: dbProduct.price,
+        brand: dbProduct.brand,
+        image: dbProduct.image,
+        offer: offerSnapshot,
+      });
+    }
+
+    // 2️⃣ Delivery fee & time
+    let deliveryFee = 0;
+    let deliveryTime = null;
+    const zone = await Zone.findOne({ pincode: shippingAddress.zipCode });
+    if (zone) {
+      deliveryFee = zone.deliveryFee;
+      deliveryTime = zone.deliveryTime;
+    }
+
+    // 3️⃣ Coupon validation & discount
+    let appliedCoupon = null;
+    let couponDiscount = 0;
+    if (couponCode) {
+      appliedCoupon = await Coupon.findOne({ code: couponCode });
+      if (!appliedCoupon) return res.status(400).json({ message: "Invalid coupon" });
+
       if (appliedCoupon.expiry && new Date() > appliedCoupon.expiry) {
         return res.status(400).json({ message: "Coupon expired" });
       }
 
-      // Global usage limit
       if (appliedCoupon.usedCount >= appliedCoupon.totalLimit) {
         return res.status(400).json({ message: "Coupon usage limit reached" });
       }
 
-      // Min order amount
-      if (total < appliedCoupon.minOrder) {
+      if (itemsTotal < appliedCoupon.minOrder) {
         return res.status(400).json({
           message: `Minimum order amount is ${appliedCoupon.minOrder}`,
         });
       }
 
-      // Per-user limit
-      const userOrders = await Order.find({ user: _id, couponCode });
+      if (appliedCoupon.minQuantity && totalQuantity < appliedCoupon.minQuantity) {
+        return res.status(400).json({
+          message: `Minimum ${appliedCoupon.minQuantity} items required to use this coupon`,
+        });
+      }
+
+      const userOrders = await Order.find({ user: userId, couponCode });
       if (userOrders.length >= appliedCoupon.perUserLimit) {
-        return res
-          .status(400)
-          .json({ message: "You have already used this coupon" });
+        return res.status(400).json({ message: "You have already used this coupon" });
+      }
+
+      // ✅ Calculate coupon discount
+      if (appliedCoupon.type.toLowerCase() === "percentage") {
+        couponDiscount = (itemsTotal * appliedCoupon.value) / 100;
+      } else {
+        couponDiscount = appliedCoupon.value;
       }
     }
 
-    // ✅ Create order
+    // 4️⃣ Tax
+    const TAX_RATE = 0.1; // 10%
+    const taxAmount = itemsTotal * TAX_RATE;
+
+    // 5️⃣ Final total
+    let finalTotal = itemsTotal + taxAmount + deliveryFee - couponDiscount;
+    finalTotal = Math.round(finalTotal * 100) / 100; // round to 2 decimals
+
+    // 6️⃣ Active offer product ID
+    const activeOfferProduct = processedProducts.find((p) => p.offer?.isActive);
+    const activeOfferId = activeOfferProduct ? activeOfferProduct.product : null;
+
+    // 7️⃣ Create order
     const orderData = {
-      user: _id,
+      user: userId,
       customer: name,
       email,
-      products,
-      total,
-      status,
+      products: processedProducts,
       shippingAddress,
-      couponCode: appliedCoupon ? appliedCoupon.code : null, // ✅ store code
-      coupon: appliedCoupon ? appliedCoupon._id : null, // ✅ optional: also store reference
+      couponCode: appliedCoupon ? appliedCoupon.code : null,
+      itemsTotal: Math.round(itemsTotal * 100) / 100,
+      deliveryFee,
+      deliveryTime,
+      taxAmount: Math.round(taxAmount * 100) / 100,
+      discount: Math.round(couponDiscount * 100) / 100,
+      finalTotal,
+      activeOffer: activeOfferId,
+      status: "pending",
     };
 
     const order = await Order.create(orderData);
 
-    // 📈 Increment coupon usage count AFTER successful order
+    // 8️⃣ Increment coupon usage
     if (appliedCoupon) {
       await Coupon.updateOne(
         { _id: appliedCoupon._id },
@@ -71,6 +164,7 @@ export const placeOrder = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
+
 
 export const getOrderById = async (req, res) => {
   try {
@@ -164,27 +258,34 @@ export const updateOrderStatusByAdmin = async (req, res) => {
   }
 };
 // GET /admin/orders/revenue
+; // make sure correct path
+
 export const getRevenue = async (req, res) => {
   try {
     const result = await Order.aggregate([
-      {
-        $match: { status: "delivered" }, // Only delivered orders count as revenue
-      },
+      { $match: { status: "delivered" } }, // Only delivered orders
       {
         $group: {
           _id: null,
-          totalRevenue: { $sum: "$total" },
+          totalRevenue: { $sum: "$finalTotal" }, // sum of finalTotal
+          totalOrders: { $sum: 1 },             // count delivered orders
         },
       },
     ]);
 
-    const revenue = result[0]?.totalRevenue || 0;
+    const revenue = result[0] || { totalRevenue: 0, totalOrders: 0 };
 
-    res.json({ revenue, currency: "INR" });
+    res.json({
+      totalRevenue: revenue.totalRevenue,
+      totalOrders: revenue.totalOrders,
+      currency: "INR",
+    });
   } catch (err) {
+    console.error("Revenue fetch failed:", err.message);
     res.status(500).json({ message: err.message });
   }
 };
+
 export const getOrdersByUser = async (req, res) => {
   try {
     const orders = await Order.find({ user: req.user._id }).populate(
@@ -221,5 +322,22 @@ export const cancelOrder = async (req, res) => {
   } catch (err) {
     console.error("Cancel Order Error:", err);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+export const deleteOrder = async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    await Order.findByIdAndDelete(orderId);
+
+    res.status(200).json({ message: "Order deleted successfully", orderId });
+  } catch (err) {
+    console.error("❌ Delete order failed:", err.message);
+    res.status(500).json({ message: err.message });
   }
 };

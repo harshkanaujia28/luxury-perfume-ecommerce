@@ -53,3 +53,36 @@ export const assignVendorsToZone = async (req, res) => {
   }
 };
 
+export const checkPincode = async (req, res) => {
+  try {
+    const { pincode } = req.body;
+
+    if (!pincode) {
+      return res.status(400).json({ message: "Pincode is required" });
+    }
+
+    const zone = await Zone.findOne({
+      pincode: String(pincode), // ✅ ensure string match
+      isActive: true,
+    });
+
+    if (!zone) {
+      return res.status(404).json({
+        available: false,
+        message: "Sorry, we currently don't deliver to this Area",
+      });
+    }
+  
+
+    res.json({
+      available: true,
+      deliveryFee: zone.deliveryFee,
+      deliveryTime: zone.deliveryTime,
+      zoneType: zone.zoneType,
+    });
+   
+
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

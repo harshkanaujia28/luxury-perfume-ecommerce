@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +15,8 @@ export default function ResetPasswordPage() {
   const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { toast } = useToast();
@@ -82,38 +85,52 @@ export default function ResetPasswordPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
+              <div className="relative">
                 <Label htmlFor="password" className="text-gray-300">
                   New Password
                 </Label>
                 <Input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={isSuccess}
-                  className="mt-1 bg-black text-gray-200 border-gray-700 focus:border-lime-400"
+                  className="mt-1 bg-black text-gray-200 border-gray-700 focus:border-lime-400 pr-10"
                   placeholder="Enter new password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-[38px] text-gray-400 hover:text-gray-200"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
 
-              <div>
+              {/* Confirm Password */}
+              <div className="relative mt-4">
                 <Label htmlFor="confirmPassword" className="text-gray-300">
                   Confirm Password
                 </Label>
                 <Input
                   id="confirmPassword"
-                  type="password"
+                  type={showConfirmPassword ? "text" : "password"}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                   disabled={isSuccess}
-                  className="mt-1 bg-black text-gray-200 border-gray-700 focus:border-lime-400"
+                  className="mt-1 bg-black text-gray-200 border-gray-700 focus:border-lime-400 pr-10"
                   placeholder="Confirm new password"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-[38px] text-gray-400 hover:text-gray-200"
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
-
               <Button
                 type="submit"
                 className="w-full bg-lime-500 text-black hover:bg-lime-400 transition"
@@ -122,8 +139,8 @@ export default function ResetPasswordPage() {
                 {isLoading
                   ? "Resetting..."
                   : isSuccess
-                  ? "Password Reset!"
-                  : "Reset Password"}
+                    ? "Password Reset!"
+                    : "Reset Password"}
               </Button>
             </form>
           </CardContent>

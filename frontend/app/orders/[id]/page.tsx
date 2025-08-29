@@ -152,16 +152,16 @@ export default function OrderDetailPage() {
                       >
                         <div
                           className={`w-10 h-10 rounded-full flex items-center justify-center border-2 z-10 ${completed
-                              ? "bg-lime-500 border-lime-500 text-black"
-                              : "border-gray-600 text-gray-500 bg-zinc-800"
+                            ? "bg-lime-500 border-lime-500 text-black"
+                            : "border-gray-600 text-gray-500 bg-zinc-800"
                             }`}
                         >
                           <Icon className="h-5 w-5" />
                         </div>
                         <span
                           className={`text-xs mt-2 ${completed
-                              ? "text-lime-400 font-medium"
-                              : "text-gray-500"
+                            ? "text-lime-400 font-medium"
+                            : "text-gray-500"
                             }`}
                         >
                           {step.status}
@@ -171,9 +171,9 @@ export default function OrderDetailPage() {
                         {index < statusSteps.length - 1 && (
                           <div
                             className={`absolute top-5 left-1/2 w-full h-0.5 z-0 ${statusSteps[index + 1].status === order.status ||
-                                index < currentStep
-                                ? "bg-lime-500"
-                                : "bg-gray-600"
+                              index < currentStep
+                              ? "bg-lime-500"
+                              : "bg-gray-600"
                               }`}
                             style={{
                               transform: "translateX(50%)",
@@ -252,7 +252,7 @@ export default function OrderDetailPage() {
                           Qty: {p.quantity} × ₹{p.product.price}
                         </p>
                         <p className="text-xs font-semibold text-lime-300">
-                          Total: ₹{(p.quantity * p.product.price).toFixed(2)}
+                          Total: ₹{(p.quantity * p.product.price)}
                         </p>
                         {p.selectedSize && (
                           <p className="text-xs text-gray-500 italic">
@@ -270,10 +270,12 @@ export default function OrderDetailPage() {
                   ))}
                   <p className="font-semibold mt-2 text-right text-lime-400">
                     Grand Total: ₹
-                    {typeof order.total === "number"
-                      ? order.total.toFixed(2)
-                      : "0.00"}
+                    {typeof order.finalTotal === "number"
+                      ? Math.round(order.finalTotal)
+                      : 0}
                   </p>
+
+
 
                   {order.status === "pending" && (
                     <button
@@ -287,11 +289,11 @@ export default function OrderDetailPage() {
               </div>
             </>
           )}
-          {order && order.status === "delivered" && (
+          {/* {order && order.status === "delivered" && (
             <div className="mt-4">
               <RequestReturnDialog orderId={order._id} />
             </div>
-          )}
+          )} */}
         </main>
       </div>
       <Footer />

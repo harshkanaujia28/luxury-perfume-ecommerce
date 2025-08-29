@@ -5,7 +5,8 @@ import "./globals.css";
 import { CartProvider } from "@/contexts/cart-context";
 import { WishlistProvider } from "@/contexts/wishlist-context";
 import { Toaster } from "@/components/ui/toaster";
-import { ApiProvider } from "@/contexts/api-context";  // ✅ already manages user
+import { ApiProvider } from "@/contexts/api-context";
+import { CheckoutProvider } from "@/contexts/checkoutContext";// ✅ add
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
   description: "Discover timeless luxury fragrances from premium brands",
   generator: "v0.dev",
   icons: {
-    icon: "/Zafrine_Logo-removebg-preview.png",
+    icon: "/Zafrine_Logo.png",
   },
 };
 
@@ -29,8 +30,10 @@ export default function RootLayout({
         <ApiProvider>
           <CartProvider>
             <WishlistProvider>
-              {children}
-              <Toaster />
+              <CheckoutProvider>
+                {children}
+                <Toaster />
+              </CheckoutProvider>
             </WishlistProvider>
           </CartProvider>
         </ApiProvider>

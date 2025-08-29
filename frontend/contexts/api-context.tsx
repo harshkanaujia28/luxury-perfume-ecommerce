@@ -139,6 +139,7 @@ export interface ReportResponse {
         products: ProductPerformance[]
         brands: BrandPerformance[]
         topUsers: TopUser[]
+        users: UserReport[];
         createdAt: string
         updatedAt: string
         _id: string
@@ -192,7 +193,12 @@ export interface LegalDocumentHistory {
     wordCount: number;
 }
 
-
+type UserReport = {
+    _id: string;
+    name: string;
+    email: string;
+    createdAt: string;
+};
 export interface Category {
     id: number;
     name: string;
@@ -1052,16 +1058,17 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
 
     // ✅ Admin: get revenue
     const getRevenue = async () => {
-        const token = localStorage.getItem("token") // adjust based on where your token is stored
+        const token = localStorage.getItem("token"); // adjust based on where your token is stored
 
         const res = await axios.get("/orders/revenue", {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
-        })
+        });
 
-        return res.data.revenue
-    }
+        // ✅ Return full object, not res.data.revenue
+        return res.data;
+    };
 
 
     // =====================

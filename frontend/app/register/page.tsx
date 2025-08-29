@@ -7,58 +7,64 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useApi } from "@/contexts/api-context";
 import { useToast } from "@/hooks/use-toast";
+import { Eye, EyeOff } from "lucide-react";
+import axios from "@/utils/axios"; // your axios instance
 
 export default function RegisterPage() {
   const [step, setStep] = useState<"form" | "otp">("form");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [otp, setOtp] = useState("");
-  const [serverOtp, setServerOtp] = useState("");
+  const [userId, setUserId] = useState(""); // store backend user id
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { toast } = useToast();
-  const { register } = useApi();
   const router = useRouter();
 
+  // Step 1: Send OTP via backend
   const sendOtp = async () => {
-    if (!mobile.match(/^\d{10}$/)) {
+    if (!email) {
       toast({
-        title: "Invalid Mobile",
-        description: "Enter a valid 10-digit mobile number",
+        title: "Invalid Email",
+        description: "Please enter a valid email address",
         variant: "destructive",
       });
       return;
     }
 
     setIsLoading(true);
-    const mockOtp = "123456";
-    setServerOtp(mockOtp);
+    try {
+      const res = await axios.post("/auth/register", {
+        name,
+        email,
+        password,
+      });
 
-    toast({
-      title: "OTP Sent",
-      description: `A 6-digit OTP was sent to ${mobile}. (For demo: ${mockOtp})`,
-    });
-
-    setStep("otp");
-    setIsLoading(false);
-  };
-
-  const verifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (otp !== serverOtp) {
+      setUserId(res.data.userId);
       toast({
-        title: "Invalid OTP",
-        description: "Please enter the correct OTP.",
+        title: "OTP Sent",
+        description: `A 6-digit OTP was sent to ${email}.`,
+      });
+      setStep("otp");
+    } catch (error: any) {
+      toast({
+        title: "Registration Failed",
+        description: error.response?.data?.message || "Please try again.",
         variant: "destructive",
       });
-      return;
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  // Step 2: Verify OTP
+  const verifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     if (password !== confirmPassword) {
       toast({
@@ -71,17 +77,20 @@ export default function RegisterPage() {
 
     setIsLoading(true);
     try {
-      const newUser = await register(name, email, password);
+      await axios.post("/auth/verify-otp", {
+        userId,
+        otp,
+      });
+
       toast({
         title: "Registration Successful",
-        description: `Welcome, ${newUser.name}!`,
+        description: `Welcome, ${name}!`,
       });
       router.push("/login");
     } catch (error: any) {
       toast({
-        title: "Registration Failed",
-        description:
-          error.response?.data?.message || "Please try again.",
+        title: "OTP Verification Failed",
+        description: error.response?.data?.message || "Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -134,43 +143,54 @@ export default function RegisterPage() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="mobile" className="text-gray-300">
-                    Mobile Number
-                  </Label>
-                  <Input
-                    id="mobile"
-                    type="tel"
-                    value={mobile}
-                    onChange={(e) => setMobile(e.target.value)}
-                    required
-                    className="bg-black border-gray-700 text-gray-200 focus:border-lime-400"
-                  />
-                </div>
-                <div>
                   <Label htmlFor="password" className="text-gray-300">
                     Password
                   </Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="bg-black border-gray-700 text-gray-200 focus:border-lime-400"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="bg-black border-gray-700 text-gray-200 focus:border-lime-400 pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lime-400"
+                    >
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="confirmPassword" className="text-gray-300">
                     Confirm Password
                   </Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                    className="bg-black border-gray-700 text-gray-200 focus:border-lime-400"
-                  />
+                  <div className="relative">
+                    <Input
+                      id="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      className="bg-black border-gray-700 text-gray-200 focus:border-lime-400 pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setShowConfirmPassword(!showConfirmPassword)
+                      }
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-lime-400"
+                    >
+                      {showConfirmPassword ? (
+                        <EyeOff size={18} />
+                      ) : (
+                        <Eye size={18} />
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 <Button
