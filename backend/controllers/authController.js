@@ -13,16 +13,14 @@ export const register = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    // const hashed = await bcrypt.hash(password, 10);
-
     // generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000);
 
-    // create user but mark as not verified
+    // create user with plain password (will be hashed by pre-save hook)
     const user = await User.create({
       name,
       email,
-      password: hashed,
+      password, // ⚡️ plain password, will be auto-hashed
       role,
       isVerified: false,
       otp,
@@ -38,11 +36,14 @@ export const register = async (req, res) => {
        <p>This code will expire in 10 minutes.</p>`
     );
 
-    res.status(201).json({ message: "User registered, please verify OTP", userId: user._id });
+    res
+      .status(201)
+      .json({ message: "User registered, please verify OTP", userId: user._id });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
 export const verifyOtp = async (req, res) => {
   try {
     const { userId, otp } = req.body;
@@ -213,3 +214,4 @@ export const updateProfile = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
