@@ -64,18 +64,26 @@ export const deleteBanner = async (req, res) => {
 
 export const toggleActiveStatus = async (req, res) => {
   try {
-    const banner = await Banner.findById(req.params.id);
-    if (!banner) return res.status(404).json({ error: "Banner not found" });
+    const { id } = req.params;
 
+    // Banner dhoondo
+    const banner = await Banner.findById(id);
+    if (!banner) {
+      return res.status(404).json({ error: "Banner not found" });
+    }
+
+    // isActive flip karo
     banner.isActive = !banner.isActive;
-    banner.updatedAt = new Date();
-    await banner.save();
 
-    res.json(banner);
+    await banner.save({ validateBeforeSave: false });
+
+    res.json({ success: true, banner });
   } catch (err) {
+    console.error("❌ Toggle error:", err);
     res.status(500).json({ error: err.message });
   }
 };
+
 
 export const reorderHeroImage = async (req, res) => {
   try {
@@ -87,7 +95,6 @@ export const reorderHeroImage = async (req, res) => {
     const index = heroImages.findIndex((img) => img._id.toString() === id);
 
     if (index === -1) {
-      console.warn("⚠️ Hero image not found");
       return res.status(404).json({ error: "Hero image not found" });
     }
 
@@ -96,17 +103,23 @@ export const reorderHeroImage = async (req, res) => {
     if (newIndex < 0 || newIndex >= heroImages.length) {
       return res.status(400).json({ error: "Out of bounds" });
     }
-    // Swap the order values
+
+    // 🔄 Swap order values
     const current = heroImages[index];
     const target = heroImages[newIndex];
+
     const tempOrder = current.order;
     current.order = target.order;
     target.order = tempOrder;
-    await current.save();
-    await target.save();
+
+    // ✅ Save without validation
+    await current.save({ validateBeforeSave: false });
+    await target.save({ validateBeforeSave: false });
+
     res.json({ success: true, reordered: [current, target] });
   } catch (err) {
     console.error("❌ Reorder error:", err);
     res.status(500).json({ error: err.message });
   }
 };
+

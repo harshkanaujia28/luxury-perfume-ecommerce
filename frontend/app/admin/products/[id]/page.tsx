@@ -87,6 +87,7 @@ export default function ProductDetailsDialog({ productId, open, onOpenChange }: 
                             ? "Buy 1 Get 1"
                             : "Bundle Offer"}
                     </Badge>
+
                     {["percentage", "fixed"].includes(product.offer.type) && (
                       <span className="text-amber-700 font-medium">
                         Save ₹
@@ -96,12 +97,24 @@ export default function ProductDetailsDialog({ productId, open, onOpenChange }: 
                       </span>
                     )}
                   </div>
+
                   <p className="text-amber-700 text-sm">
                     {product.offer.description || "Special offer available!"}
                   </p>
+
+                  {/* 🎯 maxUses aur usedCount show karo */}
+                  <p className="text-xs text-amber-600 mt-1">
+                    {product.offer.usedCount}/{product.offer.maxUses} offers used
+                  </p>
+
+                  {/* Min quantity condition bhi dikhana chaho to */}
+                  {product.offer.minQuantity > 1 && (
+                    <p className="text-xs text-amber-600">
+                      Minimum {product.offer.minQuantity} items required
+                    </p>
+                  )}
                 </div>
               )}
-
 
             </div>
 

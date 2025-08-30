@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-//  Review Schema
+// ================= Review Schema =================
 const reviewSchema = new mongoose.Schema(
   {
     userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -11,22 +11,37 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-//  Offer Schema
+// ================= Offer Schema =================
 const offerSchema = new mongoose.Schema(
   {
     isActive: { type: Boolean, default: false },
     type: { type: String, enum: ["percentage", "fixed", "bogo", "bundle"] },
-    value: Number,
-    startDate: Date,
-    endDate: Date,
-    description: String,
-    minQuantity: Number,
-    maxUses: Number,
+    value: { type: Number, required: function () { return this.type !== "bogo"; } },
+    startDate: { type: Date },
+    endDate: { type: Date },
+    description: { type: String },
+    minQuantity: { type: Number },
+    maxUses: { type: Number },
+    usedCount: { type: Number, default: 0 },
   },
   { _id: false }
 );
 
-//  Specification Schema
+// Auto-check offer validity
+offerSchema.methods.isOfferValid = function () {
+  const now = new Date();
+
+  // Check date validity
+  if (this.startDate && now < this.startDate) return false;
+  if (this.endDate && now > this.endDate) return false;
+
+  // Check usage
+  if (this.maxUses && this.usedCount >= this.maxUses) return false;
+
+  return true;
+};
+
+// ================= Specification Schema =================
 const specificationSchema = new mongoose.Schema(
   {
     skinType: String,
@@ -37,7 +52,7 @@ const specificationSchema = new mongoose.Schema(
   { _id: false }
 );
 
-//  Category Schema
+// ================= Category Schema =================
 const categorySchema = new mongoose.Schema(
   {
     type: { type: String, enum: ["Perfume", "Attar"], required: true },
@@ -60,34 +75,40 @@ const categorySchema = new mongoose.Schema(
   { _id: false }
 );
 
-//  Product Schema
+// ================= Product Schema =================
 const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     brand: { type: String, required: true },
-    brandimage: { type: String, required: false },
+    brandimage: { type: String },
+
     price: { type: Number, required: true },
-    originalPrice: Number,
+    originalPrice: { type: Number },
+
     image: { type: String, required: true },
     images: { type: [String], default: [] },
+
     description: { type: String, required: true },
     category: { type: categorySchema, required: true },
 
+    // Stock & Quantity
     quantity: { type: [String], default: [] },
-
-    // Stock
     stock: { type: Number, required: true, default: 1, min: 0 },
 
-    // Reviews + rating
+    // Reviews
     rating: { type: Number, default: 0 },
     reviews: { type: [reviewSchema], default: [] },
 
     features: { type: [String], default: [] },
     specifications: { type: specificationSchema, required: true },
+
+    // Offer
     offer: offerSchema,
   },
   { timestamps: true }
 );
+
+// ================= Hooks & Methods =================
 
 // Auto calculate rating from reviews
 productSchema.pre("save", function (next) {
@@ -97,6 +118,12 @@ productSchema.pre("save", function (next) {
   } else {
     this.rating = 0;
   }
+
+  // Auto deactivate expired or over-used offers
+  if (this.offer) {
+    this.offer.isActive = this.offer.isOfferValid();
+  }
+
   next();
 });
 

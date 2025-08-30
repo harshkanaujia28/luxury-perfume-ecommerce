@@ -10,9 +10,25 @@ import { useWishlist } from "@/contexts/wishlist-context";
 import { useSortedProducts } from "@/hooks/useSortedProducts";
 import { useToast } from "@/hooks/use-toast";
 
+// 🔹 Helper function to calculate final price
+function getFinalPrice(product: any) {
+  const originalPrice = product.price;
+  let finalPrice = originalPrice;
+
+  if (product.offer?.isActive) {
+    if (product.offer.type === "percentage") {
+      finalPrice = originalPrice - (originalPrice * product.offer.value) / 100;
+    } else if (product.offer.type === "fixed") {
+      finalPrice = originalPrice - product.offer.value;
+    }
+  }
+
+  return { finalPrice, originalPrice };
+}
+
 export function Featured() {
   const { addToCart } = useCart();
-     const { toast } = useToast()
+  const { toast } = useToast();
   const { addItem, removeItem, isInWishlist } = useWishlist();
   const products = useSortedProducts();
   const featuredProducts = products.slice(8, 16); // ✅ 8 to 15
@@ -24,6 +40,8 @@ export function Featured() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
           {featuredProducts.map((product) => {
             const inWishlist = isInWishlist(product._id);
+            const { finalPrice, originalPrice } = getFinalPrice(product);
+
             return (
               <Card
                 key={product._id}
@@ -35,28 +53,16 @@ export function Featured() {
                     onClick={() =>
                       inWishlist ? removeItem(product._id) : addItem(product)
                     }
-                    className={`absolute top-3 right-3 rounded-full p-2 z-10 shadow-md ${inWishlist
+                    className={`absolute top-3 right-3 rounded-full p-2 z-10 shadow-md ${
+                      inWishlist
                         ? "bg-lime-500 text-black"
                         : "bg-black/70 text-lime-400 hover:bg-lime-500 hover:text-black"
-                      }`}
+                    }`}
                   >
                     <Heart
                       className={`w-5 h-5 ${inWishlist ? "fill-current" : ""}`}
                     />
                   </button>
-
-                  {/* Offer Badge */}
-                  {product.offer?.isActive && (
-                    <div className="absolute top-3 left-3 bg-lime-500 text-black text-xs font-bold px-2 py-1 rounded">
-                      {product.offer.type === "percentage"
-                        ? `${product.offer.value}% OFF`
-                        : product.offer.type === "fixed"
-                          ? `₹${product.offer.value} OFF`
-                          : product.offer.type === "bogo"
-                            ? "Buy 1 Get 1"
-                            : "Bundle Offer"}
-                    </div>
-                  )}
 
                   {/* Product Image */}
                   <Link href={`/products/${product._id}`}>
@@ -70,6 +76,21 @@ export function Featured() {
                     </div>
                   </Link>
 
+                  {/* Offer Badge */}
+                  {product.offer?.isActive && product.offer?.type && (
+                    <div className="absolute top-3 left-3 bg-lime-500 text-black text-xs font-bold px-2 py-1 rounded">
+                      {product.offer.type === "percentage"
+                        ? `${product.offer.value}% OFF`
+                        : product.offer.type === "fixed"
+                        ? `₹${product.offer.value} OFF`
+                        : product.offer.type === "bogo"
+                        ? "Buy 1 Get 1"
+                        : product.offer.type === "bundle"
+                        ? "Bundle Offer"
+                        : null}
+                    </div>
+                  )}
+
                   {/* Product Details */}
                   <div className="p-4 space-y-2">
                     <p className="text-sm text-gray-400">{product.brand}</p>
@@ -82,45 +103,51 @@ export function Featured() {
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
-                          className={`w-4 h-4 ${i < Math.floor(product.rating)
+                          className={`w-4 h-4 ${
+                            i < Math.floor(product.rating)
                               ? "text-yellow-400 fill-current"
                               : "text-gray-600"
-                            }`}
+                          }`}
                         />
                       ))}
                     </div>
 
                     {/* Price + Cart */}
                     <div className="flex items-center justify-between mt-2">
-                      <span className="font-bold text-lime-400">
-                        ₹{product.price}
-                      </span>
+                      {/* Price Display */}
+                      <div className="flex items-center space-x-2">
+                        <span className="font-bold text-lime-400">
+                          ₹{finalPrice.toFixed(2)}
+                        </span>
+                        {finalPrice < originalPrice && (
+                          <span className="text-sm text-gray-500 line-through">
+                            ₹{originalPrice.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Cart Button */}
                       <Button
                         size="icon"
                         className="bg-lime-500 text-black rounded-full w-8 h-8 hover:bg-lime-400 flex items-center justify-center"
                         onClick={async () => {
                           if (!product) return;
-
                           try {
-                            // Calculate final price based on active offer
-                            const originalPrice = product.price;
-                            let finalPrice = originalPrice;
+                            await addToCart(
+                              product._id,
+                              1,
+                              undefined,
+                              finalPrice
+                            );
 
-                            if (product.offer?.isActive) {
-                              if (product.offer.type === "percentage") {
-                                finalPrice = originalPrice - (originalPrice * product.offer.value) / 100;
-                              } else if (product.offer.type === "fixed") {
-                                finalPrice = originalPrice - product.offer.value;
-                              }
-                            }
-
-                            // Add to cart with default quantity=1, no size selected
-                            await addToCart(product._id, 1, undefined, finalPrice);
-
-                            console.log(`Added ${product.name} to cart at ₹${finalPrice}`);
+                            console.log(
+                              `Added ${product.name} to cart at ₹${finalPrice}`
+                            );
                             toast({
                               title: "Added to cart",
-                              description: `1 ${product.name} added at ₹${finalPrice.toFixed(2)}`,
+                              description: `1 ${product.name} added at ₹${finalPrice.toFixed(
+                                2
+                              )}`,
                             });
                           } catch (err) {
                             console.error("Failed to add to cart:", err);

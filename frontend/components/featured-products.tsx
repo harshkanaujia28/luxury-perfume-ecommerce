@@ -10,9 +10,26 @@ import { useWishlist } from "@/contexts/wishlist-context";
 import { useSortedProducts } from "@/hooks/useSortedProducts";
 import { useToast } from "@/hooks/use-toast";
 
+// 🔹 Common helper for final price calculation
+function getFinalPrice(product: any) {
+  const originalPrice = product.price;
+  let finalPrice = originalPrice;
+
+  if (product.offer?.isActive) {
+    if (product.offer.type === "percentage") {
+      finalPrice =
+        originalPrice - (originalPrice * product.offer.value) / 100;
+    } else if (product.offer.type === "fixed") {
+      finalPrice = originalPrice - product.offer.value;
+    }
+  }
+
+  return { finalPrice, originalPrice };
+}
+
 export function FeaturedProducts() {
   const { addToCart } = useCart();
-   const { toast } = useToast()
+  const { toast } = useToast();
   const { addItem, removeItem, isInWishlist } = useWishlist();
   const products = useSortedProducts();
   const bestSellingProducts = products.slice(16, 24);
@@ -27,16 +44,7 @@ export function FeaturedProducts() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
           {bestSellingProducts.map((product) => {
             const inWishlist = isInWishlist(product._id);
-
-            // ✅ Calculate offer price
-            let finalPrice = product.price;
-            if (product.offer?.isActive) {
-              if (product.offer.type === "percentage") {
-                finalPrice = product.price - (product.price * product.offer.value) / 100;
-              } else if (product.offer.type === "fixed") {
-                finalPrice = product.price - product.offer.value;
-              }
-            }
+            const { finalPrice, originalPrice } = getFinalPrice(product);
 
             return (
               <Card
@@ -49,28 +57,16 @@ export function FeaturedProducts() {
                     onClick={() =>
                       inWishlist ? removeItem(product._id) : addItem(product)
                     }
-                    className={`absolute top-3 right-3 rounded-full p-2 z-10 shadow-md ${inWishlist
-                      ? "bg-lime-500 text-black"
-                      : "bg-black/70 text-lime-400 hover:bg-lime-500 hover:text-black"
-                      }`}
+                    className={`absolute top-3 right-3 rounded-full p-2 z-10 shadow-md ${
+                      inWishlist
+                        ? "bg-lime-500 text-black"
+                        : "bg-black/70 text-lime-400 hover:bg-lime-500 hover:text-black"
+                    }`}
                   >
                     <Heart
                       className={`w-5 h-5 ${inWishlist ? "fill-current" : ""}`}
                     />
                   </button>
-
-                  {/* Offer Badge */}
-                  {product.offer?.isActive && (
-                    <div className="absolute top-3 left-3 bg-lime-500 text-black text-xs font-bold px-2 py-1 rounded">
-                      {product.offer.type === "percentage"
-                        ? `${product.offer.value}% OFF`
-                        : product.offer.type === "fixed"
-                          ? `₹${product.offer.value} OFF`
-                          : product.offer.type === "bogo"
-                            ? "Buy 1 Get 1"
-                            : "Bundle Offer"}
-                    </div>
-                  )}
 
                   {/* Product Image */}
                   <Link href={`/products/${product._id}`}>
@@ -88,6 +84,21 @@ export function FeaturedProducts() {
                     </div>
                   </Link>
 
+                  {/* Offer Badge */}
+                  {product.offer?.isActive && product.offer?.type && (
+                    <div className="absolute top-3 left-3 bg-lime-500 text-black text-xs font-bold px-2 py-1 rounded">
+                      {product.offer.type === "percentage"
+                        ? `${product.offer.value}% OFF`
+                        : product.offer.type === "fixed"
+                        ? `₹${product.offer.value} OFF`
+                        : product.offer.type === "bogo"
+                        ? "Buy 1 Get 1"
+                        : product.offer.type === "bundle"
+                        ? "Bundle Offer"
+                        : null}
+                    </div>
+                  )}
+
                   {/* Product Details */}
                   <div className="p-4 space-y-2">
                     <p className="text-sm text-gray-400">{product.brand}</p>
@@ -100,10 +111,11 @@ export function FeaturedProducts() {
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
-                          className={`w-4 h-4 ${i < Math.floor(product.rating)
-                            ? "text-yellow-400 fill-current"
-                            : "text-gray-600"
-                            }`}
+                          className={`w-4 h-4 ${
+                            i < Math.floor(product.rating)
+                              ? "text-yellow-400 fill-current"
+                              : "text-gray-600"
+                          }`}
                         />
                       ))}
                       <span className="text-xs text-gray-500 ml-1">
@@ -120,20 +132,16 @@ export function FeaturedProducts() {
 
                     {/* Price */}
                     <div className="flex items-center justify-between mt-2">
-                      {product.offer?.isActive ? (
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold text-lime-400">
-                            ₹{finalPrice.toFixed(0)}
-                          </span>
-                          <span className="text-sm text-gray-500 line-through">
-                            ₹{product.price}
-                          </span>
-                        </div>
-                      ) : (
+                      <div className="flex items-center gap-2">
                         <span className="font-bold text-lime-400">
-                          ₹{product.price}
+                          ₹{finalPrice.toFixed(2)}
                         </span>
-                      )}
+                        {finalPrice < originalPrice && (
+                          <span className="text-sm text-gray-500 line-through">
+                            ₹{originalPrice.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
 
                       {/* Add to Cart */}
                       <Button
@@ -143,25 +151,21 @@ export function FeaturedProducts() {
                           if (!product) return;
 
                           try {
-                            // Calculate final price based on active offer
-                            const originalPrice = product.price;
-                            let finalPrice = originalPrice;
+                            await addToCart(
+                              product._id,
+                              1,
+                              undefined,
+                              finalPrice
+                            );
 
-                            if (product.offer?.isActive) {
-                              if (product.offer.type === "percentage") {
-                                finalPrice = originalPrice - (originalPrice * product.offer.value) / 100;
-                              } else if (product.offer.type === "fixed") {
-                                finalPrice = originalPrice - product.offer.value;
-                              }
-                            }
-
-                            // Add to cart with default quantity=1, no size selected
-                            await addToCart(product._id, 1, undefined, finalPrice);
-
-                            console.log(`Added ${product.name} to cart at ₹${finalPrice}`);
+                            console.log(
+                              `Added ${product.name} to cart at ₹${finalPrice}`
+                            );
                             toast({
                               title: "Added to cart",
-                              description: `1 ${product.name} added at ₹${finalPrice.toFixed(2)}`,
+                              description: `1 ${product.name} added at ₹${finalPrice.toFixed(
+                                2
+                              )}`,
                             });
                           } catch (err) {
                             console.error("Failed to add to cart:", err);
@@ -175,8 +179,6 @@ export function FeaturedProducts() {
                       >
                         <ShoppingCart className="w-5 h-5" />
                       </Button>
-
-
                     </div>
                   </div>
                 </CardContent>

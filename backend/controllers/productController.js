@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Product from "../models/Product.js";
+import { checkOfferStatus } from "../utils/checkOffer.js";
 
 // ✅ Safe JSON parser
 const safeParse = (value, fallback) => {
@@ -13,10 +14,15 @@ const safeParse = (value, fallback) => {
 };
 
 // ✅ Get all products
+// ✅ Get all products
 export const getProducts = async (req, res) => {
   try {
     const products = await Product.find();
-    res.json({ products });
+
+    // har ek product ka offer validate karke bhejna
+    const updatedProducts = products.map((p) => checkOfferStatus(p));
+
+    res.json({ products: updatedProducts }); // 👈 FIX
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -27,11 +33,15 @@ export const getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) return res.status(404).json({ message: "Product not found" });
-    res.json({ product });
+
+    const updatedProduct = checkOfferStatus(product);
+
+    res.json({ product: updatedProduct }); // 👈 consistency ke liye
   } catch (err) {
-    res.status(404).json({ message: "Product not found" });
+    res.status(500).json({ message: err.message });
   }
 };
+
 
 // ✅ Add product
 export const addProduct = async (req, res) => {

@@ -916,12 +916,15 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
     // =====================
     const getProducts = async () => {
         const res = await axios.get("/products");
-        return res.data.products;
+        // agar products exist nahi hai to empty array return kare
+        return Array.isArray(res.data.products) ? res.data.products : [];
     };
+
     const getProductById = async (id: string) => {
         const res = await axios.get(`/products/${id}`);
-        return res.data.product;
+        return res.data?.product || null;
     };
+
     const addProduct = async (data: FormData) => {
         try {
             const res = await axios.post(

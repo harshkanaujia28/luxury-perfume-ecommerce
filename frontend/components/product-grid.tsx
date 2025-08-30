@@ -114,27 +114,27 @@ export function ProductGrid({ products }: ProductGridProps) {
                   />
                 </Link>
 
-                {product.offer?.isActive && (
-                  <span className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg">
+                {product.offer?.isActive && product.offer?.type && (
+                  <div className="absolute top-3 left-3 bg-lime-500 text-black text-xs font-bold px-2 py-1 rounded">
                     {product.offer.type === "percentage"
                       ? `${product.offer.value}% OFF`
                       : product.offer.type === "fixed"
-                      ? `₹${product.offer.value} OFF`
-                      : product.offer.type === "bogo"
-                      ? "Buy 1 Get 1"
-                      : "Bundle Offer"}
-                  </span>
+                        ? `₹${product.offer.value} OFF`
+                        : product.offer.type === "bogo"
+                          ? "Buy 1 Get 1"
+                          : product.offer.type === "bundle"
+                            ? "Bundle Offer"
+                            : null}
+                  </div>
                 )}
-
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={() => toggleWishlist(product)}
-                  className={`absolute top-3 right-3 rounded-full p-2 shadow-md transition ${
-                    isInWishlist(product._id)
+                  className={`absolute top-3 right-3 rounded-full p-2 shadow-md transition ${isInWishlist(product._id)
                       ? "bg-lime-500 text-black hover:bg-lime-400"
                       : "bg-zinc-700/70 text-gray-300 hover:bg-zinc-600"
-                  }`}
+                    }`}
                 >
                   <Heart className={`w-5 h-5 ${isInWishlist(product._id) ? "fill-current" : ""}`} />
                 </Button>
@@ -148,9 +148,8 @@ export function ProductGrid({ products }: ProductGridProps) {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-3.5 h-3.5 ${
-                        i < Math.floor(product.rating) ? "text-yellow-400 fill-current" : "text-gray-600"
-                      }`}
+                      className={`w-3.5 h-3.5 ${i < Math.floor(product.rating) ? "text-yellow-400 fill-current" : "text-gray-600"
+                        }`}
                     />
                   ))}
                   <span className="text-[11px] text-gray-500 ml-1">({product.reviews.length})</span>

@@ -17,10 +17,26 @@ import { useWishlist } from "@/contexts/wishlist-context";
 import { useSortedProducts } from "@/hooks/useSortedProducts";
 import { useToast } from "@/hooks/use-toast";
 
+// 🔹 Common price calculation helper
+function getFinalPrice(product: any) {
+  const originalPrice = product.price;
+  let finalPrice = originalPrice;
+
+  if (product.offer?.isActive) {
+    if (product.offer.type === "percentage") {
+      finalPrice = originalPrice - (originalPrice * product.offer.value) / 100;
+    } else if (product.offer.type === "fixed") {
+      finalPrice = originalPrice - product.offer.value;
+    }
+  }
+
+  return { finalPrice, originalPrice };
+}
+
 export default function NewProductsPage() {
   const { addToCart } = useCart();
   const { addItem, removeItem, isInWishlist } = useWishlist();
-  const { toast } = useToast()
+  const { toast } = useToast();
   const products = useSortedProducts();
   const newProducts = products.slice(0, 8);
   const carouselRef = useRef<HTMLDivElement>(null);
@@ -97,6 +113,8 @@ export default function NewProductsPage() {
           >
             {newProducts.map((product) => {
               const inWishlist = isInWishlist(product._id);
+              const { finalPrice, originalPrice } = getFinalPrice(product);
+
               return (
                 <Card
                   key={product._id}
@@ -109,7 +127,7 @@ export default function NewProductsPage() {
                           src={
                             product.image?.startsWith("http")
                               ? product.image
-                              : `NEXT_PUBLIC_API_URL${product.image || product.images?.[0] || "/placeholder.svg"}`
+                              : `${process.env.NEXT_PUBLIC_API_URL}${product.image || product.images?.[0] || "/placeholder.svg"}`
                           }
                           alt={product.name}
                           fill
@@ -132,13 +150,12 @@ export default function NewProductsPage() {
                         }`}
                       >
                         <Heart
-                          className={`w-5 h-5 ${
-                            inWishlist ? "fill-current" : ""
-                          }`}
+                          className={`w-5 h-5 ${inWishlist ? "fill-current" : ""}`}
                         />
                       </Button>
+
                       {/* Offer Badge */}
-                      {product.offer?.isActive && (
+                      {product.offer?.isActive && product.offer?.type && (
                         <div className="absolute top-3 left-3 bg-lime-500 text-black text-xs font-bold px-2 py-1 rounded">
                           {product.offer.type === "percentage"
                             ? `${product.offer.value}% OFF`
@@ -146,15 +163,20 @@ export default function NewProductsPage() {
                             ? `₹${product.offer.value} OFF`
                             : product.offer.type === "bogo"
                             ? "Buy 1 Get 1"
-                            : "Bundle Offer"}
+                            : product.offer.type === "bundle"
+                            ? "Bundle Offer"
+                            : null}
                         </div>
                       )}
                     </div>
+
                     <div className="p-4 space-y-2">
                       <h3 className="font-semibold text-lime-300">
                         {product.name}
                       </h3>
                       <p className="text-sm text-gray-400">{product.brand}</p>
+
+                      {/* Rating */}
                       <div className="flex items-center space-x-1">
                         {[...Array(5)].map((_, i) => (
                           <Star
@@ -167,49 +189,51 @@ export default function NewProductsPage() {
                           />
                         ))}
                       </div>
+
+                      {/* Price */}
                       <div className="flex items-center justify-between pt-2">
-                        <span className="text-xl font-bold text-lime-400">
-                          ₹{product.price}
-                        </span>
-                         <Button
-                        size="icon"
-                        className="bg-lime-500 text-black rounded-full w-8 h-8 hover:bg-lime-400 flex items-center justify-center"
-                        onClick={async () => {
-                          if (!product) return;
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl font-bold text-lime-400">
+                            ₹{finalPrice.toFixed(2)}
+                          </span>
+                          {finalPrice < originalPrice && (
+                            <span className="text-sm text-gray-500 line-through">
+                              ₹{originalPrice.toFixed(2)}
+                            </span>
+                          )}
+                        </div>
 
-                          try {
-                            // Calculate final price based on active offer
-                            const originalPrice = product.price;
-                            let finalPrice = originalPrice;
+                        {/* Add to Cart */}
+                        <Button
+                          size="icon"
+                          className="bg-lime-500 text-black rounded-full w-8 h-8 hover:bg-lime-400 flex items-center justify-center"
+                          onClick={async () => {
+                            if (!product) return;
 
-                            if (product.offer?.isActive) {
-                              if (product.offer.type === "percentage") {
-                                finalPrice = originalPrice - (originalPrice * product.offer.value) / 100;
-                              } else if (product.offer.type === "fixed") {
-                                finalPrice = originalPrice - product.offer.value;
-                              }
+                            try {
+                              await addToCart(product._id, 1, undefined, finalPrice);
+
+                              console.log(
+                                `Added ${product.name} to cart at ₹${finalPrice}`
+                              );
+                              toast({
+                                title: "Added to cart",
+                                description: `1 ${product.name} added at ₹${finalPrice.toFixed(
+                                  2
+                                )}`,
+                              });
+                            } catch (err) {
+                              console.error("Failed to add to cart:", err);
+                              toast({
+                                title: "Error",
+                                description: "Failed to add to cart.",
+                                variant: "destructive",
+                              });
                             }
-
-                            // Add to cart with default quantity=1, no size selected
-                            await addToCart(product._id, 1, undefined, finalPrice);
-
-                            console.log(`Added ${product.name} to cart at ₹${finalPrice}`);
-                            toast({
-                              title: "Added to cart",
-                              description: `1 ${product.name} added at ₹${finalPrice.toFixed(2)}`,
-                            });
-                          } catch (err) {
-                            console.error("Failed to add to cart:", err);
-                            toast({
-                              title: "Error",
-                              description: "Failed to add to cart.",
-                              variant: "destructive",
-                            });
-                          }
-                        }}
-                      >
-                        <ShoppingCart className="w-5 h-5" />
-                      </Button>
+                          }}
+                        >
+                          <ShoppingCart className="w-5 h-5" />
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
