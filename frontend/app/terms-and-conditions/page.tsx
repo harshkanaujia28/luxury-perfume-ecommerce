@@ -2,7 +2,7 @@ import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {AlertTriangle} from "lucide-react"
-export default function TermsPage() {
+export default function TermsAndConditions() {
   return (
     <div className="min-h-screen bg-black text-lime-300">
       <Header />

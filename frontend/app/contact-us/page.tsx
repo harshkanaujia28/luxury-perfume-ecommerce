@@ -14,7 +14,7 @@ import { MapPin, Phone, Mail, Clock } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import axios from "@/utils/axios"
 
-export default function ContactPage() {
+export default function ContactUs() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",

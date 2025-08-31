@@ -3,7 +3,7 @@ import { Footer } from "@/components/footer"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Truck, Clock, Shield, Globe, Package, Phone } from "lucide-react"
 
-export default function ShippingPage() {
+export default function ShippingPolicy() {
   return (
     <>
       <Header />

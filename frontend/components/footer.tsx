@@ -38,7 +38,7 @@ export function Footer() {
               <li><Link href="/categories" className="hover:text-lime-300">Categories</Link></li>
               <li><Link href="/brands" className="hover:text-lime-300">Brands</Link></li>
               <li><Link href="/about" className="hover:text-lime-300">About Us</Link></li>
-              <li><Link href="/contact" className="hover:text-lime-300">Contact</Link></li>
+              <li><Link href="/contact-us" className="hover:text-lime-300">Contact Us</Link></li>
             </ul>
           </div>
 
@@ -46,7 +46,8 @@ export function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4 text-lime-400">Customer Service</h3>
             <ul className="space-y-2">
-              <li><Link href="/shipping" className="hover:text-lime-300">Shipping Info</Link></li>
+              <li><Link href="/shipping-policy" className="hover:text-lime-300">Shipping Policy</Link></li>
+              <li><Link href="/cancellation-refund" className="hover:text-lime-300">Cancellation & Refund</Link></li>
               <li><Link href="/returns" className="hover:text-lime-300">Returns</Link></li>
               <li><Link href="/faq" className="hover:text-lime-300">FAQ</Link></li>
               <li><Link href="/size-guide" className="hover:text-lime-300">Size Guide</Link></li>
@@ -58,8 +59,8 @@ export function Footer() {
           <div>
             <h3 className="text-lg font-semibold mb-4 text-lime-400">Legal</h3>
             <ul className="space-y-2">
-              <li><Link href="/privacy" className="hover:text-lime-300">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-lime-300">Terms of Service</Link></li>
+              <li><Link href="/privacy-policy" className="hover:text-lime-300">Privacy Policy</Link></li>
+              <li><Link href="/terms-and-conditions" className="hover:text-lime-300">Terms and Conditions</Link></li>
               <li><Link href="/cookies" className="hover:text-lime-300">Cookie Policy</Link></li>
               <li><Link href="/accessibility" className="hover:text-lime-300">Accessibility</Link></li>
             </ul>

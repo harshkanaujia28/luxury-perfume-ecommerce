@@ -46,7 +46,7 @@ export function Header() {
   const navigation = [
     { name: "Home", href: "/" },
     { name: "All Products", href: "/products" },
-    { name: "Contact", href: "/contact" },
+    { name: "Contact Us", href: "/contact-us" },
   ];
 
   return (
