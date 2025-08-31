@@ -1,197 +1,166 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
+import {AlertTriangle} from "lucide-react"
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-black text-lime-300">
       <Header />
       <main>
         {/* Hero Section */}
-        <section className="luxury-gradient py-40">
+        <section className="bg-gradient-to-b from-gray-900 via-black to-gray-900 py-40">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold text-lime-400 mb-6">Terms of Service</h1>
-            <p className="text-xl text-lime-300">
+            <h1 className="text-4xl lg:text-5xl font-bold text-lime-400 mb-6">Terms & Conditions</h1>
+            <p className="text-xl text-white">
               Please read these terms carefully before using our website and services.
             </p>
-            <p className="text-sm text-lime-500 mt-4">Last updated: January 1, 2024</p>
+            <p className="text-sm text-lime-500 mt-4">Last updated: August 31, 2025</p>
           </div>
         </section>
 
         {/* Terms Content */}
         <section className="py-16">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-white ">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 text-white">
 
             {/* Section Mapping */}
             {[
               {
-                title: "1. Acceptance of Terms",
+                title: "Intro - Terms & Conditions",
                 content: (
                   <>
-                  <p className="text-white">By accessing and using the Luxe Fragrances website and services, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service."</p>
+                    <p className="text-lime-400 mb-2">
+                      <strong className="text-white">Brand Name:</strong> ZAFRINE
+                    </p>
+                    <p className="text-lime-400 mb-2">
+                      <strong className="text-white">Legal Entity:</strong> D.M Enterprises
+                    </p>
+                    <p className="text-white">
+                      Welcome to{" "}
+                      <a
+                        href="https://zafrine.in"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-lime-400 underline hover:text-lime-300"
+                      >
+                        ZAFRINE.IN
+                      </a>
+                      . By accessing or purchasing from our website, you agree to be bound by
+                      the following Terms & Conditions. Please read them carefully before
+                      placing an order.
+                    </p>
                   </>
-                )
+                ),
               },
+
               {
-                title: "2. Use License",
-                content: (
-                  <>
-                   <p className="text-white">Permission is granted to temporarily download one copy of the materials on Luxe Fragrances' website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:</p>
-                    <ul className="list-disc list-inside space-y-1 mt-2 text-white">
-                      <li>modify or copy the materials</li>
-                      <li>use the materials for any commercial purpose or for any public display</li>
-                      <li>attempt to reverse engineer any software contained on the website</li>
-                      <li>remove any copyright or other proprietary notations from the materials</li>
-                    </ul>
-                    <p className="mt-2 text-white">This license shall automatically terminate if you violate any of these restrictions and may be terminated by Luxe Fragrances at any time.</p>
-                  </>
-                )
-              },
-              {
-                title: "3. Product Information and Pricing",
-                content: (
-                  <>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-lime-400">Product Descriptions</h4>
-                      <p className="text-white">We strive to provide accurate product descriptions and images. However, we do not warrant that product descriptions or other content is accurate, complete, reliable, current, or error-free.</p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-lime-400">Pricing</h4>
-                      <p className="text-white">All prices are subject to change without notice. We reserve the right to modify prices at any time. In case of a pricing error, we reserve the right to cancel orders placed at the incorrect price.</p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-lime-400">Availability</h4>
-                      <p className="text-white">All products are subject to availability. We reserve the right to discontinue any product at any time.</p>
-                    </div>
-                  </>
-                )
-              },
-              {
-                title: "4. Orders and Payment",
-                content: (
-                  <>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-lime-400">Order Acceptance</h4>
-                      <p className="text-white">Your receipt of an order confirmation does not signify our acceptance of your order. We reserve the right to accept or decline your order for any reason.</p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-lime-400">Payment</h4>
-                      <p className="text-white">Payment must be received by us before we ship your order. We accept major credit cards, PayPal, and other payment methods as displayed during checkout.</p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-lime-400">Taxes</h4>
-                      <p className="text-white">You are responsible for any applicable taxes, duties, or customs fees associated with your order.</p>
-                    </div>
-                  </>
-                )
-              },
-              {
-                title: "5. Shipping and Delivery",
-                content: (
-                  <>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-lime-400">Shipping Times</h4>
-                      <p className="text-white">Shipping times are estimates and not guaranteed. We are not responsible for delays caused by shipping carriers or customs.</p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-lime-400">Risk of Loss</h4>
-                      <p className="text-white">Risk of loss and title for items purchased pass to you upon delivery to the shipping carrier.</p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-lime-400">International Shipping</h4>
-                      <p className="text-white">International customers are responsible for any customs duties, taxes, or fees imposed by their country.</p>
-                    </div>
-                  </>
-                )
-              },
-              {
-                title: "6. Returns and Refunds",
+                title: "1. General",
                 content: (
                   <ul className="list-disc list-inside space-y-1 text-white">
-                    <li>Returns must be initiated within 30 days of delivery</li>
-                    <li>Items must be unopened and in original packaging</li>
-                    <li>Refunds will be processed to the original payment method</li>
-                    <li>Return shipping costs may apply</li>
+                    <li>These Terms & Conditions govern your use of the website and purchases made through ZAFRINE (operated by D.M Enterprises).</li>
+                    <li>By placing an order, you accept these Terms & Conditions, along with our Privacy Policy and Cancellation & Refund Policy.</li>
+                    <li>ZAFRINE reserves the right to update, modify, or change these terms at any time without prior notice.</li>
                   </ul>
-                )
+                ),
               },
+
               {
-                title: "7. User Accounts",
+                title: "2. Products & Pricing",
                 content: (
-                  <>
-                    <div className="space-y-2 text-white">
-                      <h4 className="font-semibold text-lime-400">Account Security</h4>
-                      <p className="text-white">You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account.</p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-lime-400">Accurate Information</h4>
-                      <p className="text-white">You agree to provide accurate, current, and complete information when creating your account and to update such information as necessary.</p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-lime-400">Account Termination</h4>
-                      <p className="text-white">We reserve the right to terminate or suspend your account at any time for violation of these terms.</p>
-                    </div>
-                  </>
-                )
+                  <ul className="list-disc list-inside space-y-1 text-white">
+                    <li>All products listed on our website are described and priced as accurately as possible.</li>
+                    <li>Prices are subject to change without prior notice.</li>
+                    <li>We reserve the right to correct any errors in pricing or product descriptions.</li>
+                    <li>All perfumes sold under ZAFRINE are non-refundable and non-returnable, except in cases of damage/defect as per our Refund Policy.</li>
+                  </ul>
+                ),
               },
+
               {
-                title: "8. Prohibited Uses",
+                title: "3. Orders & Payments",
                 content: (
-                  <>
-                    <p className="mb-2">You may not use our website for any unlawful purpose or to solicit others to perform unlawful acts. You may not:</p>
-                    <ul className="list-disc list-inside space-y-1 text-white">
-                      <li>Violate any applicable laws or regulations</li>
-                      <li>Transmit any harmful or malicious code</li>
-                      <li>Interfere with or disrupt our services</li>
-                      <li>Attempt to gain unauthorized access to our systems</li>
-                      <li>Use our website for fraudulent purposes</li>
-                      <li>Infringe upon intellectual property rights</li>
-                    </ul>
-                  </>
-                )
+                  <ul className="list-disc list-inside space-y-1 text-white">
+                    <li>Orders can be placed online through our official website or authorized platforms.</li>
+                    <li>Full payment must be made at the time of purchase using approved payment methods.</li>
+                    <li>ZAFRINE/D.M Enterprises reserves the right to refuse or cancel any order in case of suspicious activity, incorrect information, or stock unavailability.</li>
+                  </ul>
+                ),
               },
+
               {
-                title: "9. Intellectual Property",
-                content: <p className="text-white">All content on this website, including text, graphics, logos, images, and software, is the property of Luxe Fragrances or its content suppliers and is protected by copyright and other intellectual property laws. You may not reproduce, distribute, or create derivative works without our express written permission.</p>
-              },
-              {
-                title: "10. Disclaimers",
+                title: "4. Shipping & Delivery",
                 content: (
-                  <>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-lime-400">Website Content</h4>
-                      <p className="text-white">The information on this website is provided on an 'as is' basis. We make no warranties, expressed or implied, and hereby disclaim all other warranties.</p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-lime-400">Product Performance</h4>
-                      <p className="text-white">Fragrance performance may vary based on individual skin chemistry, environmental factors, and personal perception. We cannot guarantee specific performance outcomes.</p>
-                    </div>
-                  </>
-                )
+                  <ul className="list-disc list-inside space-y-1 text-white">
+                    <li>Orders are processed and shipped within the timelines mentioned on our website.</li>
+                    <li>Delivery times may vary based on location and courier partner.</li>
+                    <li>ZAFRINE is not responsible for delays caused by third-party courier services, natural events, or unforeseen circumstances.</li>
+                    <li>Shipping charges (if any) are non-refundable.</li>
+                  </ul>
+                ),
               },
+
               {
-                title: "11. Limitation of Liability",
-                content: <p className="text-white">In no event shall Luxe Fragrances or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on our website, even if we have been notified orally or in writing of the possibility of such damage. Our total liability shall not exceed the amount paid by you for the product(s) in question.</p>
+                title: "5. Cancellation & Refunds",
+                content: (
+                  <ul className="list-disc list-inside space-y-1 text-white">
+                    <li>Cancellations are accepted only within 12 hours of placing the order, provided the order has not been dispatched.</li>
+                    <li>Refunds are only applicable if the product is damaged, defective, or incorrect, and proof (unboxing video + images) is provided within 48 hours of delivery.</li>
+                    <li>No refunds/replacements will be provided for used, opened, or tampered products.</li>
+                  </ul>
+                ),
               },
+
               {
-                title: "12. Governing Law",
-                content: <p className="text-white">These terms and conditions are governed by and construed in accordance with the laws of the State of New York, and you irrevocably submit to the exclusive jurisdiction of the courts in that state or location.</p>
+                title: "6. Intellectual Property Rights",
+                content: (
+                  <ul className="list-disc list-inside space-y-1 text-white">
+                    <li>All logos, designs, product images, brand names, and website content are the intellectual property of D.M Enterprises (ZAFRINE).</li>
+                    <li>Unauthorized use, reproduction, or distribution of our intellectual property is strictly prohibited.</li>
+                  </ul>
+                ),
               },
+
               {
-                title: "13. Changes to Terms",
-                content: <p className="text-white">We reserve the right to revise these terms of service at any time without notice. By using this website, you are agreeing to be bound by the then current version of these terms of service.</p>
+                title: "7. Limitation of Liability",
+                content: (
+                  <ul className="list-disc list-inside space-y-1 text-white">
+                    <li>ZAFRINE shall not be held liable for any indirect, incidental, or consequential damages arising from the use of our products or services.</li>
+                    <li>Fragrance preference is subjective, and no liability will be accepted for dislike of scent.</li>
+                    <li>Customers are advised to read ingredient details to avoid allergic reactions. ZAFRINE is not responsible for such issues.</li>
+                  </ul>
+                ),
+              },
+
+              {
+                title: "8. User Responsibilities",
+                content: (
+                  <ul className="list-disc list-inside space-y-1 text-white">
+                    <li>Customers must provide accurate and complete delivery details. ZAFRINE will not be responsible for undelivered orders due to incorrect information.</li>
+                    <li>Misuse of our website, fraudulent activities, or violation of policies will result in legal action.</li>
+                  </ul>
+                ),
+              },
+
+              {
+                title: "9. Governing Law",
+                content: (
+                  <ul className="list-disc list-inside space-y-1 text-white">
+                    <li>These Terms & Conditions shall be governed by and construed in accordance with the laws of India.</li>
+                    <li>Any disputes shall be subject to the exclusive jurisdiction of the courts in Kanpur, India.</li>
+                  </ul>
+                ),
               },
               {
                 title: "14. Contact Information",
                 content: (
                   <div className="space-y-2 text-white">
-                    <p>If you have any questions about these Terms of Service, please contact us:</p>
-                    <p><strong>Email:</strong> legal@luxefragrances.com</p>
-                    <p><strong>Phone:</strong> (555) 123-4567</p>
-                    <p><strong>Mail:</strong> Luxe Fragrances Legal Department<br />123 Fragrance Avenue<br />New York, NY 10001</p>
+                    <p>For any queries regarding these Terms & Conditions, please contact:</p>
+                    <p className="text-lime-400"><strong className="text-white">Email:</strong> info@zafrine.in</p>
+                    <p className="text-lime-400"><strong className="text-white">Phone:</strong> +91 79051 68856</p>
+                    <p className="text-lime-400"><strong className="text-white">Registered Office</strong> D.M Enterprises<br />88/475, Dalelpurva Rajvi Road, Qasim	Ganj Kanpur,208001<br />UttarPradesh, India</p>
                   </div>
                 )
               },
+             
             ].map((section, idx) => (
               <Card key={idx} className="bg-zinc-900 border-lime-500/30 shadow-lg rounded-2xl">
                 <CardHeader>
@@ -200,6 +169,22 @@ export default function TermsPage() {
                 <CardContent>{section.content}</CardContent>
               </Card>
             ))}
+             <Card className="max-w-3xl mx-auto mt-6 border border-red-600/40 shadow-md rounded-2xl bg-zinc-950">
+                    <CardHeader className="flex items-center gap-2 text-red-600">
+                      <AlertTriangle className="w-6 h-6" />
+                      <h2 className="text-lg font-semibold">Disclaimer</h2>
+                    </CardHeader>
+                    <CardContent className="text-gray-300 text-sm leading-relaxed">
+                      <p>
+                        🔒 Disclaimer: This policy is subject to change at any time without prior notice.
+                        By purchasing from <span className="font-semibold text-white">ZAFRINE (D.M Enterprises)</span>,
+                        you agree to the terms stated above.
+                      </p>
+                      <div className="border-t border-gray-600 mt-4 pt-2 text-center text-xs text-gray-500">
+                        ________________________________________
+                      </div>
+                    </CardContent>
+                  </Card>
 
           </div>
         </section>

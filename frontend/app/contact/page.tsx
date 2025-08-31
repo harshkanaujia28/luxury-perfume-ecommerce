@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { MapPin, Phone, Mail, Clock } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import axios from "@/utils/axios"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -30,12 +31,13 @@ export default function ContactPage() {
     })
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setIsLoading(true)
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+  try {
+    // Send form data to backend API
+    await axios.post("/contact", formData)
 
     toast({
       title: "Message sent!",
@@ -43,29 +45,38 @@ export default function ContactPage() {
     })
 
     setFormData({ name: "", email: "", subject: "", message: "" })
+  } catch (error) {
+    toast({
+      title: "Error",
+      description: "Failed to send message. Please try again.",
+      variant: "destructive",
+    })
+    console.error("Contact form error:", error)
+  } finally {
     setIsLoading(false)
   }
+}
 
   const contactInfo = [
     {
       icon: MapPin,
       title: "Address",
-      details: ["123 Fragrance Avenue", "New York, NY 10001", "United States"],
+      details: [" D.M Enterprises", "88/475, Dalelpurva Rajvi Road", "QasimGanj Kanpur,208001", "UttarPradesh, India"],
     },
     {
       icon: Phone,
       title: "Phone",
-      details: ["+1 (555) 123-4567", "+1 (555) 987-6543"],
+      details: ["+91 79051 68856"],
     },
     {
       icon: Mail,
       title: "Email",
-      details: ["info@luxefragrances.com", "support@luxefragrances.com"],
+      details: ["info@zafrine.in"],
     },
     {
       icon: Clock,
       title: "Business Hours",
-      details: ["Monday - Friday: 9:00 AM - 6:00 PM", "Saturday: 10:00 AM - 4:00 PM", "Sunday: Closed"],
+      details: [" Monday – Sunday: 10:00 AM – 7:00 PM"],
     },
   ]
 
@@ -76,9 +87,9 @@ export default function ContactPage() {
 
         <main>
           {/* Hero Section */}
-          <section className="luxury-gradient py-36 text-center">
+          <section className="bg-gradient-to-b from-gray-900 via-black to-gray-900 py-40">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-              <h1 className="text-4xl lg:text-5xl font-bold text-lime-400 mb-6">Contact Us</h1>
+              <h1 className="text-4xl lg:text-5xl font-bold text-lime-400 mb-6 text-center">Contact Us</h1>
               <p className="text-xl text-white">
                 We'd love to hear from you. Send us a message and we'll respond as soon as possible.
               </p>
@@ -155,13 +166,12 @@ export default function ContactPage() {
                     </form>
                   </CardContent>
                 </Card>
-
                 {/* Contact Information */}
                 <div className="space-y-6">
                   <div>
                     <h2 className="text-2xl font-bold text-lime-400 mb-6">Get in Touch</h2>
                     <p className="text-white mb-8">
-                      Have questions about our fragrances or need personalized recommendations? Our team is here to help.
+                      We’re always here to assist you. For any queries related to your orders, products, or services, feel free to reach out to us:
                     </p>
                   </div>
 

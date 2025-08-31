@@ -1,217 +1,165 @@
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { RotateCcw, Package, CreditCard, Clock, CheckCircle, XCircle } from "lucide-react"
+import { Shield, XCircle, RefreshCcw, Package, CreditCard, AlertTriangle, Phone } from "lucide-react"
 
 export default function ReturnsPage() {
-  const returnSteps = [
-    {
-      step: 1,
-      title: "Initiate Return",
-      description: "Contact our customer service or use our online return form",
-      icon: RotateCcw,
-    },
-    {
-      step: 2,
-      title: "Package Item",
-      description: "Securely package the item in its original packaging",
-      icon: Package,
-    },
-    {
-      step: 3,
-      title: "Ship Back",
-      description: "Use the prepaid return label we provide",
-      icon: Package,
-    },
-    {
-      step: 4,
-      title: "Receive Refund",
-      description: "Get your refund within 5-7 business days",
-      icon: CreditCard,
-    },
-  ]
-
-  const returnableItems = [
-    { item: "Unopened fragrances", status: "returnable", icon: CheckCircle },
-    { item: "Damaged items", status: "returnable", icon: CheckCircle },
-    { item: "Wrong item received", status: "returnable", icon: CheckCircle },
-    { item: "Opened fragrances", status: "not-returnable", icon: XCircle },
-    { item: "Items after 30 days", status: "not-returnable", icon: XCircle },
-    { item: "Gift sets (partial)", status: "not-returnable", icon: XCircle },
-  ]
-
   return (
     <div className="min-h-screen bg-black text-lime-300">
       <Header />
       <main>
         {/* Hero Section */}
-        <section className="relative py-48 border-b border-lime-400">
-          <div className="absolute inset-0 bg-black/50"></div>
+        <section className="relative py-40 border-b border-lime-400">
+          <div className="absolute inset-0 bg-black/60"></div>
           <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl lg:text-5xl font-bold text-lime-400 mb-6">
-              Returns & Exchanges
+              Cancellation & Refund Policy
             </h1>
             <p className="text-xl text-white">
-              We want you to love your fragrance. If you're not satisfied, we're here to help.
+              Safe, transparent, and fair policies by ZAFRINE
+            </p>
+            <p className="text-sm text-lime-500 mt-4">
+              Brand Name: <span className="text-white">ZAFRINE</span> | Legal Entity:{" "}
+              <span className="text-white">D.M Enterprises</span>
+            </p>
+            <p className="text-sm text-white mt-4">
+              At{" "}
+              <span className="text-lime-400 font-semibold">ZAFRINE</span>, we are
+              committed to delivering your perfumes safely and on time. Please read our
+              Cancellation & Refund Policy carefully to understand our process and conditions.
             </p>
           </div>
         </section>
 
-        {/* Return Policy Overview */}
+        {/* Policy Content */}
         <section className="py-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-lime-400 mb-4">30-Day Return Policy</h2>
-              <p className="text-lg text-white max-w-2xl mx-auto">
-                We offer a 30-day return policy for unopened items. Your satisfaction is our priority.
-              </p>
-            </div>
-
-            {/* Return Process */}
-            <div className="mb-16">
-              <h3 className="text-2xl font-bold text-lime-400 mb-8 text-center">How to Return</h3>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-                {returnSteps.map((step) => {
-                  const Icon = step.icon;
-                  return (
-                    <Card
-                      key={step.step}
-                      className="bg-zinc-900 border-lime-500/30 shadow-lg rounded-2xl text-center"
-                    >
-                      <CardContent className="p-6">
-                        <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center mx-auto mb-4">
-                          <Icon className="w-6 h-6 text-lime-400" />
-                        </div>
-                        <div className="text-sm font-medium text-white mb-2">Step {step.step}</div>
-                        <h4 className="text-lg font-semibold text-lime-400 mb-2">{step.title}</h4>
-                        <p className="text-white text-sm">{step.description}</p>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* What Can Be Returned */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-              <Card className="bg-zinc-900 border-lime-500/30 shadow-lg rounded-2xl">
-                <CardHeader>
-                  <CardTitle className="text-xl text-lime-400">What Can Be Returned</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {returnableItems.map((item) => {
-                      const Icon = item.icon;
-                      return (
-                        <div key={item.item} className="flex items-center space-x-3">
-                          <Icon
-                            className={`w-5 h-5 ${item.status === "returnable" ? "text-lime-400" : "text-red-600"}`}
-                          />
-                          <span
-                            className={`${item.status === "returnable" ? "text-white" : "text-red-500"}`}
-                          >
-                            {item.item}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-zinc-900 border-lime-500/30 shadow-lg rounded-2xl">
-                <CardHeader>
-                  <CardTitle className="text-xl text-lime-400">Return Conditions</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold mb-2 flex items-center text-lime-400">
-                      <Clock className="w-4 h-4 mr-2" />
-                      Time Limit
-                    </h4>
-                    <p className="text-white text-sm">Returns must be initiated within 30 days of delivery.</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2 flex items-center text-lime-400">
-                      <Package className="w-4 h-4 mr-2" />
-                      Condition
-                    </h4>
-                    <p className="text-white text-sm">
-                      Items must be unopened and in original packaging with all tags attached.
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold mb-2 flex items-center text-lime-400">
-                      <CreditCard className="w-4 h-4 mr-2" />
-                      Refund Method
-                    </h4>
-                    <p className="text-white text-sm">Refunds will be processed to the original payment method.</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* FAQ Section */}
-            <Card className="bg-zinc-900 border-lime-500/30 shadow-lg rounded-2xl">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            {/* 1. Cancellation Policy */}
+            <Card className="bg-zinc-900 border-lime-500/30 rounded-2xl">
               <CardHeader>
-                <CardTitle className="text-2xl text-lime-400">Frequently Asked Questions</CardTitle>
+                <CardTitle className="flex items-center text-lime-400">
+                  <XCircle className="w-5 h-5 mr-2" /> 1. Cancellation Policy
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-white space-y-2">
+                <p>● Orders once placed cannot be cancelled after they have been processed or dispatched.</p>
+                <p>● If you wish to cancel your order, please contact us within 12 hours of placing the order.</p>
+                <p>● Once your order has been shipped, no cancellations will be accepted.</p>
+              </CardContent>
+            </Card>
+
+            {/* 2. Refund & Replacement Policy */}
+            <Card className="bg-zinc-900 border-lime-500/30 rounded-2xl">
+              <CardHeader>
+                <CardTitle className="flex items-center text-lime-400">
+                  <RefreshCcw className="w-5 h-5 mr-2" /> 2. Refund & Replacement Policy
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-white space-y-2">
+                <p>
+                  Since perfumes fall under non-returnable and non-refundable products, refunds are not
+                  applicable except in the case of damage or defective products.
+                </p>
+                <p>We will provide a refund or replacement only under the following conditions:</p>
+                <p>● The product delivered is damaged during transit.</p>
+                <p>● The product received is defective, leaking, broken, or incorrect.</p>
+              </CardContent>
+            </Card>
+
+            {/* 3. Conditions for Claim */}
+            <Card className="bg-zinc-900 border-lime-500/30 rounded-2xl">
+              <CardHeader>
+                <CardTitle className="flex items-center text-lime-400">
+                  <Shield className="w-5 h-5 mr-2" /> 3. Conditions for Claim
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-white space-y-2">
+                <p>
+                  ● You must inform us within 48 hours of receiving the product by emailing us at{" "}
+                  <a
+                    href="mailto:customer@zafrine.in"
+                    className="text-lime-400 underline hover:text-lime-300"
+                  >
+                    customer@zafrine.in
+                  </a>{" "}
+                  or contacting our customer support.
+                </p>
+                <p>● You must provide unboxing video proof and images of the damaged/defective product.</p>
+                <p>
+                  ● The product must be unused, sealed, and in its original packaging (except in cases of
+                  damage during delivery).
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* 4. Refund Process */}
+            <Card className="bg-zinc-900 border-lime-500/30 rounded-2xl">
+              <CardHeader>
+                <CardTitle className="flex items-center text-lime-400">
+                  <CreditCard className="w-5 h-5 mr-2" /> 4. Refund Process
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-white space-y-2">
+                <p>
+                  ● Once your claim is approved, the refund will be processed within 7–10 business days to
+                  your original payment method.
+                </p>
+                <p>
+                  ● In the case of a replacement, the new product will be shipped within 5–7 business days
+                  after claim approval.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* 5. Non-Refundable Cases */}
+            <Card className="bg-zinc-900 border-lime-500/30 rounded-2xl">
+              <CardHeader>
+                <CardTitle className="flex items-center text-lime-400">
+                  <Package className="w-5 h-5 mr-2" /> 5. Non-Refundable Cases
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-white space-y-2">
+                <p>● Change of mind or dislike of fragrance.</p>
+                <p>● Opened, used, or tampered products.</p>
+                <p>● Delays caused by courier/shipping companies beyond our control.</p>
+              </CardContent>
+            </Card>
+            <Card className="bg-zinc-900 border border-lime-500/30 shadow-lg rounded-2xl">
+              <CardHeader>
+                <CardTitle className="flex items-center text-lime-400"><Phone className="w-5 h-5 mr-2" />Contact Us</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
-                  <div>
-                    <h4 className="font-semibold text-lime-400 mb-2">
-                      How long does it take to process a return?
-                    </h4>
-                    <p className="text-white">
-                      Once we receive your returned item, we'll process your refund within 3-5 business days.
-                      The refund will appear in your account within 5-7 business days depending on your payment method.
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-lime-400 mb-2">Do I have to pay for return shipping?</h4>
-                    <p className="text-white">
-                      We provide free return shipping for defective items or if we sent the wrong product.
-                      For other returns, a $5.99 return shipping fee will be deducted from your refund.
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-lime-400 mb-2">Can I exchange an item instead of returning it?</h4>
-                    <p className="text-white">
-                      Yes! We offer exchanges for the same item in a different size or for a different fragrance
-                      of equal or lesser value. Contact our customer service team to arrange an exchange.
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-lime-400 mb-2">What if my item arrives damaged?</h4>
-                    <p className="text-white">
-                      If your item arrives damaged, please contact us within 48 hours with photos of the damage.
-                      We'll arrange for a replacement or full refund at no cost to you.
-                    </p>
-                  </div>
+                <div className="space-y-2 text-white">
+                  <p>For shipping-related queries, please contact us:</p>
+                  <p className="text-lime-400"><strong className="text-white">Email:</strong> info@zafrine.in</p>
+                  <p className="text-lime-400"><strong className="text-white">Phone:</strong> +91 79051 68856</p>
+                  <p className="text-lime-400"><strong className="text-white">Registered Office</strong> D.M Enterprises<br />88/475, Dalelpurva Rajvi Road, Qasim	Ganj Kanpur,208001<br />UttarPradesh, India</p>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Contact Section */}
-            <div className="text-center mt-12">
-              <h3 className="text-2xl font-bold text-lime-400 mb-4">Need Help with a Return?</h3>
-              <p className="text-white mb-6">Our customer service team is here to help you with your return.</p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Button size="lg" className="bg-lime-500 hover:bg-lime-400 text-black">
-                  <a href="/support">Contact Support</a>
-                </Button>
-                <Button variant="outline" size="lg" className="border-lime-500 text-lime-400 hover:bg-lime-500 hover:text-black">
-                  <a href="mailto:returns@luxefragrances.com">Email Returns Team</a>
-                </Button>
-              </div>
-            </div>
+            {/* Disclaimer Section */}
+            <Card className="max-w-3xl mx-auto mt-6 border border-red-600/40 shadow-md rounded-2xl bg-zinc-950">
+              <CardHeader className="flex items-center gap-2 text-red-600">
+                <AlertTriangle className="w-6 h-6" />
+                <h2 className="text-lg font-semibold">Disclaimer</h2>
+              </CardHeader>
+              <CardContent className="text-gray-300 text-sm leading-relaxed">
+                <p>
+                  🔒 Disclaimer: This policy is subject to change at any time without prior notice.
+                  By purchasing from <span className="font-semibold text-white">ZAFRINE (D.M Enterprises)</span>,
+                  you agree to the terms stated above.
+                </p>
+                <div className="border-t border-gray-600 mt-4 pt-2 text-center text-xs text-gray-500">
+                  ________________________________________
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </section>
       </main>
 
       <Footer />
     </div>
-
   )
 }
