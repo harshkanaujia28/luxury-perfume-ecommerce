@@ -11,6 +11,7 @@ const userSchema = new mongoose.Schema(
     city: String,
     state: String,
     country: String,
+    pincode: String,
     role: { type: String, enum: ["admin", "user", "vendor"], default: "user" },
 
     // OTP fields for verification

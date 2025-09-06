@@ -15,6 +15,8 @@ import { RadioGroup, RadioGroupItem, RadioGroupIndicator } from "@radix-ui/react
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import axios from "@/utils/axios";
+import { loadRazorpayScript } from "@/utils/razorpay";
+
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -25,7 +27,7 @@ export default function CheckoutPage() {
 
   const [hasMounted, setHasMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<"online" | "cod">("online");
+  const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "cod">("razorpay");
   const [profileData, setProfileData] = useState<any>({});
   const [couponCode, setCouponCode] = useState("");
   const [couponValue, setCouponValue] = useState(0);
@@ -57,22 +59,35 @@ export default function CheckoutPage() {
     setProfileData({ ...profileData, [e.target.name]: e.target.value });
   };
 
-  // Cart subtotal
-  const subtotal = state.items.reduce((sum, item) => {
+  // ✅ Cart subtotal after offer discount
+  const subtotalAfterOffer = state.items.reduce((sum, item) => {
     const price = item.price ?? item.product?.price ?? 0;
-    const quantity = typeof item.quantity === "number" ? item.quantity : 1;
-    return sum + price * quantity;
+    let discount = 0;
+
+    if (item.offer?.isActive) {
+      if (item.offer.type === "Percentage") {
+        discount = (price * item.offer.value) / 100;
+      } else if (["Flat", "Fixed"].includes(item.offer.type)) {
+        discount = item.offer.value;
+      }
+    }
+
+    return sum + (price - discount) * item.quantity;
   }, 0);
 
-  const tax = subtotal * 0.1; // example 10% tax
+  // ✅ Coupon discount (applied after offer)
   const couponDiscount =
     couponType === "Percentage"
-      ? (couponValue / 100) * subtotal
+      ? (couponValue / 100) * subtotalAfterOffer
       : couponType === "Fixed Amount"
         ? couponValue
         : 0;
 
-  const total = subtotal + tax + (delivery?.deliveryFee || 0) - couponDiscount;
+  // ✅ Tax calculation
+  const tax = parseFloat(((subtotalAfterOffer - couponDiscount) * 0.1).toFixed(2));
+
+  // ✅ Final total including delivery fee
+  const total = parseFloat((subtotalAfterOffer - couponDiscount + tax + (delivery?.deliveryFee || 0)).toFixed(2));
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("en-IN", {
@@ -84,7 +99,7 @@ export default function CheckoutPage() {
   // ✅ Apply Coupon
   const applyCoupon = async () => {
     try {
-      const result = await validateCoupon(couponCode, subtotal);
+      const result = await validateCoupon(couponCode, subtotalAfterOffer);
       if (result.valid) {
         setCouponValue(result.value);
         setCouponType(result.type);
@@ -107,22 +122,16 @@ export default function CheckoutPage() {
       }
     } catch (err: any) {
       console.error(err);
-
-      // ✅ Backend error toast
-      const errorMessage =
-        err?.response?.data?.message || err?.message || "Something went wrong";
-
+      const errorMessage = err?.response?.data?.message || err?.message || "Something went wrong";
       toast({
         title: "Coupon Error",
         description: errorMessage,
         variant: "destructive",
       });
-
       setCouponValue(0);
       setCouponType(null);
     }
   };
-
 
   // ✅ Check Delivery (Pincode)
   const checkDelivery = async () => {
@@ -132,10 +141,7 @@ export default function CheckoutPage() {
     setSuccess("");
 
     try {
-      const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/zones/check-pincode`,
-        { pincode }
-      );
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/zones/check-pincode`, { pincode });
 
       if (res.data.available) {
         setDelivery({
@@ -152,39 +158,41 @@ export default function CheckoutPage() {
       }
     } catch (err: any) {
       console.error(err);
-
-      // If backend returned an error message, show it
-      if (err.response?.data?.message) {
-        setError(`❌ ${err.response.data.message}`);
-      } else {
-        setError("❌ Something went wrong! Please try again later.");
-      }
+      setError(err.response?.data?.message ? `❌ ${err.response.data.message}` : "❌ Something went wrong! Please try again later.");
       setSuccess("");
     } finally {
       setLoading(false);
     }
   };
+
   // ✅ Place Order
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // 🚨 Delivery Required Validation
     if (!delivery) {
       toast({
         title: "Delivery Required",
         description: "Please select a delivery option before checkout",
         variant: "destructive",
       });
-      return; // ❌ Stop execution if delivery not selected
+      return;
     }
 
     setIsLoading(true);
 
     try {
-      // 1️⃣ Update profile first
       await updateProfile(profileData);
 
-      // 2️⃣ Prepare products for order payload
+        const totalOfferDiscount = state.items.reduce((sum, item) => {
+      const price = item.price ?? item.product?.price ?? 0;
+      let discount = 0;
+      if (item.offer?.isActive) {
+        if (item.offer.type === "Percentage") discount = (price * item.offer.value) / 100;
+        else if (["Flat", "Fixed"].includes(item.offer.type)) discount = item.offer.value;
+      }
+      return sum + discount * item.quantity;
+    }, 0);
+
       const products = state.items.map((item) => ({
         product: item.product?._id || item._id || item.productId,
         quantity: item.quantity,
@@ -193,16 +201,26 @@ export default function CheckoutPage() {
         brand: item.product?.brand || item.brand,
         image: item.product?.image || item.image,
         price: item.price ?? item.product?.price,
-        offer: item.offer?._id || null, // ✅ only ObjectId
+        offer: item.offer || null,
       }));
 
-      const activeOfferId =
-        state.items.find((item) => item.offer?.isActive)?._id || null;
+      const activeOfferId = state.items.find((item) => item.offer?.isActive)?._id || null;
 
       const orderPayload = {
+        user: profileData._id,
         customer: profileData.name,
         email: profileData.email,
         products,
+        itemsTotal: subtotalAfterOffer,
+        discount: totalOfferDiscount,  // total offer discount
+        couponCode: couponCode || null,
+        couponType: couponType || null,
+        couponValue: couponValue || 0,
+        couponDiscount: couponDiscount,
+        taxAmount: tax,
+        deliveryFee: delivery?.deliveryFee || 0,
+        finalTotal: total,
+        activeOffer: activeOfferId,
         shippingAddress: {
           address: profileData.address,
           city: profileData.city,
@@ -210,45 +228,74 @@ export default function CheckoutPage() {
           zipCode: profileData.zipCode,
           phone: profileData.phone,
         },
-        couponCode: couponCode || null,
-        itemsTotal: subtotal,
-        deliveryFee: delivery?.deliveryFee || 0,
-        finalTotal:
-          subtotal + tax - couponDiscount + (delivery?.deliveryFee || 0),
-        activeOffer: activeOfferId,
+        deliveryTime: "1-2 days",
       };
+      if (typeof window === "undefined") return;
 
-      // 3️⃣ Handle payment method
-      if (paymentMethod === "online") {
-        const res = await createPaymentSession(total, "Order Payment");
-        if (res?.url) {
-          window.location.href = res.url;
-        } else throw new Error("No payment URL received");
+
+      if (paymentMethod === "razorpay") {
+        const res = await loadRazorpayScript();
+        if (!res) {
+          toast({ title: "Payment Failed", description: "Razorpay SDK failed to load", variant: "destructive" });
+          setIsLoading(false);
+          return;
+        }
+
+        try {
+          const preValidate = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/payment/pre-validate`, { products, couponCode: couponCode || null });
+          if (!preValidate.data.success) {
+            toast({ title: "Validation Failed", description: preValidate.data.message || "Offer/Stock invalid", variant: "destructive" });
+            setIsLoading(false);
+            return;
+          }
+
+          const { data } = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/payment/create-order`, { amount: total });
+
+          const options = {
+            key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+            amount: data.amount,
+            currency: "INR",
+            name: "Zafrine",
+            description: "Order Payment",
+            order_id: data.orderId,
+            handler: async function (response: any) {
+              try {
+                await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/payment/verify-payment`, {
+                  razorpay_order_id: response.razorpay_order_id,
+                  razorpay_payment_id: response.razorpay_payment_id,
+                  razorpay_signature: response.razorpay_signature,
+                  orderDetails: orderPayload,
+                  paymentMethod: "Razorpay",
+                  paymentStatus: "paid",
+                });
+                toast({ title: "Payment Successful 🎉", description: "Your order has been placed successfully!" });
+                clearCart();
+                router.push("/orders");
+              } catch (err: any) {
+                toast({ title: "Payment Verification Failed", description: err?.response?.data?.message || "Something went wrong", variant: "destructive" });
+              }
+            },
+            prefill: { name: profileData?.name, email: profileData?.email, contact: profileData?.phone },
+            theme: { color: "#84cc16" },
+          };
+
+          const paymentObject = new (window as any).Razorpay(options);
+          paymentObject.open();
+        } catch (err: any) {
+          toast({ title: "Validation Error", description: err?.response?.data?.message || "Failed before payment", variant: "destructive" });
+          setIsLoading(false);
+          return;
+        }
       } else {
-        // COD / normal order
-        const newOrder = await placeOrder(orderPayload);
-
-        // ✅ Success toast
-        toast({
-          title: "Order placed successfully",
-          description: `Order ID: ${newOrder?._id}`,
-        });
-
+        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/orders`, { ...orderPayload, paymentMethod: "COD", paymentStatus: "pending" });
+        toast({ title: "Order Placed", description: "Your order has been placed successfully!" });
         clearCart();
         router.push("/orders");
       }
     } catch (err: any) {
       console.error(err);
-
-      // ✅ Show backend error if available, otherwise generic
-      const errorMessage =
-        err?.response?.data?.message || err?.message || "Something went wrong";
-
-      toast({
-        title: "Checkout failed",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      const errorMessage = err?.response?.data?.message || err?.message || "Something went wrong";
+      toast({ title: "Checkout failed", description: errorMessage, variant: "destructive" });
     } finally {
       setIsLoading(false);
     }
@@ -393,19 +440,19 @@ export default function CheckoutPage() {
                 <CardContent className="text-lime-300">
                   <RadioGroup
                     value={paymentMethod}
-                    onValueChange={(v) => setPaymentMethod(v as "online" | "cod")}
+                    onValueChange={(v) => setPaymentMethod(v as "razorpay" | "cod")}
                     className="flex flex-col space-y-2"
                   >
                     <label className="flex items-center space-x-2 cursor-pointer">
                       <RadioGroupItem
-                        value="online"
-                        id="online"
+                        value="razorpay"
+                        id="razorpay"
                         className="w-5 h-5 border border-lime-500 rounded-full bg-black flex items-center justify-center focus:outline-none"
                       >
                         <RadioGroupIndicator className="w-2 h-2 bg-lime-500 rounded-full" />
                       </RadioGroupItem>
-                      <Label htmlFor="online" className="text-lime-300 font-medium">
-                        Online Payment (Stripe)
+                      <Label htmlFor="razorpay" className="text-lime-300 font-medium">
+                        Online Payment (Razorpay)
                       </Label>
                     </label>
 
@@ -418,10 +465,11 @@ export default function CheckoutPage() {
                         <RadioGroupIndicator className="w-2 h-2 bg-lime-500 rounded-full" />
                       </RadioGroupItem>
                       <Label htmlFor="cod" className="text-lime-300 font-medium">
-                        Cash on Delivery
+                        Cash on Delivery (COD)
                       </Label>
                     </label>
                   </RadioGroup>
+
                 </CardContent>
               </Card>
 
@@ -458,10 +506,10 @@ export default function CheckoutPage() {
 
                   <Separator className="bg-lime-500/30" />
 
-                  <div className="flex justify-between"><span>Subtotal</span><span>₹{subtotal.toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span>Subtotal</span><span>₹{subtotalAfterOffer.toFixed(2)}</span></div>
                   <div className="flex justify-between"><span>Tax</span><span>₹{tax.toFixed(2)}</span></div>
                   {delivery && <div className="flex justify-between"><span>Delivery Fee</span><span>₹{delivery.deliveryFee.toFixed(2)}</span></div>}
-                  {couponValue > 0 && <div className="flex justify-between text-lime-400"><span>Coupon Discount</span><span>- ₹{couponType === "Percentage" ? ((couponValue / 100) * subtotal).toFixed(2) : couponValue.toFixed(2)}</span></div>}
+                  {couponValue > 0 && <div className="flex justify-between text-lime-400"><span>Coupon Discount</span><span>- ₹{couponType === "Percentage" ? ((couponValue / 100) * subtotalAfterOffer).toFixed(2) : couponValue.toFixed(2)}</span></div>}
                   <Separator className="bg-lime-500/30" />
                   <div className="flex justify-between font-semibold text-lg text-lime-400"><span>Total</span><span>₹{total.toFixed(2)}</span></div>
 

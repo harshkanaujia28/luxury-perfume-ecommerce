@@ -5,58 +5,48 @@ import Zone from "../models/Zone.js";
 import Offer from "../models/Offer.js";
 import Product from "../models/Product.js";
 
+
 export const placeOrder = async (req, res) => {
   try {
     const { _id: userId, name, email } = req.user;
-    const { products, shippingAddress, couponCode } = req.body;
+    const { products, shippingAddress, couponCode, paymentMethod } = req.body;
 
-    let itemsTotal = 0;
+    if (!["COD", "Razorpay"].includes(paymentMethod)) {
+      return res.status(400).json({ message: "Invalid payment method" });
+    }
+
+    let subtotal = 0;
     let totalQuantity = 0;
     const processedProducts = [];
 
-    // 1️⃣ Process each product
+    // 1️⃣ Process products & apply product-level offers
     for (const item of products) {
       const dbProduct = await Product.findById(item.product);
-      if (!dbProduct) {
-        return res
-          .status(400)
-          .json({ message: `Product not found: ${item.product}` });
-      }
+      if (!dbProduct) return res.status(400).json({ message: `Product not found: ${item.product}` });
 
       let price = dbProduct.price;
-      let offerSnapshot = {
-        isActive: false,
-        type: null,
-        value: 0,
-        discountApplied: 0,
-      };
+      let discountApplied = 0;
+      let offerSnapshot = { isActive: false, type: null, value: 0, discountApplied: 0 };
 
       totalQuantity += item.quantity;
 
-      // ✅ Apply product-level offer if active
-      let discountApplied = 0;
       if (dbProduct.offer && dbProduct.offer.isActive) {
         if (item.quantity < (dbProduct.offer.minQuantity || 1)) {
           return res.status(400).json({
-            message: `Minimum quantity ${dbProduct.offer.minQuantity} required to apply offer on ${dbProduct.name}`,
+            message: `Minimum quantity ${dbProduct.offer.minQuantity} required for offer on ${dbProduct.name}`,
           });
         }
 
         if (dbProduct.offer.type === "percentage") {
-          discountApplied = (price * item.quantity * dbProduct.offer.value) / 100;
+          discountApplied = (price * dbProduct.offer.value) / 100;
         } else if (dbProduct.offer.type === "fixed" || dbProduct.offer.type === "flat") {
-          discountApplied = dbProduct.offer.value * item.quantity; // multiply by quantity
+          discountApplied = dbProduct.offer.value;
         }
 
-        offerSnapshot = {
-          isActive: true,
-          type: dbProduct.offer.type,
-          value: dbProduct.offer.value,
-          discountApplied,
-        };
+        offerSnapshot = { isActive: true, type: dbProduct.offer.type, value: dbProduct.offer.value, discountApplied };
       }
 
-      itemsTotal += price * item.quantity - discountApplied;
+      subtotal += (price - discountApplied) * item.quantity;
 
       processedProducts.push({
         ...item,
@@ -78,53 +68,44 @@ export const placeOrder = async (req, res) => {
       deliveryTime = zone.deliveryTime;
     }
 
-    // 3️⃣ Coupon validation & discount
+    // 3️⃣ Apply coupon
     let appliedCoupon = null;
     let couponDiscount = 0;
     if (couponCode) {
       appliedCoupon = await Coupon.findOne({ code: couponCode });
       if (!appliedCoupon) return res.status(400).json({ message: "Invalid coupon" });
 
-      if (appliedCoupon.expiry && new Date() > appliedCoupon.expiry) {
+      if (appliedCoupon.expiry && new Date() > appliedCoupon.expiry)
         return res.status(400).json({ message: "Coupon expired" });
-      }
 
-      if (appliedCoupon.usedCount >= appliedCoupon.totalLimit) {
+      if (appliedCoupon.usedCount >= appliedCoupon.totalLimit)
         return res.status(400).json({ message: "Coupon usage limit reached" });
-      }
 
-      if (itemsTotal < appliedCoupon.minOrder) {
-        return res.status(400).json({
-          message: `Minimum order amount is ${appliedCoupon.minOrder}`,
-        });
-      }
+      if (appliedCoupon.minOrder && subtotal < appliedCoupon.minOrder)
+        return res.status(400).json({ message: `Minimum order amount is ${appliedCoupon.minOrder}` });
 
-      if (appliedCoupon.minQuantity && totalQuantity < appliedCoupon.minQuantity) {
-        return res.status(400).json({
-          message: `Minimum ${appliedCoupon.minQuantity} items required to use this coupon`,
-        });
-      }
+      if (appliedCoupon.minQuantity && totalQuantity < appliedCoupon.minQuantity)
+        return res.status(400).json({ message: `Minimum ${appliedCoupon.minQuantity} items required to use this coupon` });
 
       const userOrders = await Order.find({ user: userId, couponCode });
-      if (userOrders.length >= appliedCoupon.perUserLimit) {
+      if (userOrders.length >= appliedCoupon.perUserLimit)
         return res.status(400).json({ message: "You have already used this coupon" });
-      }
 
-      // ✅ Calculate coupon discount
       if (appliedCoupon.type.toLowerCase() === "percentage") {
-        couponDiscount = (itemsTotal * appliedCoupon.value) / 100;
+        couponDiscount = (subtotal * appliedCoupon.value) / 100;
       } else {
         couponDiscount = appliedCoupon.value;
       }
     }
 
-    // 4️⃣ Tax
+    // 4️⃣ Tax calculation AFTER offers & coupon
     const TAX_RATE = 0.1; // 10%
-    const taxAmount = itemsTotal * TAX_RATE;
+    const taxableAmount = subtotal - couponDiscount;
+    const taxAmount = Math.round(taxableAmount * TAX_RATE * 100) / 100;
 
     // 5️⃣ Final total
-    let finalTotal = itemsTotal + taxAmount + deliveryFee - couponDiscount;
-    finalTotal = Math.round(finalTotal * 100) / 100; // round to 2 decimals
+    let finalTotal = taxableAmount + taxAmount + deliveryFee;
+    finalTotal = Math.round(finalTotal * 100) / 100;
 
     // 6️⃣ Active offer product ID
     const activeOfferProduct = processedProducts.find((p) => p.offer?.isActive);
@@ -137,14 +118,18 @@ export const placeOrder = async (req, res) => {
       email,
       products: processedProducts,
       shippingAddress,
-      couponCode: appliedCoupon ? appliedCoupon.code : null,
-      itemsTotal: Math.round(itemsTotal * 100) / 100,
+      itemsTotal: Math.round(subtotal * 100) / 100,
       deliveryFee,
       deliveryTime,
-      taxAmount: Math.round(taxAmount * 100) / 100,
+      taxAmount,
       discount: Math.round(couponDiscount * 100) / 100,
       finalTotal,
+      couponCode: appliedCoupon ? appliedCoupon.code : null,
+      couponType: appliedCoupon ? appliedCoupon.type : null,
+      couponValue: appliedCoupon ? appliedCoupon.value : 0,
+      couponDiscount: Math.round(couponDiscount * 100) / 100,
       activeOffer: activeOfferId,
+      paymentMethod,
       status: "pending",
     };
 
@@ -152,10 +137,7 @@ export const placeOrder = async (req, res) => {
 
     // 8️⃣ Increment coupon usage
     if (appliedCoupon) {
-      await Coupon.updateOne(
-        { _id: appliedCoupon._id },
-        { $inc: { usedCount: 1 } }
-      );
+      await Coupon.updateOne({ _id: appliedCoupon._id }, { $inc: { usedCount: 1 } });
     }
 
     res.status(201).json(order);
@@ -164,7 +146,6 @@ export const placeOrder = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
-
 
 export const getOrderById = async (req, res) => {
   try {
@@ -242,33 +223,46 @@ export const updateOrderStatusByAdmin = async (req, res) => {
   try {
     const { status } = req.body;
 
-    const order = await Order.findByIdAndUpdate(
-      req.params.id,
-      { status },
-      { new: true }
-    );
-
+    const order = await Order.findById(req.params.id);
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    res.json({ message: "Order status updated", order });
+    // 🟢 Update status
+    order.status = status;
+
+    // 🟡 Auto-update paymentStatus if COD + Delivered
+    if (
+      status === "delivered" &&
+      order.paymentMethod === "COD" &&
+      order.paymentStatus === "pending"
+    ) {
+      order.paymentStatus = "paid";
+    }
+
+    await order.save();
+
+    res.json({ message: "Order status updated successfully", order });
   } catch (err) {
+    console.error("Error updating order status:", err);
     res.status(400).json({ message: err.message });
   }
 };
+// make sure correct path
 // GET /admin/orders/revenue
-; // make sure correct path
-
 export const getRevenue = async (req, res) => {
   try {
     const result = await Order.aggregate([
-      { $match: { status: "delivered" } }, // Only delivered orders
+      {
+        $match: {
+          paymentStatus: "paid", // ✅ बस ये check रखना है
+        },
+      },
       {
         $group: {
           _id: null,
           totalRevenue: { $sum: "$finalTotal" }, // sum of finalTotal
-          totalOrders: { $sum: 1 },             // count delivered orders
+          totalOrders: { $sum: 1 }, // count paid orders
         },
       },
     ]);

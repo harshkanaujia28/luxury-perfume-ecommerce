@@ -74,34 +74,36 @@ export function OrderManagement() {
   }
 
 
-  useEffect(() => {
-    fetchOrders()
-    fetchRevenue()
-  }, [])
-
   const fetchRevenue = async () => {
     try {
-      const data = await getRevenue(); // API call
+      const data = await getRevenue(); // ✅ API call
       setTotalRevenue(data.totalRevenue ?? 0);
       setTotalDeliveredOrders(data.totalOrders ?? 0);
-      console.log(data);
+      console.log("Revenue Data:", data);
     } catch (err) {
       console.error("Failed to fetch revenue", err);
     }
   };
+
+  useEffect(() => {
+    fetchOrders();
+    fetchRevenue();
+  }, []);
+
 
   const handleStatusUpdate = async (orderId: string, newStatus: string) => {
     try {
       await updateOrderStatusByAdmin(orderId, newStatus)
       toast({
         title: "Order Updated",
-        description: `Order ₹{orderId} status updated to ₹{newStatus}.`,
+        description: `Order ${orderId} status updated to ${newStatus}.`,
       })
       fetchOrders()
     } catch (err) {
       console.error("Failed to update order status", err)
     }
   }
+
 
   const handleViewOrder = (order: any) => {
     setSelectedOrder(order)
@@ -235,7 +237,7 @@ export function OrderManagement() {
                     }).format(totalRevenue)}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    ({totalDeliveredOrders} delivered orders)
+                    ({totalDeliveredOrders} Paid orders)
                   </p>
 
                 </div>
@@ -392,39 +394,36 @@ export function OrderManagement() {
             <div className="space-y-6">
 
               {/* Order Status */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <Card>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">Order Status</p>
-                    <Badge className={getStatusColor(selectedOrder.status)}>
-                      {selectedOrder.status}
-                    </Badge>
-                  </CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                {/* Order Status */}
+                <Card className=" border border-lime-500/30 shadow-md rounded-2xl flex flex-col justify-center items-center p-4">
+                  <p className="text-sm text-gray-400 mb-2">Order Status</p>
+                  <Badge className={getStatusColor(selectedOrder.status)}>
+                    {selectedOrder.status}
+                  </Badge>
                 </Card>
 
-                <Card>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">Payment Status</p>
-                    <Badge className={getPaymentStatusColor(selectedOrder.paymentStatus)}>
-                      {selectedOrder.paymentStatus}
-                    </Badge>
-                  </CardContent>
+                {/* Payment Status */}
+                <Card className=" border border-lime-500/30 shadow-md rounded-2xl flex flex-col justify-center items-center p-4">
+                  <p className="text-sm text-gray-400 mb-2">Payment Status</p>
+                  <Badge className={getPaymentStatusColor(selectedOrder.paymentStatus)}>
+                    {selectedOrder.paymentStatus}
+                  </Badge>
                 </Card>
 
-                <Card>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">Payment Method</p>
-                    <p className="font-medium">{selectedOrder.paymentMethod || "N/A"}</p>
-                  </CardContent>
+                {/* Payment Method */}
+                <Card className=" border border-lime-500/30 shadow-md rounded-2xl flex flex-col justify-center items-center p-4">
+                  <p className="text-sm text-gray-400 mb-2">Payment Method</p>
+                  <p className="font-medium">{selectedOrder.paymentMethod || "N/A"}</p>
                 </Card>
 
-                <Card>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">Order Date</p>
-                    <p className="font-medium">{new Date(selectedOrder.createdAt).toLocaleString()}</p>
-                  </CardContent>
+                {/* Order Date */}
+                <Card className="border border-lime-500/30 shadow-md rounded-2xl flex flex-col justify-center items-center p-4">
+                  <p className="text-sm text-gray-400 mb-2">Order Date</p>
+                  <p className="font-medium">{new Date(selectedOrder.createdAt).toLocaleString()}</p>
                 </Card>
               </div>
+
 
               {/* Customer Info */}
               <Card>
@@ -525,12 +524,13 @@ export function OrderManagement() {
                   )}
 
                   {/* Coupon Discount */}
-                  {selectedOrder.couponCode && (selectedOrder.discount || 0) > 0 && (
+                  {selectedOrder.couponCode && (selectedOrder.couponDiscount || 0) > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Coupon ({selectedOrder.couponCode})</span>
-                      <span>-₹{selectedOrder.discount.toFixed(2)}</span>
+                      <span>-₹{selectedOrder.couponDiscount.toFixed(2)}</span>
                     </div>
                   )}
+
 
 
                   {/* Tax */}

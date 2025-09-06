@@ -41,14 +41,20 @@ export const getReportData = async (req, res) => {
 
     // ===== Sales Trend aggregation (Orders, delivered only)
     const salesDataRaw = await Order.aggregate([
-      { $match: { status: "delivered", ...dateFilter } },
+      {
+        $match: {
+          status: "delivered",
+          paymentStatus: "paid", // ✅ सिर्फ़ paid orders
+          ...dateFilter,
+        },
+      },
       {
         $group: {
           _id: {
             year: { $year: "$createdAt" },
             month: { $month: "$createdAt" },
           },
-          revenue: { $sum: "$finalTotal" }, // ✅ finalTotal used
+          revenue: { $sum: "$finalTotal" },
           orders: { $sum: 1 },
         },
       },
@@ -82,7 +88,13 @@ export const getReportData = async (req, res) => {
 
     // ===== Users involved in orders (with order count + revenue)
     const userAgg = await Order.aggregate([
-      { $match: { status: "delivered", ...dateFilter } },
+      {
+        $match: {
+          status: "delivered",
+          paymentStatus: "paid", // ✅ सिर्फ़ paid orders
+          ...dateFilter,
+        },
+      },
       {
         $group: {
           _id: "$user",
@@ -117,10 +129,20 @@ export const getReportData = async (req, res) => {
     // ===== Overview
     const [totalOrders, totalRevenueAgg, totalUsers, totalProducts] =
       await Promise.all([
-        Order.countDocuments({ status: "delivered", ...dateFilter }),
+        Order.countDocuments({
+          status: "delivered",
+          paymentStatus: "paid",
+          ...dateFilter,
+        }),
         Order.aggregate([
-          { $match: { status: "delivered", ...dateFilter } },
-          { $group: { _id: null, total: { $sum: "$finalTotal" } } }, // ✅ finalTotal
+          {
+            $match: {
+              status: "delivered",
+              paymentStatus: "paid",
+              ...dateFilter,
+            },
+          },
+          { $group: { _id: null, total: { $sum: "$finalTotal" } } },
         ]),
         User.countDocuments(),
         Product.countDocuments(),
@@ -135,12 +157,17 @@ export const getReportData = async (req, res) => {
 
     // ===== Payments
     const payments = await Order.aggregate([
-      { $match: dateFilter },
+      {
+        $match: {
+          paymentStatus: "paid", // ✅ sirf paid orders
+          ...dateFilter,
+        },
+      },
       {
         $group: {
-          _id: "$status",
+          _id: "$status", // delivered, shipped etc
           count: { $sum: 1 },
-          amount: { $sum: "$finalTotal" }, // ✅ finalTotal
+          amount: { $sum: "$finalTotal" },
         },
       },
       {

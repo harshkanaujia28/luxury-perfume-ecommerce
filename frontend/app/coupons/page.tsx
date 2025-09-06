@@ -439,7 +439,7 @@ export default function CouponsPage() {
                       {coupon.type === "Percentage" ? `${coupon.value}%` : `$${coupon.value}`}
                     </TableCell>
                     <TableCell>{coupon.minOrder || "-"}</TableCell>
-                    <TableCell>{coupon.usage || "-"}</TableCell>
+                    <TableCell>{coupon.usedCount || "-"}</TableCell>
                     <TableCell>{coupon.perUserLimit || "-"}</TableCell>
 
                     <TableCell>

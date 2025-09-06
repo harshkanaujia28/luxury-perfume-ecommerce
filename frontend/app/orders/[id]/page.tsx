@@ -192,8 +192,9 @@ export default function OrderDetailPage() {
                     {latestStatus
                       ? new Date(latestStatus.updatedAt).toLocaleString()
                       : "N/A"}{" "}
-                    • Estimated delivery within 15–20 business days
+                    • Estimated delivery with in {order?.deliveryTime || "N/A"}
                   </span>
+
                 </div>
               </div>
 
@@ -260,7 +261,7 @@ export default function OrderDetailPage() {
                           </p>
                         )}
                         <Link
-                          href={`/product/${p.product._id}`}
+                          href={`/products/${p.product._id}`}
                           className="text-lime-400 hover:underline text-xs"
                         >
                           View Details

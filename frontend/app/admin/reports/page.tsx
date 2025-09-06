@@ -137,6 +137,7 @@ export default function ReportsPage() {
         setLoading(true);
         const data = await getReportData(range as any);
         setReport(data as ReportResponse);
+        console.log(data);
       } catch (e) {
         console.error("Failed to load report", e);
       } finally {
@@ -162,10 +163,16 @@ export default function ReportsPage() {
 
   const users = report?.users ?? [];
 
-  const formattedRevenue = useMemo(
-    () => (overview.totalRevenue || 0).toLocaleString("en-IN", { style: "currency", currency: "INR" }),
-    [overview.totalRevenue]
-  );
+  const formatCurrency = (amount: number) => {
+    return amount.toLocaleString("en-IN", {
+      style: "currency",
+      currency: "INR",
+    });
+  };
+const formattedRevenue = useMemo(
+  () => formatCurrency(overview.totalRevenue || 0),
+  [overview.totalRevenue]
+);
 
   const fragranceCategoryData = useMemo(() => {
     const buckets: Record<string, { name: string; value: number }> = {};
@@ -223,103 +230,103 @@ export default function ReportsPage() {
 
   // ===== Export: PDF with tables =====
   // ===== Export: PDF with tables =====
-const handleExportPDF = () => {
-  if (!report) return;
-  const doc = new jsPDF({ orientation: "p", unit: "pt", format: "a4" });
+  const handleExportPDF = () => {
+    if (!report) return;
+    const doc = new jsPDF({ orientation: "p", unit: "pt", format: "a4" });
 
-  const addHeader = (title: string) => {
-    doc.setFontSize(14);
-    doc.text(title, 40, doc.lastAutoTable ? (doc as any).lastAutoTable.finalY + 40 : 40);
+    const addHeader = (title: string) => {
+      doc.setFontSize(14);
+      doc.text(title, 40, doc.lastAutoTable ? (doc as any).lastAutoTable.finalY + 40 : 40);
+    };
+
+    // 1) Overview
+    addHeader("Overview");
+    autoTable(doc, {
+      startY: 60,
+      head: [["Total Revenue", "Total Orders", "Total Users", "Total Products"]],
+      body: [[
+        formattedRevenue,
+        String(overview.totalOrders ?? 0),
+        String(overview.totalUsers ?? 0),
+        String(overview.totalProducts ?? 0),
+      ]],
+      styles: { fontSize: 9 },
+    });
+
+    // 2) Sales
+    addHeader("Sales Trend");
+    autoTable(doc, {
+      head: [["Month", "Revenue (₹)", "Orders", "Customers"]],
+      body: timeSeries.map((s) => [s.month, s.revenue, s.orders, s.customers ?? 0]),
+      styles: { fontSize: 9 },
+    });
+
+    // 3) Products
+    addHeader("Products");
+    autoTable(doc, {
+      head: [["Name", "Brand", "Price", "Revenue", "Units", "Gender", "Type", "Subcategory"]],
+      body: (report.products ?? []).map((p) => [
+        p.name,
+        p.brand ?? "",
+        p.price ?? "",
+        p.revenue ?? "",
+        p.unitsSold ?? "",
+        p.category?.gender ?? "",
+        p.category?.type ?? "",
+        p.category?.subCategory ?? "",
+      ]),
+      styles: { fontSize: 8 },
+      columnStyles: { 0: { cellWidth: 150 } },
+    });
+
+    // 4) Brands
+    addHeader("Brands");
+    autoTable(doc, {
+      head: [["Name", "Description", "Fragrances"]],
+      body: (report.brands ?? []).map((b) => [b.name, b.description ?? "", b.fragrances ?? 0]),
+      styles: { fontSize: 9 },
+    });
+
+    // 5) Vendors
+    addHeader("Vendors");
+    autoTable(doc, {
+      head: [["Name", "Email", "Phone", "Orders", "On-time %", "Avg Delivery"]],
+      body: (report.vendors ?? []).map((v) => [
+        v.name,
+        v.email ?? "",
+        v.phone ?? "",
+        v.orders ?? 0,
+        v.onTimeDelivery ?? 0,
+        v.avgDeliveryTime ?? 0,
+      ]),
+      styles: { fontSize: 9 },
+    });
+
+    // 6) Payments
+    addHeader("Payments");
+    autoTable(doc, {
+      head: [["Status", "Count", "Amount (₹)"]],
+      body: (report.payments ?? []).map((p) => [p.status, p.count, p.amount]),
+      styles: { fontSize: 9 },
+    });
+
+    // 7) Customers 👈 NEW
+    addHeader("Customers");
+    autoTable(doc, {
+      head: [["Name", "Email", "Joined", "Orders", "Revenue (₹)"]],
+      body: (report.users ?? []).map((u) => [
+        u.name,
+        u.email,
+        new Date(u.createdAt).toLocaleDateString("en-IN"),
+        u.orders ?? 0,
+        (u.revenue ?? 0).toLocaleString("en-IN", { style: "currency", currency: "INR" }),
+      ]),
+      styles: { fontSize: 9 },
+      columnStyles: { 0: { cellWidth: 120 }, 1: { cellWidth: 150 } },
+    });
+
+    doc.save(`report-${range}.pdf`);
   };
-
-  // 1) Overview
-  addHeader("Overview");
-  autoTable(doc, {
-    startY: 60,
-    head: [["Total Revenue", "Total Orders", "Total Users", "Total Products"]],
-    body: [[
-      formattedRevenue,
-      String(overview.totalOrders ?? 0),
-      String(overview.totalUsers ?? 0),
-      String(overview.totalProducts ?? 0),
-    ]],
-    styles: { fontSize: 9 },
-  });
-
-  // 2) Sales
-  addHeader("Sales Trend");
-  autoTable(doc, {
-    head: [["Month", "Revenue (₹)", "Orders", "Customers"]],
-    body: timeSeries.map((s) => [s.month, s.revenue, s.orders, s.customers ?? 0]),
-    styles: { fontSize: 9 },
-  });
-
-  // 3) Products
-  addHeader("Products");
-  autoTable(doc, {
-    head: [["Name", "Brand", "Price", "Revenue", "Units", "Gender", "Type", "Subcategory"]],
-    body: (report.products ?? []).map((p) => [
-      p.name,
-      p.brand ?? "",
-      p.price ?? "",
-      p.revenue ?? "",
-      p.unitsSold ?? "",
-      p.category?.gender ?? "",
-      p.category?.type ?? "",
-      p.category?.subCategory ?? "",
-    ]),
-    styles: { fontSize: 8 },
-    columnStyles: { 0: { cellWidth: 150 } },
-  });
-
-  // 4) Brands
-  addHeader("Brands");
-  autoTable(doc, {
-    head: [["Name", "Description", "Fragrances"]],
-    body: (report.brands ?? []).map((b) => [b.name, b.description ?? "", b.fragrances ?? 0]),
-    styles: { fontSize: 9 },
-  });
-
-  // 5) Vendors
-  addHeader("Vendors");
-  autoTable(doc, {
-    head: [["Name", "Email", "Phone", "Orders", "On-time %", "Avg Delivery"]],
-    body: (report.vendors ?? []).map((v) => [
-      v.name,
-      v.email ?? "",
-      v.phone ?? "",
-      v.orders ?? 0,
-      v.onTimeDelivery ?? 0,
-      v.avgDeliveryTime ?? 0,
-    ]),
-    styles: { fontSize: 9 },
-  });
-
-  // 6) Payments
-  addHeader("Payments");
-  autoTable(doc, {
-    head: [["Status", "Count", "Amount (₹)"]],
-    body: (report.payments ?? []).map((p) => [p.status, p.count, p.amount]),
-    styles: { fontSize: 9 },
-  });
-
-  // 7) Customers 👈 NEW
-  addHeader("Customers");
-  autoTable(doc, {
-    head: [["Name", "Email", "Joined", "Orders", "Revenue (₹)"]],
-    body: (report.users ?? []).map((u) => [
-      u.name,
-      u.email,
-      new Date(u.createdAt).toLocaleDateString("en-IN"),
-      u.orders ?? 0,
-      (u.revenue ?? 0).toLocaleString("en-IN", { style: "currency", currency: "INR" }),
-    ]),
-    styles: { fontSize: 9 },
-    columnStyles: { 0: { cellWidth: 120 }, 1: { cellWidth: 150 } },
-  });
-
-  doc.save(`report-${range}.pdf`);
-};
 
 
   if (loading) {
