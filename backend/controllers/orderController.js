@@ -31,19 +31,34 @@ export const placeOrder = async (req, res) => {
       totalQuantity += item.quantity;
 
       if (dbProduct.offer && dbProduct.offer.isActive) {
+        // ✅ minQuantity check
         if (item.quantity < (dbProduct.offer.minQuantity || 1)) {
           return res.status(400).json({
             message: `Minimum quantity ${dbProduct.offer.minQuantity} required for offer on ${dbProduct.name}`,
           });
         }
 
+        // ✅ discount calc
         if (dbProduct.offer.type === "percentage") {
           discountApplied = (price * dbProduct.offer.value) / 100;
-        } else if (dbProduct.offer.type === "fixed" || dbProduct.offer.type === "flat") {
+        } else if (["fixed", "flat"].includes(dbProduct.offer.type)) {
           discountApplied = dbProduct.offer.value;
         }
 
-        offerSnapshot = { isActive: true, type: dbProduct.offer.type, value: dbProduct.offer.value, discountApplied };
+        // ✅ snapshot for order record
+        offerSnapshot = { 
+          isActive: true, 
+          type: dbProduct.offer.type, 
+          value: dbProduct.offer.value, 
+          discountApplied 
+        };
+
+        // ✅ usage update
+        dbProduct.offer.usedCount = (dbProduct.offer.usedCount || 0) + 1;
+        if (dbProduct.offer.maxUses && dbProduct.offer.usedCount >= dbProduct.offer.maxUses) {
+          dbProduct.offer.isActive = false;
+        }
+        await dbProduct.save();
       }
 
       subtotal += (price - discountApplied) * item.quantity;
@@ -146,6 +161,7 @@ export const placeOrder = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
+
 
 export const getOrderById = async (req, res) => {
   try {

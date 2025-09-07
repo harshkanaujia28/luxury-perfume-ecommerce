@@ -294,7 +294,7 @@ export default function CouponsPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="min-order">Minimum Order</Label>
+                    <Label htmlFor="min-order">Minimum Order Ammount(₹) </Label>
                     <Input
                       id="min-order"
                       type="number"
@@ -799,7 +799,7 @@ export default function CouponsPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="edit-min-order">Minimum Order</Label>
+                    <Label htmlFor="edit-min-order">Minimum Order Ammount(₹)</Label>
                     <Input
                       id="edit-min-order"
                       value={editingCoupon.minOrder}
