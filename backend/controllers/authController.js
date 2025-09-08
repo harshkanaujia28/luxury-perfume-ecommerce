@@ -189,11 +189,23 @@ export const getProfile = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
-    const { name, phone, address, city, state, country, password } = req.body;
+    const { name, phone, email, address, city, state, country, password } = req.body;
 
     const user = await User.findById(req.user.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
+    // 🔹 Email update with duplicate check
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
+      user.email = email;
+    }
+
+    // 🔹 Update other profile fields
     user.name = name || user.name;
     user.phone = phone || user.phone;
     user.address = address || user.address;
@@ -201,17 +213,20 @@ export const updateProfile = async (req, res) => {
     user.state = state || user.state;
     user.country = country || user.country;
 
+    // 🔹 Password update (plain set, pre-save hook will hash)
     if (password) {
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(password, salt);
+      user.password = password;
     }
 
     await user.save();
 
+    // 🔹 Return updated profile without password
     const updatedUser = await User.findById(user._id).select("-password");
     res.json({ user: updatedUser });
+
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
 

@@ -55,7 +55,7 @@ export default function AdminProfilePage() {
   const [newPassword, setNewPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [didInit, setDidInit] = useState(false)
-
+  const [email, setEmail] = useState("")
 
   const { toast } = useToast()
 
@@ -87,86 +87,88 @@ export default function AdminProfilePage() {
         setFirstName(nameParts[0])
         setLastName(nameParts.slice(1).join(" "))
       }
+      setEmail(user.email || "")   // ✅ email bhi set karo
       setPhone(user.phone || "")
       setAddress(user.address || "")
       setCity(user.city || "")
       setState(user.state || "")
       setCountry(user.country || "")
-      setDidInit(true) // ✅ Prevent future resets
+      setDidInit(true)
     }
   }, [user, didInit])
 
 
 
 
-const handleSave = async () => {
-  console.log("handleSave called")
+  const handleSave = async () => {
+    console.log("handleSave called")
 
-  if (!user) return
+    if (!user) return
 
-  const name = `${firstName.trim()} ${lastName.trim()}`.trim()
+    const name = `${firstName.trim()} ${lastName.trim()}`.trim()
 
-  if (!name) {
-    toast({
-      title: "Name Required",
-      description: "Please enter at least a first name.",
-      variant: "destructive",
-    })
-    return
-  }
-
-  if (newPassword && newPassword !== confirmPassword) {
-    toast({
-      title: "Password Mismatch",
-      description: "New password and confirmation do not match.",
-      variant: "destructive",
-    })
-    return
-  }
-
-  const payload = {
-    name,
-    phone: phone.trim(),
-    address: address.trim(),
-    city: city.trim(),
-    state: state.trim(),
-    country: country.trim(),
-    password: newPassword || undefined,
-  }
-
-  console.log("Sending update:", payload)
-
-  try {
-    const updated = await updateProfile(payload)
-    console.log("Updated user:", updated)
-
-    if (!updated || !updated._id) {
+    if (!name) {
       toast({
-        title: "Unexpected Response",
-        description: "Server did not return updated user.",
+        title: "Name Required",
+        description: "Please enter at least a first name.",
         variant: "destructive",
       })
       return
     }
 
-    setUser(updated)
-    setNewPassword("")
-    setConfirmPassword("")
+    if (newPassword && newPassword !== confirmPassword) {
+      toast({
+        title: "Password Mismatch",
+        description: "New password and confirmation do not match.",
+        variant: "destructive",
+      })
+      return
+    }
 
-    toast({
-      title: "Profile Updated",
-      description: "Your profile details have been saved.",
-    })
-  } catch (error: any) {
-    console.error("Update error:", error?.response?.data || error.message || error)
+    const payload = {
+      name,
+      email: email.trim(),  // ✅ added email
+      phone: phone.trim(),
+      address: address.trim(),
+      city: city.trim(),
+      state: state.trim(),
+      country: country.trim(),
+      password: newPassword || undefined,
+    }
 
-    toast({
-      title: "Update Failed",
-      description: error?.response?.data?.message || "There was a problem saving your profile.",
-      variant: "destructive",
-    })
+    console.log("Sending update:", payload)
+
+    try {
+      const updated = await updateProfile(payload)
+      console.log("Updated user:", updated)
+
+      if (!updated || !updated._id) {
+        toast({
+          title: "Unexpected Response",
+          description: "Server did not return updated user.",
+          variant: "destructive",
+        })
+        return
+      }
+
+      setUser(updated)
+      setNewPassword("")
+      setConfirmPassword("")
+
+      toast({
+        title: "Profile Updated",
+        description: "Your profile details have been saved.",
+      })
+    } catch (error: any) {
+      console.error("Update error:", error?.response?.data || error.message || error)
+
+      toast({
+        title: "Update Failed",
+        description: error?.response?.data?.message || "There was a problem saving your profile.",
+        variant: "destructive",
+      })
+    }
   }
-}
 
   if (!user) {
     return (
@@ -195,10 +197,10 @@ const handleSave = async () => {
         </div>
 
         <Tabs defaultValue="personal" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="personal">Personal Info</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
-            <TabsTrigger value="preferences">Preferences</TabsTrigger>
+            {/* <TabsTrigger value="preferences">Preferences</TabsTrigger> */}
           </TabsList>
 
           <TabsContent value="personal">
@@ -219,7 +221,17 @@ const handleSave = async () => {
                   </div>
                 </div>
 
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
                   <div className="space-y-2">
                     <Label htmlFor="phone">Phone</Label>
                     <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} />
@@ -276,7 +288,7 @@ const handleSave = async () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="preferences">
+          {/* <TabsContent value="preferences">
             <Card>
               <CardHeader>
                 <CardTitle>Preferences</CardTitle>
@@ -292,7 +304,7 @@ const handleSave = async () => {
                 </div>
               </CardContent>
             </Card>
-          </TabsContent>
+          </TabsContent> */}
         </Tabs>
       </div>
     </div>

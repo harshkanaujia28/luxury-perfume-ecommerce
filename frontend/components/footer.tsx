@@ -18,10 +18,10 @@ export function Footer() {
               <Link href="#" className="text-gray-500 hover:text-lime-400 transition">
                 <Facebook className="w-5 h-5" />
               </Link>
-              <Link href="#" className="text-gray-500 hover:text-lime-400 transition">
+              {/* <Link href="#" className="text-gray-500 hover:text-lime-400 transition">
                 <Twitter className="w-5 h-5" />
-              </Link>
-              <Link href="#" className="text-gray-500 hover:text-lime-400 transition">
+              </Link> */}
+              <Link href="https://www.instagram.com/zafr_ine/" className="text-gray-500 hover:text-lime-400 transition">
                 <Instagram className="w-5 h-5" />
               </Link>
               <Link href="#" className="text-gray-500 hover:text-lime-400 transition">
@@ -48,7 +48,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li><Link href="/shipping-policy" className="hover:text-lime-300">Shipping Policy</Link></li>
               <li><Link href="/cancellation-refund" className="hover:text-lime-300">Cancellation & Refund</Link></li>
-              <li><Link href="/returns" className="hover:text-lime-300">Returns</Link></li>
+              {/* <li><Link href="/returns" className="hover:text-lime-300">Returns</Link></li> */}
               <li><Link href="/faq" className="hover:text-lime-300">FAQ</Link></li>
               <li><Link href="/size-guide" className="hover:text-lime-300">Size Guide</Link></li>
               <li><Link href="/support" className="hover:text-lime-300">Support</Link></li>

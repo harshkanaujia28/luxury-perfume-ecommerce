@@ -459,28 +459,13 @@ export default function ProductDetailPage() {
                     <Share2 className="w-5 h-5" />
                   </Button>
                 </div>
-                {/* <div className="space-y-2">
-                  <input
-                    type="text"
-                    placeholder="Enter Pincode"
-                    value={pincode}
-                    onChange={(e) => setPincode(e.target.value)}
-                    className="border p-2 rounded"
-                  />
-                  <button
-                    onClick={checkDelivery}
-                    disabled={loading}
-                    className="bg-blue-600 text-white px-4 py-2 rounded"
-                  >
-                    {loading ? "Checking..." : "Check Delivery"}
-                  </button>
+                <div className="mt-4 p-3 border border-yellow-400 bg-yellow-50 rounded">
+                  <p className="text-sm text-yellow-800 font-medium">
+                    ⚠️ Please note: All purchases are final. No returns or refunds will be
+                    provided once the order is placed.
+                  </p>
+                </div>
 
-                  {/* Error message */}
-                  {/* {error && <p className="text-red-500">{error}</p>} */}
-
-                  {/* ✅ Success message */}
-                  {/* {success && <p className="text-green-500">{success}</p>} */}
-                {/* </div>  */}
 
               </div>
               <div className="flex items-center space-x-4 mb-4">
