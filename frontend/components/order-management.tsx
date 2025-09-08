@@ -97,6 +97,7 @@ export function OrderManagement() {
       toast({
         title: "Order Updated",
         description: `Order ${orderId} status updated to ${newStatus}.`,
+        variant:"success",
       })
       fetchOrders()
     } catch (err) {

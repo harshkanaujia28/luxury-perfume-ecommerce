@@ -109,15 +109,24 @@ export default function CheckoutPage() {
             result.type === "Percentage"
               ? `${result.value}% discount applied`
               : `₹${result.value} discount applied`,
-          variant: "default",
+          variant: "success",
         });
       } else {
+        let variant: "destructive" | "warning" | "info" = "destructive";
+
+        if (result.message?.toLowerCase().includes("expired")) {
+          variant = "warning"; // coupon expired
+        } else if (result.message?.toLowerCase().includes("limit")) {
+          variant = "warning"; // usage limit reached / per-user limit
+        } else if (result.message?.toLowerCase().includes("minimum")) {
+          variant = "info"; // min order / min quantity not met
+        }
         setCouponValue(0);
         setCouponType(null);
         toast({
-          title: "Invalid Coupon",
+          title: "Coupon Error",
           description: result.message || "Coupon is not valid.",
-          variant: "destructive",
+          variant,
         });
       }
     } catch (err: any) {
@@ -135,7 +144,15 @@ export default function CheckoutPage() {
 
   // ✅ Check Delivery (Pincode)
   const checkDelivery = async () => {
-    if (!pincode) return setError("Please enter a pincode");
+    if (!pincode) {
+      toast({
+        title: "Pincode Required",
+        description: "Please enter a pincode to check delivery.",
+        variant: "info", // ✅ info because user input missing
+      });
+      return;
+    }
+
     setLoading(true);
     setError("");
     setSuccess("");
@@ -151,19 +168,41 @@ export default function CheckoutPage() {
         });
         setSuccess("✅ Great news! Delivery is available in your area.");
         setError("");
+
+        toast({
+          title: "Delivery Available 🎉",
+          description: `We deliver to your area. Delivery fee: ₹${res.data.deliveryFee}, Time: ${res.data.deliveryTime}`,
+          variant: "success", // ✅ success when available
+        });
       } else {
         setDelivery(null);
         setError(res.data.message || "❌ Sorry, we currently don't deliver to this pincode.");
         setSuccess("");
+
+        toast({
+          title: "Delivery Unavailable",
+          description: res.data.message || "Sorry, we don't deliver to this pincode.",
+          variant: "warning", // ✅ warning because condition unmet
+        });
       }
     } catch (err: any) {
       console.error(err);
-      setError(err.response?.data?.message ? `❌ ${err.response.data.message}` : "❌ Something went wrong! Please try again later.");
+      const errorMessage =
+        err.response?.data?.message || "Something went wrong! Please try again later.";
+
+      setError(`❌ ${errorMessage}`);
       setSuccess("");
+
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive", // ✅ destructive for server errors
+      });
     } finally {
       setLoading(false);
     }
   };
+
 
   // ✅ Place Order
   const handleSubmit = async (e: React.FormEvent) => {
@@ -183,15 +222,15 @@ export default function CheckoutPage() {
     try {
       await updateProfile(profileData);
 
-        const totalOfferDiscount = state.items.reduce((sum, item) => {
-      const price = item.price ?? item.product?.price ?? 0;
-      let discount = 0;
-      if (item.offer?.isActive) {
-        if (item.offer.type === "Percentage") discount = (price * item.offer.value) / 100;
-        else if (["Flat", "Fixed"].includes(item.offer.type)) discount = item.offer.value;
-      }
-      return sum + discount * item.quantity;
-    }, 0);
+      const totalOfferDiscount = state.items.reduce((sum, item) => {
+        const price = item.price ?? item.product?.price ?? 0;
+        let discount = 0;
+        if (item.offer?.isActive) {
+          if (item.offer.type === "Percentage") discount = (price * item.offer.value) / 100;
+          else if (["Flat", "Fixed"].includes(item.offer.type)) discount = item.offer.value;
+        }
+        return sum + discount * item.quantity;
+      }, 0);
 
       const products = state.items.map((item) => ({
         product: item.product?._id || item._id || item.productId,
@@ -268,7 +307,7 @@ export default function CheckoutPage() {
                   paymentMethod: "Razorpay",
                   paymentStatus: "paid",
                 });
-                toast({ title: "Payment Successful 🎉", description: "Your order has been placed successfully!" });
+                toast({ title: "Payment Successful 🎉", description: "Your order has been placed successfully!", variant: "success" });
                 clearCart();
                 router.push("/orders");
               } catch (err: any) {
@@ -288,7 +327,7 @@ export default function CheckoutPage() {
         }
       } else {
         await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/orders`, { ...orderPayload, paymentMethod: "COD", paymentStatus: "pending" });
-        toast({ title: "Order Placed", description: "Your order has been placed successfully!" });
+        toast({ title: "Order Placed", description: "Your order has been placed successfully!", variant: "success" });
         clearCart();
         router.push("/orders");
       }

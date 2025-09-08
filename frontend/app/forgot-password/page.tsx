@@ -23,7 +23,7 @@ export default function ForgotPasswordPage() {
       toast({
         title: data.status === "success" ? "Success" : "Error",
         description: data.message,
-        variant: data.status === "success" ? "default" : "destructive",
+        variant: "success",
       });
     } catch (err: any) {
       toast({

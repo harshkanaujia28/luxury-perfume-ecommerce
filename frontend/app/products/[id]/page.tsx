@@ -123,6 +123,7 @@ export default function ProductDetailPage() {
       toast({
         title: "Added to cart",
         description: `${quantity} ${product.name} added at ₹${finalPrice.toFixed(2)}`,
+        variant: "success",
       });
       console.log("Adding to cart with:", {
         id: product._id,
@@ -188,6 +189,7 @@ export default function ProductDetailPage() {
       toast({
         title: "Success",
         description: data.message || "Review submitted successfully",
+        variant: "success",
       });
     } catch (err: any) {
       console.error("Review error:", err);
@@ -394,46 +396,55 @@ export default function ProductDetailPage() {
                   <Button
                     size="lg"
                     className="flex-1 w-full bg-lime-500 hover:bg-lime-400 text-white"
-                    disabled={!selectedSize}
                     onClick={async () => {
+
+
                       if (!selectedSize) {
                         toast({
-                          title: "Please select quantity",
-                          variant: "destructive",
-                        });
-                        return;
-                      }
+                          title: "Missing Quantity",
+                          description: "Please select a quantity before buying.",
+                          variant: "destructive", // 👈 red error tone
+                        })
 
-                      const originalPrice = product.price;
-                      let finalPrice = originalPrice;
+                        return
+                      }
+                      const originalPrice = product.price
+                      let finalPrice = originalPrice
 
                       if (product.offer?.isActive) {
                         if (product.offer.type === "percentage") {
-                          finalPrice = originalPrice - (originalPrice * product.offer.value) / 100;
+                          finalPrice =
+                            originalPrice - (originalPrice * product.offer.value) / 100
                         } else if (product.offer.type === "fixed") {
-                          finalPrice = originalPrice - product.offer.value;
+                          finalPrice = originalPrice - product.offer.value
                         }
                       }
-
-                      try {
-                        await addToCart(product._id, quantity, selectedSize, finalPrice);
+                          try {
+                        await addToCart(product._id, quantity, selectedSize, finalPrice)
                         toast({
                           title: "Added to cart",
-                          description: `${quantity} ${product.name} added at ₹${finalPrice.toFixed(2)}`,
-                        });
-                        window.location.href = "/checkout";
+                          description: `${quantity} ${product.name} added at ₹${finalPrice.toFixed(
+                            2
+                          )}`,
+                          variant: "success"
+                        })
+                        window.location.href = "/checkout"
                       } catch (err) {
-                        console.error(err);
+                        
+                        
+                        console.error(err)
                         toast({
                           title: "Error",
                           description: "Failed to add product to cart",
                           variant: "destructive",
-                        });
+                        })
                       }
                     }}
                   >
                     Buy Now
                   </Button>
+
+
 
 
                   <Button

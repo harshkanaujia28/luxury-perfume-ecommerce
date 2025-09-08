@@ -64,6 +64,7 @@ export default function SupportPage() {
       toast({
         title: "Support ticket created!",
         description: "We've received your request and will respond within 24 hours.",
+        variant: "success",
       });
 
       // Reset form

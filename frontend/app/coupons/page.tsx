@@ -169,6 +169,7 @@ export default function CouponsPage() {
       toast({
         title: "Coupon updated",
         description: "Coupon has been updated successfully.",
+        variant: "success",
       });
     } catch (error) {
       console.error("Failed to update coupon", error)
@@ -215,7 +216,7 @@ export default function CouponsPage() {
     try {
       await deleteCoupon(id)
       setCoupons((prev) => prev.filter((c) => c._id !== id))
-      toast({ title: "Coupon deleted", description: "Coupon has been deleted successfully." });
+      toast({ title: "Coupon deleted", description: "Coupon has been deleted successfully.",variant:"success" });
     } catch (error) {
       console.error("Failed to delete coupon", error)
     }

@@ -284,6 +284,7 @@ export default function UpdateProductDialog({ product, trigger, onUpdate, onClos
             toast({
                 title: "Product updated",
                 description: `${updatedProduct.name} was updated successfully.`,
+                variant: "success",
             });
 
             if (onUpdate) onUpdate(updatedProduct);

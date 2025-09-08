@@ -42,6 +42,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     toast({
       title: "Message sent!",
       description: "Thank you for contacting us. We'll get back to you soon.",
+      variant: "success",
     })
 
     setFormData({ name: "", email: "", subject: "", message: "" })

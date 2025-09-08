@@ -49,6 +49,7 @@ export default function RegisterPage() {
       toast({
         title: "OTP Sent",
         description: `A 6-digit OTP was sent to ${email}.`,
+        variant: "info",
       });
       setStep("otp");
     } catch (error: any) {
@@ -85,6 +86,7 @@ export default function RegisterPage() {
       toast({
         title: "Registration Successful",
         description: `Welcome, ${name}!`,
+        variant:"success"
       });
       router.push("/login");
     } catch (error: any) {

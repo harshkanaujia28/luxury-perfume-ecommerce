@@ -155,6 +155,7 @@ const handleToggleZone = async (zoneId: string) => {
     toast({
       title: "Zone Updated",
       description: "Delivery zone status has been updated successfully.",
+      variant: "success",
     })
   } catch (error) {
     console.error("Toggle status failed:", error)
@@ -223,6 +224,7 @@ const handleEditZone = (zone: DeliveryZone) => {
       toast({
         title: "Zone Updated",
         description: "Delivery zone has been updated successfully.",
+        variant: "success",
       })
       console.log("Editing zone:", zones)
 

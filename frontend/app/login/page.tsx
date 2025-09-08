@@ -34,6 +34,7 @@ export default function LoginPage() {
       toast({
         title: "Login successful",
         description: `Welcome back, ${user.name || user.role}!`,
+        variant: "success",
       });
 
       await refreshCart();

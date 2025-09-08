@@ -111,7 +111,7 @@ export default function AdminProfilePage() {
       toast({
         title: "Name Required",
         description: "Please enter at least a first name.",
-        variant: "destructive",
+        variant: "info",
       })
       return
     }
@@ -120,7 +120,7 @@ export default function AdminProfilePage() {
       toast({
         title: "Password Mismatch",
         description: "New password and confirmation do not match.",
-        variant: "destructive",
+        variant: "warning",
       })
       return
     }
@@ -158,6 +158,7 @@ export default function AdminProfilePage() {
       toast({
         title: "Profile Updated",
         description: "Your profile details have been saved.",
+        variant: "success",
       })
     } catch (error: any) {
       console.error("Update error:", error?.response?.data || error.message || error)
