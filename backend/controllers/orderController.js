@@ -4,7 +4,8 @@ import { Coupon } from "../models/couponModel.js";
 import Zone from "../models/Zone.js";
 import Offer from "../models/Offer.js";
 import Product from "../models/Product.js";
-
+import { getOrderEmailTemplate } from "../utils/emailTemplates.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
 export const placeOrder = async (req, res) => {
   try {
@@ -22,11 +23,19 @@ export const placeOrder = async (req, res) => {
     // 1️⃣ Process products & apply product-level offers
     for (const item of products) {
       const dbProduct = await Product.findById(item.product);
-      if (!dbProduct) return res.status(400).json({ message: `Product not found: ${item.product}` });
+      if (!dbProduct)
+        return res
+          .status(400)
+          .json({ message: `Product not found: ${item.product}` });
 
       let price = dbProduct.price;
       let discountApplied = 0;
-      let offerSnapshot = { isActive: false, type: null, value: 0, discountApplied: 0 };
+      let offerSnapshot = {
+        isActive: false,
+        type: null,
+        value: 0,
+        discountApplied: 0,
+      };
 
       totalQuantity += item.quantity;
 
@@ -46,16 +55,19 @@ export const placeOrder = async (req, res) => {
         }
 
         // ✅ snapshot for order record
-        offerSnapshot = { 
-          isActive: true, 
-          type: dbProduct.offer.type, 
-          value: dbProduct.offer.value, 
-          discountApplied 
+        offerSnapshot = {
+          isActive: true,
+          type: dbProduct.offer.type,
+          value: dbProduct.offer.value,
+          discountApplied,
         };
 
         // ✅ usage update
         dbProduct.offer.usedCount = (dbProduct.offer.usedCount || 0) + 1;
-        if (dbProduct.offer.maxUses && dbProduct.offer.usedCount >= dbProduct.offer.maxUses) {
+        if (
+          dbProduct.offer.maxUses &&
+          dbProduct.offer.usedCount >= dbProduct.offer.maxUses
+        ) {
           dbProduct.offer.isActive = false;
         }
         await dbProduct.save();
@@ -88,7 +100,8 @@ export const placeOrder = async (req, res) => {
     let couponDiscount = 0;
     if (couponCode) {
       appliedCoupon = await Coupon.findOne({ code: couponCode });
-      if (!appliedCoupon) return res.status(400).json({ message: "Invalid coupon" });
+      if (!appliedCoupon)
+        return res.status(400).json({ message: "Invalid coupon" });
 
       if (appliedCoupon.expiry && new Date() > appliedCoupon.expiry)
         return res.status(400).json({ message: "Coupon expired" });
@@ -97,14 +110,27 @@ export const placeOrder = async (req, res) => {
         return res.status(400).json({ message: "Coupon usage limit reached" });
 
       if (appliedCoupon.minOrder && subtotal < appliedCoupon.minOrder)
-        return res.status(400).json({ message: `Minimum order amount is ${appliedCoupon.minOrder}` });
+        return res
+          .status(400)
+          .json({
+            message: `Minimum order amount is ${appliedCoupon.minOrder}`,
+          });
 
-      if (appliedCoupon.minQuantity && totalQuantity < appliedCoupon.minQuantity)
-        return res.status(400).json({ message: `Minimum ${appliedCoupon.minQuantity} items required to use this coupon` });
+      if (
+        appliedCoupon.minQuantity &&
+        totalQuantity < appliedCoupon.minQuantity
+      )
+        return res
+          .status(400)
+          .json({
+            message: `Minimum ${appliedCoupon.minQuantity} items required to use this coupon`,
+          });
 
       const userOrders = await Order.find({ user: userId, couponCode });
       if (userOrders.length >= appliedCoupon.perUserLimit)
-        return res.status(400).json({ message: "You have already used this coupon" });
+        return res
+          .status(400)
+          .json({ message: "You have already used this coupon" });
 
       if (appliedCoupon.type.toLowerCase() === "percentage") {
         couponDiscount = (subtotal * appliedCoupon.value) / 100;
@@ -124,7 +150,9 @@ export const placeOrder = async (req, res) => {
 
     // 6️⃣ Active offer product ID
     const activeOfferProduct = processedProducts.find((p) => p.offer?.isActive);
-    const activeOfferId = activeOfferProduct ? activeOfferProduct.product : null;
+    const activeOfferId = activeOfferProduct
+      ? activeOfferProduct.product
+      : null;
 
     // 7️⃣ Create order
     const orderData = {
@@ -152,7 +180,23 @@ export const placeOrder = async (req, res) => {
 
     // 8️⃣ Increment coupon usage
     if (appliedCoupon) {
-      await Coupon.updateOne({ _id: appliedCoupon._id }, { $inc: { usedCount: 1 } });
+      await Coupon.updateOne(
+        { _id: appliedCoupon._id },
+        { $inc: { usedCount: 1 } }
+      );
+    }
+
+    // 9️⃣ Send email to admin AFTER coupon update
+    try {
+      const html = getOrderEmailTemplate(order);
+      await sendEmail(
+        process.env.ADMIN_EMAIL,
+        `🛒 New Order #${order._id}`,
+        html
+      );
+      console.log("✅ Admin notified about new order");
+    } catch (err) {
+      console.error("❌ Failed to send order notification:", err.message);
     }
 
     res.status(201).json(order);
@@ -161,7 +205,6 @@ export const placeOrder = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
-
 
 export const getOrderById = async (req, res) => {
   try {

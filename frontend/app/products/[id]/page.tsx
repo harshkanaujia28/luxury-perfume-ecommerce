@@ -234,31 +234,36 @@ export default function ProductDetailPage() {
           <Link href="/" className="hover:underline text-gray-400">Home</Link>
           <span>/</span>
           <Link
-            href={`/products?type=${product.category?.type}`}
+            href={`/products?type=${encodeURIComponent(product.category?.type || "")}`}
             className="hover:underline capitalize"
           >
-            {product.category?.type}
+            {product.category?.type || "No Type"}
           </Link>
           <span>/</span>
           <Link
-            href={`/products?gender=${product.category?.gender}`}
+            href={`/products?gender=${encodeURIComponent(product.category?.gender || "")}`}
             className="hover:underline capitalize"
           >
-            {product.category?.gender}
+            {product.category?.gender || "No Gender"}
           </Link>
           <span>/</span>
           <Link
-            href={`/products?subCategory=${encodeURIComponent(product.category?.subCategory || "")}`}
+            href={`/products?subCategory=${encodeURIComponent(
+              product.category?.subCategories?.join(",") || ""
+            )}`}
             className="hover:underline capitalize"
           >
-            {product.category?.subCategory}
+            {product.category?.subCategories?.length
+              ? product.category.subCategories.join(", ")
+              : "No SubCategory"}
           </Link>
         </div>
+
         <main className="w-full max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 py-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Product Images */}
             <div className="space-y-4">
-              <div className="w-full h-[500px] sm:h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden rounded-lg bg-zinc-900">
+              <div className="w-full h-[500px] sm:h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden rounded-lg bg-black flex items-center justify-center">
                 <Image
                   src={
                     product.images[selectedImage] && product.images[selectedImage].startsWith("http")
@@ -270,7 +275,7 @@ export default function ProductDetailPage() {
                   alt={product.name}
                   width={600}
                   height={600}
-                  className="w-full h-full object-cover rounded-lg transition-all duration-300 ease-in-out"
+                  className="w-full h-full object-contain rounded-lg transition-all duration-300 ease-in-out"
                 />
               </div>
 
@@ -298,9 +303,8 @@ export default function ProductDetailPage() {
                   </button>
                 ))}
               </div>
-
-
             </div>
+
 
             {/* Product Info */}
             <div className="space-y-6">
@@ -327,6 +331,7 @@ export default function ProductDetailPage() {
 
                     </div>
                   )}
+
 
                 </div>
 
@@ -419,7 +424,7 @@ export default function ProductDetailPage() {
                           finalPrice = originalPrice - product.offer.value
                         }
                       }
-                          try {
+                      try {
                         await addToCart(product._id, quantity, selectedSize, finalPrice)
                         toast({
                           title: "Added to cart",
@@ -430,8 +435,8 @@ export default function ProductDetailPage() {
                         })
                         window.location.href = "/checkout"
                       } catch (err) {
-                        
-                        
+
+
                         console.error(err)
                         toast({
                           title: "Error",
@@ -561,21 +566,15 @@ export default function ProductDetailPage() {
                 <Card className="bg-zinc-900 border border-lime-400/40">
                   <CardContent className="p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="font-semibold text-lime-400 mb-2">Skin Type</h4>
-                        <p className="text-gray-200">{product.specifications.skinType}</p>
-                      </div>
+                     
                       <div>
                         <h4 className="font-semibold text-lime-400 mb-2">Longevity</h4>
                         <p className="text-gray-200">{product.specifications.longevity}</p>
                       </div>
+                      
                       <div>
-                        <h4 className="font-semibold text-lime-400 mb-2">Sillage</h4>
-                        <p className="text-gray-200">{product.specifications.sillage}</p>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-lime-400 mb-2">Best Season</h4>
-                        <p className="text-gray-200">{product.specifications.season}</p>
+                        <h4 className="font-semibold text-lime-400 mb-2">Best Use</h4>
+                        <p className="text-gray-200">{product.specifications.highlight}</p>
                       </div>
                     </div>
                   </CardContent>

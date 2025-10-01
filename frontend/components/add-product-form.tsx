@@ -47,6 +47,7 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
   const { addProduct, createOffer } = useApi();
   const [newImage, setNewImage] = useState("");
   const [newQuantity, setNewQuantity] = useState("");
+  const [newSubCategory, setNewSubCategory] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     brand: "",
@@ -56,7 +57,7 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
     rating: 0,
     type: "", // "Perfume" or "Attar"
     gender: "", // "Men" or "Women"
-    subCategory: "", // see list below
+    subCategory: [] as string[],
     seller: "admin",
     images: [] as File[], // for file uploads
     reviews: [] as { name: string; comment: string; stars: number }[],
@@ -73,12 +74,11 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
     quantity: [] as string[],
     features: [] as string[],
     specifications: {
-      skinType: "",
-      sillage: "",
       longevity: "",
-      season: "",
+      highlight: "", // ✅ सिर्फ highlight रहे
     },
   });
+
 
 
   const [newReview, setNewReview] = useState({ name: "", comment: "", stars: 0 });
@@ -151,54 +151,59 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
       reviews: prev.reviews.filter((_, i) => i !== index),
     }));
   };
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  try {
-    const data = new FormData();
-    data.append("name", formData.name);
-    data.append("brand", formData.brand);
-    data.append("description", formData.description);
-    data.append("price", formData.price.toString());
-    data.append("stock", formData.stock.toString());
-    data.append("features", JSON.stringify(formData.features));
+    try {
+      const data = new FormData();
+      data.append("name", formData.name);
+      data.append("brand", formData.brand);
+      data.append("description", formData.description);
+      data.append("price", formData.price.toString());
+      data.append("stock", formData.stock.toString());
+      data.append("features", JSON.stringify(formData.features));
 
-    // ✅ Main image (first uploaded image)
-    if (formData.images.length > 0) {
-      data.append("image", formData.images[0]); // main image
+      // Main image
+      if (formData.images.length > 0) {
+        data.append("image", formData.images[0]);
+      }
+
+      // All images
+      data.append("images", JSON.stringify(formData.images));
+
+      // Category object — ✅ corrected field name
+      const category = {
+        type: formData.type,
+        gender: formData.gender,
+        subCategories: formData.subCategory, // plural
+      };
+      data.append("category", JSON.stringify(category));
+
+      // Specifications — only highlight
+      const specifications = {
+        highlight: formData.specifications.highlight,
+      };
+      data.append("specifications", JSON.stringify(specifications));
+
+      // Seller, reviews, quantity
+      data.append("seller", formData.seller);
+      data.append("reviews", JSON.stringify(formData.reviews));
+      data.append("quantity", JSON.stringify(formData.quantity));
+
+      // Offer
+      data.append("offer", JSON.stringify(formData.offer));
+
+      // Backend call
+      const savedProduct = await addProduct(data);
+
+      alert("✅ Product added successfully!");
+      setIsDialogOpen(false);
+      if (onProductAdded) onProductAdded();
+    } catch (error) {
+      console.error("Failed to add product:", error);
+      alert("❌ Failed to add product");
     }
-
-    // ✅ All images as JSON array
-    data.append("images", JSON.stringify(formData.images));
-
-    // ✅ Category object
-    const category = {
-      type: formData.type,
-      gender: formData.gender,
-      subCategory: formData.subCategory,
-    };
-    data.append("category", JSON.stringify(category));
-
-    // ✅ Specs, seller, reviews, quantity
-    data.append("specifications", JSON.stringify(formData.specifications));
-    data.append("seller", formData.seller);
-    data.append("reviews", JSON.stringify(formData.reviews));
-    data.append("quantity", JSON.stringify(formData.quantity));
-
-    // ✅ Offer (directly product ke andar save hoga)
-    data.append("offer", JSON.stringify(formData.offer));
-
-    // 🔥 Backend call
-    const savedProduct = await addProduct(data);
-
-    alert("✅ Product added successfully with offer!");
-    setIsDialogOpen(false);
-    if (onProductAdded) onProductAdded();
-  } catch (error) {
-    console.error("Failed to add product:", error);
-    alert("❌ Failed to add product");
-  }
-};
+  };
 
 
 
@@ -389,9 +394,12 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
                       </div>
                     </div>
                     {/* Gender */}
-                    <div className="space-y-1.5 sm:space-y-2">
-                      <Label htmlFor="gender" className="text-sm font-semibold text-slate-700">
-                        Category
+                    <div className="space-y-2">
+                      <Label
+                        htmlFor="gender"
+                        className="text-sm font-semibold text-slate-700"
+                      >
+                        Gender
                       </Label>
                       <Select
                         value={formData.gender}
@@ -401,44 +409,85 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
                           <SelectValue placeholder="Select Category" />
                         </SelectTrigger>
                         <SelectContent className="rounded-lg sm:rounded-xl border-slate-200 shadow-xl max-h-60 sm:max-h-80">
-                          {["Men", "Women"].map((gender) => (
-                            <SelectItem key={gender} value={gender} className="rounded-md text-xs sm:text-sm py-2">
+                          {["Men", "Women", "Unisex"].map((gender) => (
+                            <SelectItem
+                              key={gender}
+                              value={gender}
+                              className="rounded-md text-xs sm:text-sm py-2"
+                            >
                               {gender}
                             </SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
                     </div>
+
                     {/* SubCategory */}
-                    <div className="space-y-1.5 sm:space-y-2">
-                      <Label htmlFor="subCategory" className="text-sm font-semibold text-slate-700">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-semibold text-slate-700">
                         Sub Category
                       </Label>
-                      <Select
-                        value={formData.subCategory}
-                        onValueChange={(value) => handleChange("subCategory", value)}
-                      >
-                        <SelectTrigger className="h-10 sm:h-11 border-slate-300 focus:border-green-500 focus:ring-green-500/20 rounded-lg transition-all duration-200 text-sm sm:text-base">
-                          <SelectValue placeholder="Select sub category" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-lg sm:rounded-xl border-slate-200 shadow-xl max-h-60 sm:max-h-80">
-                          {[
-                            "Celebrity",
-                            "Summer",
-                            "Gym",
-                            "Office",
-                            "Winter",
-                            "Party, Dates, Special Occasion",
-                            "Traditional",
-                            "Spiritual & Devotional",
-                          ].map((sub) => (
-                            <SelectItem key={sub} value={sub} className="rounded-md text-xs sm:text-sm py-2">
+
+                      {/* Input / Dropdown to select subcategory */}
+                      <div className="flex gap-2">
+                        <select
+                          value={newSubCategory}
+                          onChange={(e) => setNewSubCategory(e.target.value)}
+                          className="h-10 sm:h-11 border-slate-300 rounded px-2"
+                        >
+                          <option value="">Select Sub Category</option>
+                          {["Celebrity", "Summer", "Gym", "Office", "Winter", "Party, Dates, Special Occasion", "Traditional", "Spiritual & Devotional"].map((sub) => (
+                            <option key={sub} value={sub}>
                               {sub}
-                            </SelectItem>
+                            </option>
                           ))}
-                        </SelectContent>
-                      </Select>
+                        </select>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => {
+                            if (
+                              newSubCategory &&
+                              !formData.subCategory.includes(newSubCategory)
+                            ) {
+                              setFormData((prev) => ({
+                                ...prev,
+                                subCategory: [...prev.subCategory, newSubCategory],
+                              }));
+                              setNewSubCategory("");
+                            }
+                          }}
+                        >
+                          Add
+                        </Button>
+                      </div>
+
+                      {/* Show selected subcategories */}
+                      <div className="flex flex-wrap gap-2 mt-2">
+                        {formData.subCategory.map((sub) => (
+                          <div
+                            key={sub}
+                            className="flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-sm"
+                          >
+                            {sub}
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  subCategory: prev.subCategory.filter((s) => s !== sub),
+                                }))
+                              }
+                              className="text-green-600 hover:text-green-900 font-bold"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
+
+
                     {/* <div className="space-y-1.5 sm:space-y-2">
                       <Label htmlFor="quantity" className="text-sm font-semibold text-slate-700">
                         Quantity (ML)
@@ -506,32 +555,6 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
                       )}
                     </div>
                     <div>
-                      <Label className="text-sm font-semibold text-slate-700">Skin Type</Label>
-                      <Input
-                        value={formData.specifications.skinType}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            specifications: { ...prev.specifications, skinType: e.target.value },
-                          }))
-                        }
-                        placeholder="e.g., All Skin Types"
-                      />
-                    </div>
-                    <div>
-                      <Label className="text-sm font-semibold text-slate-700">Sillage</Label>
-                      <Input
-                        value={formData.specifications.sillage}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            specifications: { ...prev.specifications, sillage: e.target.value },
-                          }))
-                        }
-                        placeholder="e.g., Moderate"
-                      />
-                    </div>
-                    <div>
                       <Label className="text-sm font-semibold text-slate-700">Longevity</Label>
                       <Input
                         value={formData.specifications.longevity}
@@ -545,18 +568,20 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
                       />
                     </div>
                     <div>
-                      <Label className="text-sm font-semibold text-slate-700">Best Season</Label>
+                      <Label className="text-sm font-semibold text-slate-700">Best Use</Label>
                       <Input
-                        value={formData.specifications.season}
+                        value={formData.specifications.highlight}
                         onChange={(e) =>
                           setFormData((prev) => ({
                             ...prev,
-                            specifications: { ...prev.specifications, season: e.target.value },
+                            specifications: { ...prev.specifications, highlight: e.target.value },
                           }))
                         }
-                        placeholder="e.g., Winter"
+                        placeholder="Best word that defines the product"
                       />
                     </div>
+
+
                     <div className="space-y-2">
                       <Label className="text-sm font-semibold text-slate-700">Key Features</Label>
                       <div className="flex gap-2">
@@ -940,7 +965,7 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
                         className="h-10 sm:h-11 border-slate-300 focus:border-green-500 focus:ring-green-500/20 rounded-lg text-sm sm:text-base"
                       />
                     </div>
-                    <div className="space-y-1.5 sm:space-y-2">
+                    {/* <div className="space-y-1.5 sm:space-y-2">
                       <Label htmlFor="rating" className="text-sm font-semibold text-slate-700">
                         Product Rating (0-5)
                       </Label>
@@ -955,7 +980,7 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
                         placeholder="0"
                         className="h-10 sm:h-11 border-slate-300 focus:border-green-500 focus:ring-green-500/20 rounded-lg text-sm sm:text-base"
                       />
-                    </div>
+                    </div> */}
                   </div>
                 </CardContent>
               </Card>

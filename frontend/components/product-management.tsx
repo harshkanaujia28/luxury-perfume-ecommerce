@@ -32,25 +32,25 @@ export function ProductManagement() {
 
   const productsPerPage = 10;
 
-useEffect(() => {
-  fetchProducts();
-}, []);
+  useEffect(() => {
+    fetchProducts();
+  }, []);
 
-const fetchProducts = async () => {
-  try {
-    const data = await getProducts();
+  const fetchProducts = async () => {
+    try {
+      const data = await getProducts();
 
-    // Sort newest first by createdAt date
-    const sortedData = [...data].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
+      // Sort newest first by createdAt date
+      const sortedData = [...data].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
 
-    setProducts(sortedData);
-    console.log(sortedData);
-  } catch (err) {
-    console.error("Failed to fetch products", err);
-  }
-};
+      setProducts(sortedData);
+      console.log(sortedData);
+    } catch (err) {
+      console.error("Failed to fetch products", err);
+    }
+  };
 
   const filteredProducts = products.filter(
     (product) =>
@@ -172,8 +172,13 @@ const fetchProducts = async () => {
                         <Badge variant="secondary">{product.category?.gender || "No Gender"}</Badge>
                       </td>
                       <td className="py-3 px-4">
-                        <Badge variant="secondary">{product.category?.subCategory || "No SubCategory"}</Badge>
+                        <Badge variant="secondary">
+                          {product.category?.subCategories?.length
+                            ? product.category.subCategories.join(", ")
+                            : "No SubCategory"}
+                        </Badge>
                       </td>
+
                       <td className="py-3 px-4">₹{product.price}</td>
                       <td className="py-3 px-4">
                         <Badge variant={product.stock > 0 ? "default" : "destructive"}>

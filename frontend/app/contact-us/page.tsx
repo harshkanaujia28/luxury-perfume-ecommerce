@@ -215,7 +215,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                 {[
                   { question: "How long do your fragrances last?", answer: "Our fragrances are designed to last 6-12 hours..." },
                   { question: "Do you offer samples?", answer: "Yes! We offer sample sets..." },
-                  { question: "What is your return policy?", answer: "We offer a 30-day return policy..." },
+                  // { question: "What is your return policy?", answer: "We offer a 30-day return policy..." },
                   { question: "Do you ship internationally?", answer: "Yes, we ship to most countries..." },
                 ].map((faq, index) => (
                   <Card key={index} className="bg-zinc-900 border border-lime-500/30 shadow-lg rounded-2xl">

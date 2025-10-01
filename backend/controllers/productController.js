@@ -42,36 +42,66 @@ export const getProductById = async (req, res) => {
   }
 };
 
-
 // ✅ Add product
 export const addProduct = async (req, res) => {
   try {
+    // Safely parse incoming arrays and objects
     const images = safeParse(req.body.images, []);
+    const features = safeParse(req.body.features, []);
+    const category = safeParse(req.body.category, {});
+    const specifications = safeParse(req.body.specifications, {});
+    const quantity = safeParse(req.body.quantity, []);
+    const offer = safeParse(req.body.offer, {});
 
+    // Create new Product instance
     const product = new Product({
       name: req.body.name,
       brand: req.body.brand,
       brandimage: req.body.brandimage || "",
       description: req.body.description,
       price: Number(req.body.price),
-      originalPrice: req.body.originalPrice || null,
+      originalPrice: req.body.originalPrice
+        ? Number(req.body.originalPrice)
+        : null,
       stock: Number(req.body.stock),
-      features: safeParse(req.body.features, []),
+      features,
       image: images[0] || "",
       images,
-      category: safeParse(req.body.category, {}),
-      specifications: safeParse(req.body.specifications, {}),
-      quantity: safeParse(req.body.quantity, []),
-      offer: safeParse(req.body.offer, {}),
+      category: {
+        type: category.type || "Perfume",
+        gender: category.gender || "Unisex",
+        subCategories: Array.isArray(category.subCategories)
+          ? category.subCategories
+          : [],
+      },
+      specifications: {
+        longevity: specifications.longevity || "",
+        highlight: specifications.highlight || "", // ← अब occasionNote की जगह highlight
+      },
+
+      quantity,
+      offer: {
+        type: offer.type || "",
+        value: offer.value || 0,
+        startDate: offer.startDate || null,
+        endDate: offer.endDate || null,
+        description: offer.description || "",
+        minQuantity: offer.minQuantity || 0,
+        maxUses: offer.maxUses || 0,
+        usedCount: 0,
+        isActive: false, // will be auto-updated by schema pre-save hook
+      },
     });
 
     await product.save();
-    res.status(201).json(product);
+    res.status(201).json({ success: true, product });
   } catch (error) {
     console.error("Error creating product:", error);
-    res
-      .status(500)
-      .json({ message: "Failed to add product", error: error.message });
+    res.status(500).json({
+      success: false,
+      message: "Failed to add product",
+      error: error.message,
+    });
   }
 };
 
@@ -99,6 +129,26 @@ export const updateProduct = async (req, res) => {
     // Exclude reviews and rating from updates
     const { reviews, rating, ...rest } = req.body;
 
+    // Handle category with multi-select subCategories
+    let category = {};
+    if (req.body.category) {
+      const parsedCategory = safeParse(req.body.category, {});
+      category = {
+        ...parsedCategory,
+        subCategories: Array.isArray(parsedCategory.subCategories)
+          ? parsedCategory.subCategories
+          : [],
+      };
+    }
+    let specifications = safeParse(req.body.specifications, {});
+
+    // Ensure highlight exists instead of occasionNote
+    specifications = {
+      longevity: specifications.longevity || "",
+      highlight: specifications.highlight || "", // ← replace occasionNote
+    };
+
+    // Then pass to update
     const product = await Product.findByIdAndUpdate(
       req.params.id,
       {
@@ -107,8 +157,8 @@ export const updateProduct = async (req, res) => {
         image: images[0] || req.body.image || "",
         features: safeParse(req.body.features, []),
         quantity: safeParse(req.body.quantity, []),
-        category: safeParse(req.body.category, {}),
-        specifications: safeParse(req.body.specifications, {}),
+        category,
+        specifications, // ✅ updated
         offer: safeParse(req.body.offer, {}),
       },
       { new: true, runValidators: true }

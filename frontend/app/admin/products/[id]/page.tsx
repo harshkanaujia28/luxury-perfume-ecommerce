@@ -69,9 +69,23 @@ export default function ProductDetailsDialog({ productId, open, onOpenChange }: 
               </div>
 
               <Badge className="bg-blue-100 text-blue-800 border-blue-200">
-                {product.category.type} / {product.category.gender} / {product.category.subCategory}
+                {product.category?.type} / {product.category?.gender} / {product.category?.subCategories?.length
+                  ? product.category.subCategories.join(", ")
+                  : "No SubCategory"}
               </Badge>
 
+              <div className="mt-4 space-y-1">
+                {product.specifications?.longevity && (
+                  <p className="text-sm text-gray-700">
+                     Longevity: {product.specifications.longevity}
+                  </p>
+                )}
+                {product.specifications?.highlight && (
+                  <p className="text-sm text-gray-700">
+                     Best Use: {product.specifications.highlight}
+                  </p>
+                )}
+              </div>
 
               <p className="text-gray-600">{product.description}</p>
 

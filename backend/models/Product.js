@@ -3,7 +3,11 @@ import mongoose from "mongoose";
 // ================= Review Schema =================
 const reviewSchema = new mongoose.Schema(
   {
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     name: { type: String, required: true },
     comment: { type: String, required: true },
     stars: { type: Number, min: 1, max: 5, required: true },
@@ -16,7 +20,12 @@ const offerSchema = new mongoose.Schema(
   {
     isActive: { type: Boolean, default: false },
     type: { type: String, enum: ["percentage", "fixed", "bogo", "bundle"] },
-    value: { type: Number, required: function () { return this.type !== "bogo"; } },
+    value: {
+      type: Number,
+      required: function () {
+        return this.type !== "bogo";
+      },
+    },
     startDate: { type: Date },
     endDate: { type: Date },
     description: { type: String },
@@ -31,11 +40,8 @@ const offerSchema = new mongoose.Schema(
 offerSchema.methods.isOfferValid = function () {
   const now = new Date();
 
-  // Check date validity
   if (this.startDate && now < this.startDate) return false;
   if (this.endDate && now > this.endDate) return false;
-
-  // Check usage
   if (this.maxUses && this.usedCount >= this.maxUses) return false;
 
   return true;
@@ -44,10 +50,12 @@ offerSchema.methods.isOfferValid = function () {
 // ================= Specification Schema =================
 const specificationSchema = new mongoose.Schema(
   {
-    skinType: String,
-    longevity: String,
-    sillage: String,
-    season: String,
+    longevity: String, // ⏳ कितने समय तक टिकता है
+    highlight: {
+      type: String,
+      default: "",
+      // Example: "Perfect for summer evenings, parties, and casual outings"
+    },
   },
   { _id: false }
 );
@@ -56,20 +64,26 @@ const specificationSchema = new mongoose.Schema(
 const categorySchema = new mongoose.Schema(
   {
     type: { type: String, enum: ["Perfume", "Attar"], required: true },
-    gender: { type: String, enum: ["Men", "Women"], required: true },
-    subCategory: {
-      type: String,
-      enum: [
-        "Celebrity",
-        "Summer",
-        "Gym",
-        "Office",
-        "Winter",
-        "Party, Dates, Special Occasion",
-        "Traditional",
-        "Spiritual & Devotional",
+    gender: { type: String, enum: ["Men", "Women", "Unisex"], required: true },
+
+    // multiple select allowed now
+    subCategories: {
+      type: [
+        {
+          type: String,
+          enum: [
+            "Celebrity",
+            "Summer",
+            "Gym",
+            "Office",
+            "Winter",
+            "Party, Dates, Special Occasion", // ✅ treat as single category
+            "Traditional",
+            "Spiritual & Devotional",
+          ],
+        },
       ],
-      required: true,
+      default: [],
     },
   },
   { _id: false }
@@ -109,8 +123,6 @@ const productSchema = new mongoose.Schema(
 );
 
 // ================= Hooks & Methods =================
-
-// Auto calculate rating from reviews
 productSchema.pre("save", function (next) {
   if (this.reviews.length > 0) {
     const totalStars = this.reviews.reduce((acc, r) => acc + r.stars, 0);
@@ -119,7 +131,6 @@ productSchema.pre("save", function (next) {
     this.rating = 0;
   }
 
-  // Auto deactivate expired or over-used offers
   if (this.offer) {
     this.offer.isActive = this.offer.isOfferValid();
   }
