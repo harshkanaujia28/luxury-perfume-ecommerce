@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   icons: {
     icon: "/Zafrine_Logo.png",
   },
+    verification: {
+    google: "x6aU0LBxPsCJ5mrNhkJFyOm6rfFb1s3tsriXwMvP_Dc",
+  },
+
 };
 
 export default function RootLayout({
