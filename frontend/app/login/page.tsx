@@ -24,39 +24,42 @@ export default function LoginPage() {
   const { refreshCart } = useCart();
   const { refreshWishlist } = useWishlist();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsLoading(true);
 
-    try {
-      const user: User = await login(email, password);
+  try {
+    const user: User = await login(email, password); // ← Backend se user object aata hai
 
-      toast({
-        title: "Login successful",
-        description: `Welcome back, ${user.name || user.role}!`,
-        variant: "success",
-      });
+    toast({
+      title: "Login successful",
+      description: `Welcome back, ${user.name || user.role}!`,
+      variant: "success",
+    });
 
-      await refreshCart();
-      await refreshWishlist();
+    await refreshCart();
+    await refreshWishlist();
 
-      if (user.role === "admin") {
-        router.push("/admin");
-      } else if (user.role === "vendor") {
-        router.push("/vendor");
-      } else {
-        router.push("/");
-      }
-    } catch (err: any) {
-      toast({
-        title: "Login failed",
-        description: err.response?.data?.message || "Invalid email or password.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
+    // ✅ Role-based redirect yahin dale
+    if (user.role === "admin") {
+      router.push("/admin"); // Admin dashboard
+    } else if (user.role === "vendor") {
+      router.push("/vendor"); // Vendor dashboard
+    } else {
+      router.push("/"); // Normal store
     }
-  };
+
+  } catch (err: any) {
+    toast({
+      title: "Login failed",
+      description: err.response?.data?.message || "Invalid email or password.",
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center px-4">

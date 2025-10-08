@@ -816,10 +816,21 @@ export const ApiProvider = ({ children }: { children: React.ReactNode }) => {
     // Login function
     const login = async (email: string, password: string): Promise<User> => {
         const res = await axios.post("/auth/login", { email, password });
+
+        // 1️⃣ Store JWT token
         localStorage.setItem("token", res.data.token);
+
+        // 2️⃣ Store user role in localStorage
+        //    This is needed for frontend redirect/middleware
+        localStorage.setItem("role", res.data.role);
+
+        // 3️⃣ Update global state with user info
         dispatch({ type: "SET_USER", payload: res.data.user });
+
+        // 4️⃣ Return user object
         return res.data.user as User;
     };
+
 
     const register = async (name: string, email: string, password: string): Promise<User> => {
         const res = await axios.post("/auth/register", { name, email, password });

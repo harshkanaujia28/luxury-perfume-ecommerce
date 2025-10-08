@@ -7,6 +7,7 @@ import { WishlistProvider } from "@/contexts/wishlist-context";
 import { Toaster } from "@/components/ui/toaster";
 import { ApiProvider } from "@/contexts/api-context";
 import { CheckoutProvider } from "@/contexts/checkoutContext";// ✅ add
+import ClientRedirect from "../components/ClientRedirect";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -35,6 +36,7 @@ export default function RootLayout({
           <CartProvider>
             <WishlistProvider>
               <CheckoutProvider>
+                 <ClientRedirect />
                 {children}
                 <Toaster />
               </CheckoutProvider>

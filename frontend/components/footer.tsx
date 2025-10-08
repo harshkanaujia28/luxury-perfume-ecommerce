@@ -50,7 +50,7 @@ export function Footer() {
               <li><Link href="/cancellation-refund" className="hover:text-lime-300">Cancellation & Refund</Link></li>
               {/* <li><Link href="/returns" className="hover:text-lime-300">Returns</Link></li> */}
               <li><Link href="/faq" className="hover:text-lime-300">FAQ</Link></li>
-              <li><Link href="/size-guide" className="hover:text-lime-300">Size Guide</Link></li>
+              {/* <li><Link href="/size-guide" className="hover:text-lime-300">Size Guide</Link></li> */}
               <li><Link href="/support" className="hover:text-lime-300">Support</Link></li>
             </ul>
           </div>
@@ -61,8 +61,8 @@ export function Footer() {
             <ul className="space-y-2">
               <li><Link href="/privacy-policy" className="hover:text-lime-300">Privacy Policy</Link></li>
               <li><Link href="/terms-and-conditions" className="hover:text-lime-300">Terms and Conditions</Link></li>
-              <li><Link href="/cookies" className="hover:text-lime-300">Cookie Policy</Link></li>
-              <li><Link href="/accessibility" className="hover:text-lime-300">Accessibility</Link></li>
+              {/* <li><Link href="/cookies" className="hover:text-lime-300">Cookie Policy</Link></li>
+              <li><Link href="/accessibility" className="hover:text-lime-300">Accessibility</Link></li> */}
             </ul>
           </div>
         </div>
