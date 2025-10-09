@@ -23,7 +23,8 @@ const offerSchema = new mongoose.Schema(
     value: {
       type: Number,
       required: function () {
-        return this.type !== "bogo";
+        // ✅ Only required when offer is active AND type is not bogo
+        return this.isActive && this.type !== "bogo";
       },
     },
     startDate: { type: Date },
@@ -131,7 +132,8 @@ productSchema.pre("save", function (next) {
     this.rating = 0;
   }
 
-  if (this.offer) {
+   // ✅ Respect manual toggle: only auto-check if offer isActive
+  if (this.offer && this.offer.isActive) {
     this.offer.isActive = this.offer.isOfferValid();
   }
 

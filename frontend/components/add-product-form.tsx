@@ -181,9 +181,11 @@ export default function AddProductForm({ onProductAdded }: { onProductAdded?: ()
 
       // Specifications — only highlight
       const specifications = {
+        longevity: formData.specifications.longevity, // ✅ add this
         highlight: formData.specifications.highlight,
       };
       data.append("specifications", JSON.stringify(specifications));
+
 
       // Seller, reviews, quantity
       data.append("seller", formData.seller);

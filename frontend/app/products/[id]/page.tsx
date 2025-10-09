@@ -22,6 +22,7 @@ import { Textarea } from "@/components/ui/textarea"
 import jwt_decode from "jwt-decode";
 import { useCheckout } from "@/contexts/checkoutContext"
 import axios from "axios"
+import { RelatedProducts } from "@/components/RelatedProducts"
 const baseURL = "NEXT_PUBLIC_API_URL";
 
 export default function ProductDetailPage() {
@@ -566,12 +567,12 @@ export default function ProductDetailPage() {
                 <Card className="bg-zinc-900 border border-lime-400/40">
                   <CardContent className="p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     
+
                       <div>
                         <h4 className="font-semibold text-lime-400 mb-2">Longevity</h4>
                         <p className="text-gray-200">{product.specifications.longevity}</p>
                       </div>
-                      
+
                       <div>
                         <h4 className="font-semibold text-lime-400 mb-2">Best Use</h4>
                         <p className="text-gray-200">{product.specifications.highlight}</p>
@@ -667,7 +668,13 @@ export default function ProductDetailPage() {
 
           {/* Related Products */}
           <div className="py-8">
-            <FeaturedProducts />
+            <RelatedProducts
+              currentProductId={product._id}
+              category={product.category.type}
+              subCategories={product.category.subCategories}
+              gender={product.category.gender}
+            />
+
           </div>
         </main>
 
