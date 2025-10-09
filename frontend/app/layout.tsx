@@ -6,8 +6,9 @@ import { CartProvider } from "@/contexts/cart-context";
 import { WishlistProvider } from "@/contexts/wishlist-context";
 import { Toaster } from "@/components/ui/toaster";
 import { ApiProvider } from "@/contexts/api-context";
-import { CheckoutProvider } from "@/contexts/checkoutContext";// ✅ add
+import { CheckoutProvider } from "@/contexts/checkoutContext";
 import ClientRedirect from "../components/ClientRedirect";
+import Script from "next/script"; // ✅ import Script
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,25 +19,35 @@ export const metadata: Metadata = {
   icons: {
     icon: "/Zafrine_Logo.png",
   },
-    verification: {
+  verification: {
     google: "x6aU0LBxPsCJ5mrNhkJFyOm6rfFb1s3tsriXwMvP_Dc",
   },
-
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        {/* Google Analytics */}
+        <Script
+          strategy="afterInteractive"
+          src="https://www.googletagmanager.com/gtag/js?id=G-KZ4GTEPZLQ"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-KZ4GTEPZLQ');
+          `}
+        </Script>
+      </head>
       <body className={inter.className}>
         <ApiProvider>
           <CartProvider>
             <WishlistProvider>
               <CheckoutProvider>
-                 <ClientRedirect />
+                <ClientRedirect />
                 {children}
                 <Toaster />
               </CheckoutProvider>
