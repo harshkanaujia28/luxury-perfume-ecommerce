@@ -1,0 +1,179 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { Star, Heart, ShoppingCart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useCart } from "@/contexts/cart-context";
+import { useWishlist } from "@/contexts/wishlist-context";
+import { useSortedProducts } from "@/hooks/useSortedProducts";
+import { useToast } from "@/hooks/use-toast";
+
+// 🔹 Helper for final price calculation
+function getFinalPrice(product: any) {
+  const originalPrice = product.price;
+  let finalPrice = originalPrice;
+
+  if (product.offer?.isActive) {
+    if (product.offer.type === "percentage") {
+      finalPrice = originalPrice - (originalPrice * product.offer.value) / 100;
+    } else if (product.offer.type === "fixed") {
+      finalPrice = originalPrice - product.offer.value;
+    }
+  }
+
+  return { finalPrice, originalPrice };
+}
+
+export function FeaturedProducts() {
+  const { addToCart } = useCart();
+  const { toast } = useToast();
+  const { addItem, removeItem, isInWishlist } = useWishlist();
+  const products = useSortedProducts();
+  const bestSellingProducts = products.slice(16, 24);
+
+  return (
+    <section className="py-16 bg-black">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-lime-400">
+          Best Selling Products
+        </h2>
+
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mt-8">
+          {bestSellingProducts.map((product) => {
+            const inWishlist = isInWishlist(product._id);
+            const { finalPrice, originalPrice } = getFinalPrice(product);
+
+            return (
+              <Card
+                key={product._id}
+                className="border border-lime-400/40 bg-zinc-900 shadow-md hover:shadow-[0_0_25px_rgba(182,255,40,0.4)] transition relative overflow-hidden min-w-0"
+              >
+                <CardContent className="p-0">
+                  {/* Wishlist Button */}
+                  <button
+                    onClick={() =>
+                      inWishlist ? removeItem(product._id) : addItem(product)
+                    }
+                    className={`absolute top-3 right-3 rounded-full p-2 z-10 shadow-md transition-colors ${
+                      inWishlist
+                        ? "bg-lime-500 text-black"
+                        : "bg-black/70 text-lime-400 hover:bg-lime-500 hover:text-black"
+                    }`}
+                  >
+                    <Heart
+                      className={`w-5 h-5 ${inWishlist ? "fill-current" : ""}`}
+                    />
+                  </button>
+
+                  {/* Product Image */}
+                  <Link href={`/products/${product._id}`}>
+                    <div className="relative aspect-square overflow-hidden rounded-t-lg">
+                      <Image
+                        src={
+                          product.images?.[0]?.startsWith("http")
+                            ? product.images[0]
+                            : `/placeholder.svg`
+                        }
+                        alt={product.name}
+                        fill
+                        className="object-cover transition-transform duration-300 hover:scale-105"
+                      />
+                    </div>
+                  </Link>
+
+                  {/* Offer Badge */}
+                  {product.offer?.isActive && product.offer?.type && (
+                    <div className="absolute top-3 left-3 bg-lime-500 text-black text-xs font-bold px-2 py-1 rounded">
+                      {product.offer.type === "percentage"
+                        ? `${product.offer.value}% OFF`
+                        : product.offer.type === "fixed"
+                        ? `₹${product.offer.value} OFF`
+                        : product.offer.type === "bogo"
+                        ? "Buy 1 Get 1"
+                        : product.offer.type === "bundle"
+                        ? "Bundle Offer"
+                        : null}
+                    </div>
+                  )}
+
+                  {/* Product Details */}
+                  <div className="p-3 sm:p-4 space-y-1 sm:space-y-2">
+                    <p className="text-xs sm:text-sm text-gray-400 truncate">
+                      {product.brand}
+                    </p>
+                    <h3 className="font-semibold text-lime-300 text-sm sm:text-base truncate">
+                      {product.name}
+                    </h3>
+
+                    {/* Rating */}
+                    <div className="flex items-center space-x-1">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          className={`w-4 h-4 ${
+                            i < Math.floor(product.rating)
+                              ? "text-yellow-400 fill-current"
+                              : "text-gray-600"
+                          }`}
+                        />
+                      ))}
+                      <span className="text-xs text-gray-500 ml-1">
+                        ({product.reviews?.length || 0})
+                      </span>
+                    </div>
+
+                    {/* Offer Description */}
+                    {product.offer?.isActive && product.offer.description && (
+                      <div className="p-1 bg-lime-500/10 border border-lime-400/40 rounded text-[10px] sm:text-[11px] text-lime-300">
+                        {product.offer.description}
+                      </div>
+                    )}
+
+                    {/* Price and Add to Cart */}
+                    <div className="flex items-center justify-between mt-2">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-lime-400 text-sm sm:text-base">
+                          ₹{finalPrice.toFixed(2)}
+                        </span>
+                        {finalPrice < originalPrice && (
+                          <span className="text-xs sm:text-sm text-gray-500 line-through">
+                            ₹{originalPrice.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+
+                      <Button
+                        size="icon"
+                        className="bg-lime-500 text-black rounded-full w-8 h-8 hover:bg-lime-400 flex items-center justify-center"
+                        onClick={async () => {
+                          if (!product) return;
+                          try {
+                            await addToCart(product._id, 1, undefined, finalPrice);
+                            toast({
+                              title: "Added to cart",
+                              description: `1 ${product.name} added at ₹${finalPrice.toFixed(2)}`,
+                            });
+                          } catch {
+                            toast({
+                              title: "Error",
+                              description: "Failed to add to cart.",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                      >
+                        <ShoppingCart className="w-5 h-5" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
