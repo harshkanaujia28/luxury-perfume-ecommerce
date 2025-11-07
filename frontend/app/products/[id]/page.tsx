@@ -47,11 +47,7 @@ export default function ProductDetailPage() {
   const [pincode, setPincode] = useState("");
   const [result, setResult] = useState(null);
   const [success, setSuccess] = useState("");
-<<<<<<< HEAD
   const isOutOfStock = product && product.stock <= 0;
-=======
-
->>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -268,28 +264,16 @@ export default function ProductDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Product Images */}
             <div className="space-y-4">
-<<<<<<< HEAD
               <div className="relative w-full h-[500px] sm:h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden rounded-lg bg-black flex items-center justify-center">
                 <Image
                   src={
                     product.images[selectedImage]?.startsWith("http")
                       ? product.images[selectedImage]
                       : `${baseURL}${product.images[selectedImage]}`
-=======
-              <div className="w-full h-[500px] sm:h-[400px] md:h-[500px] lg:h-[600px] overflow-hidden rounded-lg bg-black flex items-center justify-center">
-                <Image
-                  src={
-                    product.images[selectedImage] && product.images[selectedImage].startsWith("http")
-                      ? product.images[selectedImage]
-                      : product.images[selectedImage]
-                        ? `${baseURL}${product.images[selectedImage]}`
-                        : "/placeholder.svg"
->>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
                   }
                   alt={product.name}
                   width={600}
                   height={600}
-<<<<<<< HEAD
                   className={`w-full h-full object-contain rounded-lg transition-all duration-300 ${product.stock === 0 ? "opacity-30 blur-[2px]" : ""
                     }`}
                 />
@@ -302,12 +286,6 @@ export default function ProductDetailPage() {
               </div>
 
 
-=======
-                  className="w-full h-full object-contain rounded-lg transition-all duration-300 ease-in-out"
-                />
-              </div>
-
->>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
               <div className="flex gap-2 mt-4 flex-wrap">
                 {product.images.map((img: string, index: number) => (
                   <button
@@ -429,22 +407,15 @@ export default function ProductDetailPage() {
 
                   <Button
                     size="lg"
-<<<<<<< HEAD
                     className="flex-1 w-full bg-lime-500 hover:bg-lime-400 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isOutOfStock}
                     onClick={async () => {
                       if (isOutOfStock) return; // ⛔ No action
-=======
-                    className="flex-1 w-full bg-lime-500 hover:bg-lime-400 text-white"
-                    onClick={async () => {
-
->>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
 
                       if (!selectedSize) {
                         toast({
                           title: "Missing Quantity",
                           description: "Please select a quantity before buying.",
-<<<<<<< HEAD
                           variant: "destructive",
                         });
                         return;
@@ -474,64 +445,21 @@ export default function ProductDetailPage() {
                         window.location.href = "/checkout";
                       } catch (err) {
                         console.error(err);
-=======
-                          variant: "destructive", // 👈 red error tone
-                        })
-
-                        return
-                      }
-                      const originalPrice = product.price
-                      let finalPrice = originalPrice
-
-                      if (product.offer?.isActive) {
-                        if (product.offer.type === "percentage") {
-                          finalPrice =
-                            originalPrice - (originalPrice * product.offer.value) / 100
-                        } else if (product.offer.type === "fixed") {
-                          finalPrice = originalPrice - product.offer.value
-                        }
-                      }
-                      try {
-                        await addToCart(product._id, quantity, selectedSize, finalPrice)
-                        toast({
-                          title: "Added to cart",
-                          description: `${quantity} ${product.name} added at ₹${finalPrice.toFixed(
-                            2
-                          )}`,
-                          variant: "success"
-                        })
-                        window.location.href = "/checkout"
-                      } catch (err) {
-
-
-                        console.error(err)
->>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
                         toast({
                           title: "Error",
                           description: "Failed to add product to cart",
                           variant: "destructive",
-<<<<<<< HEAD
                         });
                       }
                     }}
                   >
                     {isOutOfStock ? "Out of Stock" : "Buy Now"}
-=======
-                        })
-                      }
-                    }}
-                  >
-                    Buy Now
->>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
                   </Button>
 
 
 
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
                   <Button
                     variant="outline"
                     size="icon"
