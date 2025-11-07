@@ -20,6 +20,7 @@ export const placeOrder = async (req, res) => {
     let totalQuantity = 0;
     const processedProducts = [];
 
+<<<<<<< HEAD
     // ✅ 1️⃣ BEFORE processing, check stock for all products
     for (const item of products) {
       const dbProduct = await Product.findById(item.product);
@@ -38,6 +39,15 @@ export const placeOrder = async (req, res) => {
     // ✅ 2️⃣ Now continue original logic — untouched
     for (const item of products) {
       const dbProduct = await Product.findById(item.product);
+=======
+    // 1️⃣ Process products & apply product-level offers
+    for (const item of products) {
+      const dbProduct = await Product.findById(item.product);
+      if (!dbProduct)
+        return res
+          .status(400)
+          .json({ message: `Product not found: ${item.product}` });
+>>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
 
       let price = dbProduct.price;
       let discountApplied = 0;
@@ -51,18 +61,30 @@ export const placeOrder = async (req, res) => {
       totalQuantity += item.quantity;
 
       if (dbProduct.offer && dbProduct.offer.isActive) {
+<<<<<<< HEAD
+=======
+        // ✅ minQuantity check
+>>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
         if (item.quantity < (dbProduct.offer.minQuantity || 1)) {
           return res.status(400).json({
             message: `Minimum quantity ${dbProduct.offer.minQuantity} required for offer on ${dbProduct.name}`,
           });
         }
 
+<<<<<<< HEAD
+=======
+        // ✅ discount calc
+>>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
         if (dbProduct.offer.type === "percentage") {
           discountApplied = (price * dbProduct.offer.value) / 100;
         } else if (["fixed", "flat"].includes(dbProduct.offer.type)) {
           discountApplied = dbProduct.offer.value;
         }
 
+<<<<<<< HEAD
+=======
+        // ✅ snapshot for order record
+>>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
         offerSnapshot = {
           isActive: true,
           type: dbProduct.offer.type,
@@ -70,12 +92,23 @@ export const placeOrder = async (req, res) => {
           discountApplied,
         };
 
+<<<<<<< HEAD
         dbProduct.offer.usedCount = (dbProduct.offer.usedCount || 0) + 1;
 
         if (dbProduct.offer.maxUses && dbProduct.offer.usedCount >= dbProduct.offer.maxUses) {
           dbProduct.offer.isActive = false;
         }
 
+=======
+        // ✅ usage update
+        dbProduct.offer.usedCount = (dbProduct.offer.usedCount || 0) + 1;
+        if (
+          dbProduct.offer.maxUses &&
+          dbProduct.offer.usedCount >= dbProduct.offer.maxUses
+        ) {
+          dbProduct.offer.isActive = false;
+        }
+>>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
         await dbProduct.save();
       }
 
@@ -92,6 +125,10 @@ export const placeOrder = async (req, res) => {
       });
     }
 
+<<<<<<< HEAD
+=======
+    // 2️⃣ Delivery fee & time
+>>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
     let deliveryFee = 0;
     let deliveryTime = null;
     const zone = await Zone.findOne({ pincode: shippingAddress.zipCode });
@@ -100,6 +137,10 @@ export const placeOrder = async (req, res) => {
       deliveryTime = zone.deliveryTime;
     }
 
+<<<<<<< HEAD
+=======
+    // 3️⃣ Apply coupon
+>>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
     let appliedCoupon = null;
     let couponDiscount = 0;
     if (couponCode) {
@@ -114,6 +155,7 @@ export const placeOrder = async (req, res) => {
         return res.status(400).json({ message: "Coupon usage limit reached" });
 
       if (appliedCoupon.minOrder && subtotal < appliedCoupon.minOrder)
+<<<<<<< HEAD
         return res.status(400).json({
           message: `Minimum order amount is ${appliedCoupon.minOrder}`,
         });
@@ -126,6 +168,29 @@ export const placeOrder = async (req, res) => {
       const userOrders = await Order.find({ user: userId, couponCode });
       if (userOrders.length >= appliedCoupon.perUserLimit)
         return res.status(400).json({ message: "You have already used this coupon" });
+=======
+        return res
+          .status(400)
+          .json({
+            message: `Minimum order amount is ${appliedCoupon.minOrder}`,
+          });
+
+      if (
+        appliedCoupon.minQuantity &&
+        totalQuantity < appliedCoupon.minQuantity
+      )
+        return res
+          .status(400)
+          .json({
+            message: `Minimum ${appliedCoupon.minQuantity} items required to use this coupon`,
+          });
+
+      const userOrders = await Order.find({ user: userId, couponCode });
+      if (userOrders.length >= appliedCoupon.perUserLimit)
+        return res
+          .status(400)
+          .json({ message: "You have already used this coupon" });
+>>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
 
       if (appliedCoupon.type.toLowerCase() === "percentage") {
         couponDiscount = (subtotal * appliedCoupon.value) / 100;
@@ -134,6 +199,7 @@ export const placeOrder = async (req, res) => {
       }
     }
 
+<<<<<<< HEAD
     const TAX_RATE = 0.1;
     const taxableAmount = subtotal - couponDiscount;
     const taxAmount = Math.round(taxableAmount * TAX_RATE * 100) / 100;
@@ -144,6 +210,24 @@ export const placeOrder = async (req, res) => {
     const activeOfferProduct = processedProducts.find((p) => p.offer?.isActive);
     const activeOfferId = activeOfferProduct ? activeOfferProduct.product : null;
 
+=======
+    // 4️⃣ Tax calculation AFTER offers & coupon
+    const TAX_RATE = 0.1; // 10%
+    const taxableAmount = subtotal - couponDiscount;
+    const taxAmount = Math.round(taxableAmount * TAX_RATE * 100) / 100;
+
+    // 5️⃣ Final total
+    let finalTotal = taxableAmount + taxAmount + deliveryFee;
+    finalTotal = Math.round(finalTotal * 100) / 100;
+
+    // 6️⃣ Active offer product ID
+    const activeOfferProduct = processedProducts.find((p) => p.offer?.isActive);
+    const activeOfferId = activeOfferProduct
+      ? activeOfferProduct.product
+      : null;
+
+    // 7️⃣ Create order
+>>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
     const orderData = {
       user: userId,
       customer: name,
@@ -167,6 +251,7 @@ export const placeOrder = async (req, res) => {
 
     const order = await Order.create(orderData);
 
+<<<<<<< HEAD
     // ✅ 3️⃣ After order created → reduce stock
     for (const item of products) {
       await Product.findByIdAndUpdate(
@@ -176,6 +261,9 @@ export const placeOrder = async (req, res) => {
       );
     }
 
+=======
+    // 8️⃣ Increment coupon usage
+>>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
     if (appliedCoupon) {
       await Coupon.updateOne(
         { _id: appliedCoupon._id },
@@ -183,9 +271,20 @@ export const placeOrder = async (req, res) => {
       );
     }
 
+<<<<<<< HEAD
     try {
       const html = getOrderEmailTemplate(order);
       await sendEmail(process.env.ADMIN_EMAIL, `🛒 New Order #${order._id}`, html);
+=======
+    // 9️⃣ Send email to admin AFTER coupon update
+    try {
+      const html = getOrderEmailTemplate(order);
+      await sendEmail(
+        process.env.ADMIN_EMAIL,
+        `🛒 New Order #${order._id}`,
+        html
+      );
+>>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
       console.log("✅ Admin notified about new order");
     } catch (err) {
       console.error("❌ Failed to send order notification:", err.message);
@@ -198,7 +297,10 @@ export const placeOrder = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
 export const getOrderById = async (req, res) => {
   try {
     const orderId = req.params.id;

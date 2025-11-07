@@ -119,8 +119,11 @@ export default function NewProductsPage() {
               const inWishlist = isInWishlist(product._id);
               const { finalPrice, originalPrice } = getFinalPrice(product);
 
+<<<<<<< HEAD
               const isOutOfStock = product.stock <= 0;
 
+=======
+>>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
               return (
                 <Card
                   key={product._id}
@@ -155,6 +158,7 @@ export default function NewProductsPage() {
                       </Link>
 
                       {/* Wishlist */}
+<<<<<<< HEAD
                       {!isOutOfStock && (
                         <Button
                           variant="ghost"
@@ -177,6 +181,28 @@ export default function NewProductsPage() {
                           />
                         </Button>
                       )}
+=======
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() =>
+                          inWishlist
+                            ? removeItem(product._id)
+                            : addItem(product)
+                        }
+                        className={`absolute top-3 right-3 rounded-full shadow-md ${
+                          inWishlist
+                            ? "bg-lime-500 text-black"
+                            : "bg-black/70 text-lime-400 hover:bg-lime-500 hover:text-black"
+                        }`}
+                      >
+                        <Heart
+                          className={`w-5 h-5 ${
+                            inWishlist ? "fill-current" : ""
+                          }`}
+                        />
+                      </Button>
+>>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
 
                       {/* Offer Badge */}
                       {product.offer?.isActive && product.offer?.type && (
@@ -190,6 +216,7 @@ export default function NewProductsPage() {
                             : "Bundle Offer"}
                         </div>
                       )}
+<<<<<<< HEAD
 
                       {/* 🔥 OUT OF STOCK badge */}
                       {isOutOfStock && (
@@ -197,6 +224,8 @@ export default function NewProductsPage() {
                           Out of Stock
                         </div>
                       )}
+=======
+>>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
                     </div>
 
                     {/* Product Info */}
@@ -235,6 +264,7 @@ export default function NewProductsPage() {
                           )}
                         </div>
 
+<<<<<<< HEAD
                         {/* ✅ Stock Logic Applied to Button */}
                         <Button
                           size="icon"
@@ -247,6 +277,13 @@ export default function NewProductsPage() {
                           onClick={async () => {
                             if (isOutOfStock) return;
 
+=======
+                        <Button
+                          size="icon"
+                          className="bg-lime-500 text-black rounded-full w-8 h-8 hover:bg-lime-400 flex items-center justify-center"
+                          onClick={async () => {
+                            if (!product) return;
+>>>>>>> 870ac2dc463bca530259de0733b88cb90ffbc989
                             try {
                               await addToCart(
                                 product._id,
