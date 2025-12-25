@@ -25,7 +25,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.get("/", getProducts);
-router.get("/related", protect, getRelatedProducts);
+router.get("/related",  getRelatedProducts);
 router.get("/:id", getProductById);
 router.post("/", protect, isAdmin, upload.none(), addProduct);
 router.put("/admin/product/:id", protect, isAdmin, upload.none(), updateProduct);
