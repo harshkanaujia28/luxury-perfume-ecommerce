@@ -81,7 +81,9 @@ export const addProduct = async (req, res) => {
       brandimage: req.body.brandimage || "",
       description: req.body.description,
       price: Number(req.body.price),
-      originalPrice: req.body.originalPrice ? Number(req.body.originalPrice) : null,
+      originalPrice: req.body.originalPrice
+        ? Number(req.body.originalPrice)
+        : null,
       stock: Number(req.body.stock),
       features,
       image: images[0] || "",
@@ -89,9 +91,11 @@ export const addProduct = async (req, res) => {
       category: {
         type: category.type || "Perfume",
         gender: category.gender || "Unisex",
-        subCategories: Array.isArray(category.subCategories) ? category.subCategories : [],
+        subCategories: Array.isArray(category.subCategories)
+          ? category.subCategories
+          : [],
       },
-      specifications,  // ✅ Correctly placed here
+      specifications, // ✅ Correctly placed here
       quantity,
       offer: offerToSave, // ✅ safe offer
     });
@@ -107,8 +111,6 @@ export const addProduct = async (req, res) => {
     });
   }
 };
-
-
 
 // ================= Update Product =================
 export const updateProduct = async (req, res) => {
@@ -257,37 +259,44 @@ export const addReview = async (req, res) => {
 
 export const getRelatedProducts = async (req, res) => {
   try {
- 
-
     const { category, subCategories, excludeId, gender } = req.query;
 
-    if (!category) return res.status(400).json({ message: "Category is required" });
-
-    let excludeObjectId = null;
-    if (excludeId) {
-      if (!mongoose.Types.ObjectId.isValid(excludeId)) {
-        console.warn("Invalid excludeId:", excludeId);
-      } else {
-        excludeObjectId = new mongoose.Types.ObjectId(excludeId);
-      }
+    if (!category) {
+      return res.status(400).json({ message: "Category is required" });
     }
-    const query = { "category.type": category };
-    if (excludeObjectId) query._id = { $ne: excludeObjectId };
-    if (gender) query["category.gender"] = gender;
+
+    const query = {
+      "category.type": category,
+    };
+
+    // ✅ Exclude current product
+    if (excludeId && mongoose.Types.ObjectId.isValid(excludeId)) {
+      query._id = { $ne: new mongoose.Types.ObjectId(excludeId) };
+    }
+
+    // ✅ Optional gender filter
+    if (gender) {
+      query["category.gender"] = gender;
+    }
+
+    // ✅ Optional subCategories filter
     if (subCategories) {
-      const subs = Array.isArray(subCategories)
-        ? subCategories
-        : [subCategories];
+      const subs = subCategories.split(",").map((s) => s.trim());
       query["category.subCategories"] = { $in: subs };
     }
+
     const products = await Product.find(query)
       .sort({ createdAt: -1 })
       .limit(8)
-      .lean();  
+      .lean();
+
     return res.status(200).json(products);
   } catch (err) {
-    console.error("Full error stack:", err);
-    return res.status(500).json({ message: "Failed to fetch related products", error: err.message });
+    console.error("getRelatedProducts error:", err);
+    return res.status(500).json({
+      message: "Failed to fetch related products",
+      error: err.message,
+    });
   }
 };
 

@@ -97,7 +97,7 @@ export function OrderManagement() {
       toast({
         title: "Order Updated",
         description: `Order ${orderId} status updated to ${newStatus}.`,
-        variant:"success",
+        variant: "success",
       })
       fetchOrders()
     } catch (err) {
@@ -486,7 +486,10 @@ export function OrderManagement() {
                       <div className="text-right">
                         <p className="font-medium">Qty: {item.quantity}</p>
                         <p className="text-sm text-muted-foreground">Unit: ₹{item.price.toFixed(2)}</p>
-                        <p className="font-medium">Total: ₹{(item.price * item.quantity - (item.offer?.discountApplied || 0)).toFixed(2)}</p>
+                        <p className="font-medium">
+                          Total: ₹{(item.price * item.quantity).toFixed(2)}
+                        </p>
+
                       </div>
                     </div>
                   ))}
@@ -500,7 +503,8 @@ export function OrderManagement() {
                   <CardTitle>Order Summary</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  {/* Subtotal before any offer */}
+
+                  {/* Subtotal (before coupon) */}
                   <div className="flex justify-between">
                     <span>Subtotal</span>
                     <span>
@@ -512,7 +516,7 @@ export function OrderManagement() {
                   </div>
 
                   {/* Offer Discount */}
-                  {selectedOrder.products?.some(p => p.offer?.discountApplied > 0) && (
+                  {/* {selectedOrder.products?.some(p => p.offer?.discountApplied > 0) && (
                     <div className="flex justify-between text-green-600">
                       <span>Offer Applied</span>
                       <span>
@@ -522,32 +526,18 @@ export function OrderManagement() {
                           .toFixed(2)}
                       </span>
                     </div>
-                  )}
+                  )} */}
 
                   {/* Coupon Discount */}
-                  {selectedOrder.couponCode && (selectedOrder.couponDiscount || 0) > 0 && (
+                  {selectedOrder.couponCode && selectedOrder.couponDiscount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Coupon ({selectedOrder.couponCode})</span>
                       <span>-₹{selectedOrder.couponDiscount.toFixed(2)}</span>
                     </div>
                   )}
 
-
-
-                  {/* Tax */}
-                  <div className="flex justify-between">
-                    <span>Tax (10%)</span>
-                    <span>
-                      ₹
-                      {(
-                        selectedOrder.taxAmount ||
-                        (selectedOrder.products.reduce((sum: number, p: any) => sum + (p.price * p.quantity - (p.offer?.discountApplied || 0)), 0) * 0.1)
-                      ).toFixed(2)}
-                    </span>
-                  </div>
-
                   {/* Delivery Fee */}
-                  {selectedOrder.deliveryFee && (
+                  {selectedOrder.deliveryFee > 0 && (
                     <div className="flex justify-between">
                       <span>Delivery Fee</span>
                       <span>₹{selectedOrder.deliveryFee.toFixed(2)}</span>
@@ -556,13 +546,15 @@ export function OrderManagement() {
 
                   <Separator />
 
-                  {/* Final Total */}
+                  {/* Final Total (SOURCE OF TRUTH) */}
                   <div className="flex justify-between font-bold text-lg">
                     <span>Total</span>
                     <span>₹{selectedOrder.finalTotal.toFixed(2)}</span>
                   </div>
+
                 </CardContent>
               </Card>
+
 
 
             </div>

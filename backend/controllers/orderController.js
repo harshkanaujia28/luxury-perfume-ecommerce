@@ -12,8 +12,14 @@ export const placeOrder = async (req, res) => {
     const { _id: userId, name, email } = req.user;
     const { products, shippingAddress, couponCode, paymentMethod } = req.body;
 
-    if (!["COD", "Razorpay"].includes(paymentMethod)) {
-      return res.status(400).json({ message: "Invalid payment method" });
+    if (!Array.isArray(products) || products.length === 0) {
+      return res.status(400).json({ message: "No products in order" });
+    }
+
+    if (paymentMethod !== "Razorpay") {
+      return res.status(400).json({
+        message: "Only Razorpay payments are allowed",
+      });
     }
 
     let subtotal = 0;
@@ -25,7 +31,9 @@ export const placeOrder = async (req, res) => {
       const dbProduct = await Product.findById(item.product);
 
       if (!dbProduct) {
-        return res.status(400).json({ message: `Product not found: ${item.product}` });
+        return res
+          .status(400)
+          .json({ message: `Product not found: ${item.product}` });
       }
 
       if (dbProduct.stock < item.quantity) {
@@ -38,56 +46,32 @@ export const placeOrder = async (req, res) => {
     // ✅ 2️⃣ Now continue original logic — untouched
     for (const item of products) {
       const dbProduct = await Product.findById(item.product);
-
-      let price = dbProduct.price;
-      let discountApplied = 0;
-      let offerSnapshot = {
-        isActive: false,
-        type: null,
-        value: 0,
-        discountApplied: 0,
-      };
+      const price = item.price;
 
       totalQuantity += item.quantity;
 
+      // ✅ snapshot only (NO recalculation)
+      let offerSnapshot = null;
       if (dbProduct.offer && dbProduct.offer.isActive) {
-        if (item.quantity < (dbProduct.offer.minQuantity || 1)) {
-          return res.status(400).json({
-            message: `Minimum quantity ${dbProduct.offer.minQuantity} required for offer on ${dbProduct.name}`,
-          });
-        }
-
-        if (dbProduct.offer.type === "percentage") {
-          discountApplied = (price * dbProduct.offer.value) / 100;
-        } else if (["fixed", "flat"].includes(dbProduct.offer.type)) {
-          discountApplied = dbProduct.offer.value;
-        }
-
         offerSnapshot = {
           isActive: true,
           type: dbProduct.offer.type,
           value: dbProduct.offer.value,
-          discountApplied,
+          discountApplied: 0, // already applied in frontend price
         };
-
-        dbProduct.offer.usedCount = (dbProduct.offer.usedCount || 0) + 1;
-
-        if (dbProduct.offer.maxUses && dbProduct.offer.usedCount >= dbProduct.offer.maxUses) {
-          dbProduct.offer.isActive = false;
-        }
-
-        await dbProduct.save();
       }
 
-      subtotal += (price - discountApplied) * item.quantity;
+      // ✅ subtotal uses frontend price
+      subtotal += price * item.quantity;
 
       processedProducts.push({
-        ...item,
         product: dbProduct._id,
         name: dbProduct.name,
-        price: dbProduct.price,
+        price,
         brand: dbProduct.brand,
         image: dbProduct.image,
+        quantity: item.quantity,
+        selectedSize: item.selectedSize,
         offer: offerSnapshot,
       });
     }
@@ -118,14 +102,19 @@ export const placeOrder = async (req, res) => {
           message: `Minimum order amount is ${appliedCoupon.minOrder}`,
         });
 
-      if (appliedCoupon.minQuantity && totalQuantity < appliedCoupon.minQuantity)
+      if (
+        appliedCoupon.minQuantity &&
+        totalQuantity < appliedCoupon.minQuantity
+      )
         return res.status(400).json({
           message: `Minimum ${appliedCoupon.minQuantity} items required to use this coupon`,
         });
 
       const userOrders = await Order.find({ user: userId, couponCode });
       if (userOrders.length >= appliedCoupon.perUserLimit)
-        return res.status(400).json({ message: "You have already used this coupon" });
+        return res
+          .status(400)
+          .json({ message: "You have already used this coupon" });
 
       if (appliedCoupon.type.toLowerCase() === "percentage") {
         couponDiscount = (subtotal * appliedCoupon.value) / 100;
@@ -134,15 +123,13 @@ export const placeOrder = async (req, res) => {
       }
     }
 
-    const TAX_RATE = 0.1;
-    const taxableAmount = subtotal - couponDiscount;
-    const taxAmount = Math.round(taxableAmount * TAX_RATE * 100) / 100;
-
-    let finalTotal = taxableAmount + taxAmount + deliveryFee;
-    finalTotal = Math.round(finalTotal * 100) / 100;
+    const finalTotal =
+      Math.round((subtotal - couponDiscount + deliveryFee) * 100) / 100;
 
     const activeOfferProduct = processedProducts.find((p) => p.offer?.isActive);
-    const activeOfferId = activeOfferProduct ? activeOfferProduct.product : null;
+    const activeOfferId = activeOfferProduct
+      ? activeOfferProduct.product
+      : null;
 
     const orderData = {
       user: userId,
@@ -153,7 +140,6 @@ export const placeOrder = async (req, res) => {
       itemsTotal: Math.round(subtotal * 100) / 100,
       deliveryFee,
       deliveryTime,
-      taxAmount,
       discount: Math.round(couponDiscount * 100) / 100,
       finalTotal,
       couponCode: appliedCoupon ? appliedCoupon.code : null,
@@ -185,7 +171,11 @@ export const placeOrder = async (req, res) => {
 
     try {
       const html = getOrderEmailTemplate(order);
-      await sendEmail(process.env.ADMIN_EMAIL, `🛒 New Order #${order._id}`, html);
+      await sendEmail(
+        process.env.ADMIN_EMAIL,
+        `🛒 New Order #${order._id}`,
+        html
+      );
       console.log("✅ Admin notified about new order");
     } catch (err) {
       console.error("❌ Failed to send order notification:", err.message);
@@ -197,7 +187,6 @@ export const placeOrder = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
-
 
 export const getOrderById = async (req, res) => {
   try {

@@ -53,104 +53,54 @@ export const verifyPayment = async (req, res) => {
       orderDetails,
     } = req.body;
 
-    // ✅ Verify Razorpay signature
+    // ✅ Verify signature
     const sign = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSign = crypto
       .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
-      .update(sign.toString())
+      .update(sign)
       .digest("hex");
 
     if (expectedSign !== razorpay_signature) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid signature" });
+      return res.status(400).json({ success: false, message: "Invalid signature" });
     }
 
-    let itemsTotal = 0;
-    let totalDiscount = 0;
+    // ✅ TRUST FRONTEND SNAPSHOT
+    const productsWithDetails = orderDetails.products.map((item) => ({
+      product: item.product,
+      name: item.name,
+      brand: item.brand,
+      image: item.image,
+      price: item.price,               // ✅ discounted price (759.05)
+      quantity: item.quantity,
+      selectedSize: item.selectedSize,
+      offer: item.offer || null,       // ✅ snapshot
+    }));
 
-    // ✅ Map products and calculate offer per product
-    const productsWithDetails = await Promise.all(
-      orderDetails.products.map(async (item) => {
-        const dbProduct = await Product.findById(item.product);
-        if (!dbProduct) throw new Error(`Product ${item.product} not found`);
-
-        let discountApplied = 0;
-        if (dbProduct.offer?.isActive) {
-          if (item.quantity < (dbProduct.offer.minQuantity || 1)) {
-            throw new Error(
-              `Minimum quantity ${dbProduct.offer.minQuantity} required for ${dbProduct.name}`
-            );
-          }
-          if (dbProduct.offer.type === "percentage") {
-            discountApplied =
-              ((dbProduct.price * dbProduct.offer.value) / 100) * item.quantity;
-          } else if (["flat", "fixed"].includes(dbProduct.offer.type)) {
-            discountApplied = dbProduct.offer.value * item.quantity;
-          }
-        }
-
-        const subtotal = dbProduct.price * item.quantity;
-        itemsTotal += subtotal;
-        totalDiscount += discountApplied;
-
-        return {
-          product: dbProduct._id,
-          quantity: item.quantity,
-          selectedSize: item.selectedSize,
-          name: dbProduct.name,
-          brand: dbProduct.brand,
-          price: dbProduct.price,
-          image: dbProduct.image,
-          offer: {
-            isActive: !!dbProduct.offer?.isActive,
-            type: dbProduct.offer?.type || null,
-            value: dbProduct.offer?.value || 0,
-            discountApplied,
-          },
-          subtotalAfterOffer: subtotal - discountApplied,
-        };
-      })
+    const itemsTotal = productsWithDetails.reduce(
+      (sum, p) => sum + p.price * p.quantity,
+      0
     );
 
-    // ✅ Coupon discount applied **after offers**
-    let couponDiscount = 0;
-    if (orderDetails.couponType && orderDetails.couponValue) {
-      const subtotalAfterOffer = itemsTotal - totalDiscount;
-      if (orderDetails.couponType === "Percentage") {
-        couponDiscount = (subtotalAfterOffer * orderDetails.couponValue) / 100;
-      } else if (["Flat", "Fixed"].includes(orderDetails.couponType)) {
-        couponDiscount = orderDetails.couponValue;
-      }
-    }
+    const couponDiscount = orderDetails.couponDiscount || 0;
 
-    // ✅ Tax (10% on subtotal after offer and coupon)
-    const taxableAmount = itemsTotal - totalDiscount - couponDiscount;
-    const taxAmount = parseFloat((taxableAmount * 0.1).toFixed(2));
-
-    // ✅ Final Total
-    const finalTotal = parseFloat(
-      (taxableAmount + taxAmount + (orderDetails.deliveryFee || 0)).toFixed(2)
+    const finalTotal = Number(
+      (itemsTotal - couponDiscount + (orderDetails.deliveryFee || 0)).toFixed(2)
     );
 
-    // ✅ Save order in DB
     const order = new Order({
       user: orderDetails.user,
       customer: orderDetails.customer,
       email: orderDetails.email,
       products: productsWithDetails,
       itemsTotal,
-      discount: totalDiscount,
       couponCode: orderDetails.couponCode || null,
       couponType: orderDetails.couponType || null,
       couponValue: orderDetails.couponValue || 0,
       couponDiscount,
-      taxAmount,
       deliveryFee: orderDetails.deliveryFee || 0,
       finalTotal,
-      activeOffer: orderDetails.activeOffer || null,
       shippingAddress: orderDetails.shippingAddress,
-      deliveryTime: orderDetails.deliveryTime || "1-2 days",
+      deliveryTime: orderDetails.deliveryTime || "4-5 days",
       paymentMethod: "Razorpay",
       paymentStatus: "paid",
       razorpayOrderId: razorpay_order_id,
@@ -161,38 +111,17 @@ export const verifyPayment = async (req, res) => {
 
     await order.save();
 
-    // ✅ Update stock & offer usage
+    // ✅ Stock update ONLY
     for (const item of productsWithDetails) {
-      const dbProduct = await Product.findById(item.product);
-
-      if (!dbProduct) continue;
-
-      // Stock decrement
-      dbProduct.stock = Math.max(0, dbProduct.stock - item.quantity);
-
-      // Offer usage increment
-      if (dbProduct.offer?.isActive) {
-        dbProduct.offer.usedCount =
-          (dbProduct.offer.usedCount || 0) + item.quantity;
-
-        if (
-          dbProduct.offer.maxUses &&
-          dbProduct.offer.usedCount >= dbProduct.offer.maxUses
-        ) {
-          dbProduct.offer.isActive = false;
-        }
-      }
-
-      await dbProduct.save();
-       console.log("Offer used count updated:", dbProduct.offer.usedCount);
+      await Product.findByIdAndUpdate(
+        item.product,
+        { $inc: { stock: -item.quantity } }
+      );
     }
-   
-
-
 
     res.status(200).json({
       success: true,
-      message: "Payment verified and order placed successfully",
+      message: "Payment verified & order placed",
       order,
     });
   } catch (error) {
@@ -200,10 +129,10 @@ export const verifyPayment = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Payment verification failed",
-      error: error.message,
     });
   }
 };
+
 
 export const preValidateOrder = async (req, res) => {
   try {

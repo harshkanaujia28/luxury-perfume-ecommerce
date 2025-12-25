@@ -27,7 +27,7 @@ export default function CheckoutPage() {
 
   const [hasMounted, setHasMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "cod">("razorpay");
+  const [paymentMethod] = useState<"razorpay">("razorpay");
   const [profileData, setProfileData] = useState<any>({});
   const [couponCode, setCouponCode] = useState("");
   const [couponValue, setCouponValue] = useState(0);
@@ -84,10 +84,13 @@ export default function CheckoutPage() {
         : 0;
 
   // ✅ Tax calculation
-  const tax = parseFloat(((subtotalAfterOffer - couponDiscount) * 0.1).toFixed(2));
+
 
   // ✅ Final total including delivery fee
-  const total = parseFloat((subtotalAfterOffer - couponDiscount + tax + (delivery?.deliveryFee || 0)).toFixed(2));
+  const total = parseFloat(
+    (subtotalAfterOffer - couponDiscount + (delivery?.deliveryFee || 0)).toFixed(2)
+  );
+
 
   const formatCurrency = (value: number) =>
     new Intl.NumberFormat("en-IN", {
@@ -249,17 +252,18 @@ export default function CheckoutPage() {
         user: profileData._id,
         customer: profileData.name,
         email: profileData.email,
+
         products,
-        itemsTotal: subtotalAfterOffer,
-        discount: totalOfferDiscount,  // total offer discount
+
         couponCode: couponCode || null,
         couponType: couponType || null,
         couponValue: couponValue || 0,
-        couponDiscount: couponDiscount,
-        taxAmount: tax,
+        couponDiscount,
+
         deliveryFee: delivery?.deliveryFee || 0,
-        finalTotal: total,
+
         activeOffer: activeOfferId,
+
         shippingAddress: {
           address: profileData.address,
           city: profileData.city,
@@ -267,8 +271,10 @@ export default function CheckoutPage() {
           zipCode: profileData.zipCode,
           phone: profileData.phone,
         },
-        deliveryTime: "1-2 days",
+
+        deliveryTime: "4-5 days",
       };
+
       if (typeof window === "undefined") return;
 
 
@@ -325,11 +331,6 @@ export default function CheckoutPage() {
           setIsLoading(false);
           return;
         }
-      } else {
-        await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/orders`, { ...orderPayload, paymentMethod: "COD", paymentStatus: "pending" });
-        toast({ title: "Order Placed", description: "Your order has been placed successfully!", variant: "success" });
-        clearCart();
-        router.push("/orders");
       }
     } catch (err: any) {
       console.error(err);
@@ -474,43 +475,23 @@ export default function CheckoutPage() {
             <div>
               <Card className="bg-zinc-900 border-2 border-lime-500 shadow-xl rounded-2xl">
                 <CardHeader>
-                  <CardTitle className="text-lime-400 text-lg font-bold">Payment Method</CardTitle>
+                  <CardTitle className="text-lime-400 text-lg font-bold">
+                    Payment Method
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="text-lime-300">
-                  <RadioGroup
-                    value={paymentMethod}
-                    onValueChange={(v) => setPaymentMethod(v as "razorpay" | "cod")}
-                    className="flex flex-col space-y-2"
-                  >
-                    <label className="flex items-center space-x-2 cursor-pointer">
-                      <RadioGroupItem
-                        value="razorpay"
-                        id="razorpay"
-                        className="w-5 h-5 border border-lime-500 rounded-full bg-black flex items-center justify-center focus:outline-none"
-                      >
-                        <RadioGroupIndicator className="w-2 h-2 bg-lime-500 rounded-full" />
-                      </RadioGroupItem>
-                      <Label htmlFor="razorpay" className="text-lime-300 font-medium">
-                        Online Payment (Razorpay)
-                      </Label>
-                    </label>
 
-                    <label className="flex items-center space-x-2 cursor-pointer">
-                      <RadioGroupItem
-                        value="cod"
-                        id="cod"
-                        className="w-5 h-5 border border-lime-500 rounded-full bg-black flex items-center justify-center focus:outline-none"
-                      >
-                        <RadioGroupIndicator className="w-2 h-2 bg-lime-500 rounded-full" />
-                      </RadioGroupItem>
-                      <Label htmlFor="cod" className="text-lime-300 font-medium">
-                        Cash on Delivery (COD)
-                      </Label>
-                    </label>
-                  </RadioGroup>
+                <CardContent className="text-lime-300 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block h-2 w-2 rounded-full bg-lime-500" />
+                    <p className="font-medium">Online Payment (Razorpay)</p>
+                  </div>
 
+                  <p className="text-xs text-gray-400">
+                    Secure payment via UPI, Cards, Net Banking & Wallets
+                  </p>
                 </CardContent>
               </Card>
+
 
               <Card className="bg-zinc-900 border border-lime-500/30 shadow-lg rounded-2xl mt-2">
                 <CardHeader>
@@ -546,15 +527,23 @@ export default function CheckoutPage() {
                   <Separator className="bg-lime-500/30" />
 
                   <div className="flex justify-between"><span>Subtotal</span><span>₹{subtotalAfterOffer.toFixed(2)}</span></div>
-                  <div className="flex justify-between"><span>Tax</span><span>₹{tax.toFixed(2)}</span></div>
+
                   {delivery && <div className="flex justify-between"><span>Delivery Fee</span><span>₹{delivery.deliveryFee.toFixed(2)}</span></div>}
                   {couponValue > 0 && <div className="flex justify-between text-lime-400"><span>Coupon Discount</span><span>- ₹{couponType === "Percentage" ? ((couponValue / 100) * subtotalAfterOffer).toFixed(2) : couponValue.toFixed(2)}</span></div>}
                   <Separator className="bg-lime-500/30" />
                   <div className="flex justify-between font-semibold text-lg text-lime-400"><span>Total</span><span>₹{total.toFixed(2)}</span></div>
 
-                  <Button type="submit" className="w-full bg-lime-500 text-black hover:bg-lime-600 transition font-semibold" size="lg" disabled={isLoading}>
-                    {isLoading ? "Processing..." : paymentMethod === "cod" ? `Place COD Order - ₹${total.toFixed(2)}` : `Pay ₹${total.toFixed(2)} Online`}
+                  <Button
+                    type="submit"
+                    size="lg"
+                    disabled={isLoading}
+                    className="w-full bg-lime-500 text-black hover:bg-lime-600 transition font-semibold"
+                  >
+                    {isLoading
+                      ? "Processing..."
+                      : `Pay ₹${total.toFixed(2)} Securely`}
                   </Button>
+
                 </CardContent>
               </Card>
             </div>
