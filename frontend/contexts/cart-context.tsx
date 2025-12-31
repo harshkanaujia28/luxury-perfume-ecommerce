@@ -7,11 +7,11 @@ import {
   useReducer,
   ReactNode,
 } from "react";
-import api from "@/utils/axios"; // <-- Global Axios with token
+import api from "@/utils/axios";
 
-// Types
+// ---------------- Types ----------------
 export interface CartItem {
-  _id: string; // for cart item id (for update/remove)
+  _id: string;
   product: {
     _id: string;
     name: string;
@@ -22,10 +22,8 @@ export interface CartItem {
   };
   quantity: number;
   selectedSize: string;
-  price: number;
+  price: number; // final price (after offer)
 }
-
-
 
 interface CartState {
   items: CartItem[];
@@ -35,17 +33,29 @@ interface CartState {
 
 interface CartContextType {
   state: CartState;
-  addToCart: (productId: string, quantity?: number, selectedSize?: string) => Promise<void>;
+  addToCart: (
+    productId: string,
+    quantity?: number,
+    selectedSize?: string,
+    price?: number
+  ) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
   updateQuantity: (productId: string, quantity: number) => Promise<void>;
   clearCart: () => Promise<void>;
   refreshCart: () => Promise<void>;
 }
 
-// Context Initialization
+// ---------------- Meta Pixel helper ----------------
+const trackMetaEvent = (event: string, data?: Record<string, any>) => {
+  if (typeof window !== "undefined" && (window as any).fbq) {
+    (window as any).fbq("track", event, data);
+  }
+};
+
+// ---------------- Context ----------------
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// Reducer
+// ---------------- Reducer ----------------
 type CartAction = { type: "SET_CART"; payload: CartItem[] };
 
 function cartReducer(state: CartState, action: CartAction): CartState {
@@ -53,8 +63,14 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     case "SET_CART": {
       const items = action.payload;
 
-      const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+      const total = items.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      );
+      const itemCount = items.reduce(
+        (sum, item) => sum + item.quantity,
+        0
+      );
 
       return { ...state, items, total, itemCount };
     }
@@ -63,7 +79,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
   }
 }
 
-// Provider Component
+// ---------------- Provider ----------------
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [state, dispatch] = useReducer(cartReducer, {
     items: [],
@@ -71,24 +87,22 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     itemCount: 0,
   });
 
-  // Load Cart on Mount
   useEffect(() => {
     loadCart();
   }, []);
-
 
   const loadCart = async () => {
     try {
       const res = await api.get("/cart");
       dispatch({ type: "SET_CART", payload: res.data.items });
-      console.log("🛒 Cart Item:", res.data.items);
-
     } catch (err) {
-      console.error("Failed to fetch cart:", err);
+      console.error("❌ Failed to fetch cart:", err);
     }
   };
+
   const refreshCart = loadCart;
 
+  // ---------------- Add To Cart (Meta integrated) ----------------
   const addToCart = async (
     productId: string,
     quantity: number = 1,
@@ -100,17 +114,22 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         productId,
         quantity,
         selectedSize,
-         price, // ✅ send to backend
+        price,
       });
-      console.log("API sent:", { productId, quantity, selectedSize });
 
       dispatch({ type: "SET_CART", payload: res.data.items });
-      console.log(res.data.items);
+
+      // 🔥 Meta Pixel – AddToCart (AFTER success)
+      trackMetaEvent("AddToCart", {
+        content_ids: [productId],
+        content_type: "product",
+        value: price * quantity,
+        currency: "INR",
+      });
     } catch (err) {
       console.error("❌ addToCart error:", err);
     }
   };
-
 
   const removeFromCart = async (productId: string) => {
     try {
@@ -139,17 +158,26 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-
   return (
-    <CartContext.Provider value={{ state, addToCart, removeFromCart, updateQuantity, clearCart, refreshCart, }}>
+    <CartContext.Provider
+      value={{
+        state,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        refreshCart,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
 };
 
-// Custom Hook
+// ---------------- Hook ----------------
 export const useCart = () => {
   const context = useContext(CartContext);
-  if (!context) throw new Error("useCart must be used within a CartProvider");
+  if (!context)
+    throw new Error("useCart must be used within a CartProvider");
   return context;
 };

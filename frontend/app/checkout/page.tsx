@@ -16,6 +16,11 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import axios from "@/utils/axios";
 import { loadRazorpayScript } from "@/utils/razorpay";
+const trackMetaEvent = (event: string, data?: Record<string, any>) => {
+  if (typeof window !== "undefined" && (window as any).fbq) {
+    (window as any).fbq("track", event, data);
+  }
+};
 
 
 export default function CheckoutPage() {
@@ -312,6 +317,16 @@ export default function CheckoutPage() {
                   orderDetails: orderPayload,
                   paymentMethod: "Razorpay",
                   paymentStatus: "paid",
+                });
+                trackMetaEvent("Purchase", {
+                  value: total,
+                  currency: "INR",
+                  content_type: "product",
+                  contents: state.items.map((item) => ({
+                    id: item.product?._id,
+                    quantity: item.quantity,
+                    item_price: item.price,
+                  })),
                 });
                 toast({ title: "Payment Successful 🎉", description: "Your order has been placed successfully!", variant: "success" });
                 clearCart();
