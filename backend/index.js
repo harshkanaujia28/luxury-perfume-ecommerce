@@ -6,15 +6,13 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import http from "http";
 import { Server as SocketIOServer } from "socket.io";
-import path from "path";
+
+// Routes
 import bannerRoutes from "./routes/banners.js";
-import uploadRoutes from "./routes/upload.routes.js"
+import uploadRoutes from "./routes/upload.routes.js";
 import offerRoutes from "./routes/offerRoutes.js";
-
-
-// Other route imports
 import authRoutes from "./routes/auth.js";
-import userRoutes from "./routes/userRoutes.js"; // ✅ correct
+import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/products.js";
 import orderRoutes from "./routes/orders.js";
 import returnRoutes from "./routes/returns.js";
@@ -32,50 +30,50 @@ import dashboardRoutes from "./routes/dashboard.js";
 import settingsRoutes from "./routes/settingsRoutes.js";
 import reportRoutes from "./routes/reportRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
-import couponRoutes from "./routes/couponRoutes.js"
-
-
+import couponRoutes from "./routes/couponRoutes.js";
 
 dotenv.config();
+
 const app = express();
 const server = http.createServer(app);
+
+/* ======================================================
+   ✅ CORS (FINAL – Render + Vercel SAFE)
+   ====================================================== */
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL, // e.g. https://luxury-perfume-ecommerce.vercel.app
+    credentials: true,
+  })
+);
+
+/* ======================================================
+   Middleware
+   ====================================================== */
+app.use(express.json());
+app.use(cookieParser());
+
+// Serve uploaded files
+app.use("/uploads", express.static("uploads"));
+
+/* ======================================================
+   Socket.IO
+   ====================================================== */
 const io = new SocketIOServer(server, {
   cors: {
     origin: process.env.CLIENT_URL,
     credentials: true,
   },
 });
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://zafrine.in", // apna domain
-  "https://www.zafrine.in"
-];
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
+io.on("connection", (socket) => {
+  console.log("Socket connected:", socket.id);
+});
 
-
-// Middleware
-// app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
-app.use(express.json());
-app.use(cookieParser());
-
-// ✅ Serve uploaded files from /uploads
-app.use("/uploads", express.static("uploads"));
-
-// Routes
-app.use("/api/coupons", couponRoutes)
-app.use("/users", userRoutes);
+/* ======================================================
+   Routes
+   ====================================================== */
+app.use("/api/coupons", couponRoutes);
 app.use("/api/offers", offerRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
@@ -98,33 +96,37 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/settings", settingsRoutes);
 app.use("/api/reports", reportRoutes);
 app.use("/api/payment", paymentRoutes);
+app.use("/api/upload", uploadRoutes);
 
-// ✅ Upload Route
-app.use("/api/upload", uploadRoutes); // 👈 mount multer route here
-
+/* ======================================================
+   Health Check
+   ====================================================== */
 app.get("/", (req, res) => {
   res.send("Backend is running");
 });
 
-
-// Socket connection
-io.on("connection", (socket) => {
-  console.log("Socket connected:", socket.id);
-});
-
-// MongoDB connection
+/* ======================================================
+   MongoDB + Server Start
+   ====================================================== */
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected");
-    server.listen(process.env.PORT || 5000, () =>
-      console.log(`Server running on port ${process.env.PORT || 5000}`)
-    );
+    server.listen(process.env.PORT || 5000, () => {
+      console.log(`Server running on port ${process.env.PORT || 5000}`);
+    });
   })
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .catch((err) => {
+    console.error("MongoDB connection error:", err);
+    process.exit(1);
+  });
 
-// Error handling middleware
+/* ======================================================
+   Error Handler
+   ====================================================== */
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: "Something went wrong" });
+  console.error(err);
+  res.status(500).json({
+    message: err.message || "Internal Server Error",
+  });
 });
