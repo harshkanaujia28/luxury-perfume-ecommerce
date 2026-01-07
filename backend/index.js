@@ -1,4 +1,5 @@
 // server.js (main backend entry point)
+
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
@@ -7,7 +8,9 @@ import cookieParser from "cookie-parser";
 import http from "http";
 import { Server as SocketIOServer } from "socket.io";
 
+// ==============================
 // Routes
+// ==============================
 import bannerRoutes from "./routes/banners.js";
 import uploadRoutes from "./routes/upload.routes.js";
 import offerRoutes from "./routes/offerRoutes.js";
@@ -37,31 +40,47 @@ dotenv.config();
 const app = express();
 const server = http.createServer(app);
 
-/* ======================================================
-   ✅ CORS (FINAL – Render + Vercel SAFE)
-   ====================================================== */
+// ==================================================
+// ✅ CORS CONFIG (RENDER + VERCEL SAFE)
+// ==================================================
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://luxury-perfume-ecommerce.vercel.app",
+  "https://zafrine.in",
+  "https://www.zafrine.in",
+];
+
 app.use(
   cors({
-    origin: process.env.CLIENT_URL, // e.g. https://luxury-perfume-ecommerce.vercel.app
+    origin: function (origin, callback) {
+      // Allow Postman / server-to-server
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, origin); // 🔑 IMPORTANT
+      }
+
+      return callback(new Error("Not allowed by CORS"));
+    },
     credentials: true,
   })
 );
 
-/* ======================================================
-   Middleware
-   ====================================================== */
+// ==================================================
+// Middleware
+// ==================================================
 app.use(express.json());
 app.use(cookieParser());
 
 // Serve uploaded files
 app.use("/uploads", express.static("uploads"));
 
-/* ======================================================
-   Socket.IO
-   ====================================================== */
+// ==================================================
+// Socket.IO
+// ==================================================
 const io = new SocketIOServer(server, {
   cors: {
-    origin: process.env.CLIENT_URL,
+    origin: allowedOrigins,
     credentials: true,
   },
 });
@@ -70,9 +89,9 @@ io.on("connection", (socket) => {
   console.log("Socket connected:", socket.id);
 });
 
-/* ======================================================
-   Routes
-   ====================================================== */
+// ==================================================
+// Routes
+// ==================================================
 app.use("/api/coupons", couponRoutes);
 app.use("/api/offers", offerRoutes);
 app.use("/api/auth", authRoutes);
@@ -98,16 +117,16 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/upload", uploadRoutes);
 
-/* ======================================================
-   Health Check
-   ====================================================== */
+// ==================================================
+// Health Check
+// ==================================================
 app.get("/", (req, res) => {
-  res.send("Backend is running");
+  res.send("Backend is running 🚀");
 });
 
-/* ======================================================
-   MongoDB + Server Start
-   ====================================================== */
+// ==================================================
+// MongoDB + Server Start
+// ==================================================
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
@@ -121,11 +140,11 @@ mongoose
     process.exit(1);
   });
 
-/* ======================================================
-   Error Handler
-   ====================================================== */
+// ==================================================
+// Global Error Handler
+// ==================================================
 app.use((err, req, res, next) => {
-  console.error(err);
+  console.error("❌ Error:", err.message);
   res.status(500).json({
     message: err.message || "Internal Server Error",
   });
